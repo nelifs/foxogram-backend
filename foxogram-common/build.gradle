@@ -1,7 +1,9 @@
 plugins {
+    id 'application'
     id 'java'
 }
 
+mainClassName = 'su.foxogram.Main'
 group = 'su.foxogram'
 
 repositories {
@@ -9,10 +11,5 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-test {
-    useJUnitPlatform()
+    implementation 'com.google.protobuf:protobuf-java:3.19.6'
 }

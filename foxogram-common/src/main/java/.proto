@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package foxoproto;
+
+option java_multiple_files = true;
+option java_package = "su.foxogram.protos";
+option java_outer_classname = "Protos";
+
+message AmqpMessage {
+    int32 type = 1;
+    bytes bytes = 2;
+}

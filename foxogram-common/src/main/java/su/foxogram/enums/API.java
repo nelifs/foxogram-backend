@@ -18,7 +18,7 @@ public class API {
     }
 
     public enum Endpoints {
-        MESSAGES(Routes.DATA.route + "/messages"),
+        MESSAGES(Routes.DATA.route + "/messages"),  
         USERS(Routes.DATA.route + "/users"),
         ATTACHMENTS(Routes.DATA.route + "/attachments"),
         AVATARS(Routes.DATA.route + "/avatars");

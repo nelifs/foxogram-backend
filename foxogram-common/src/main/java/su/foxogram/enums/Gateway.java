@@ -2,22 +2,22 @@ package su.foxogram.enums;
 
 public class Gateway {
     public enum Events {
-        MESSAGE_CREATE("01"),
-        MESSAGE_UPDATE("02"),
-        MESSAGE_DELETE("03"),
-        USER_UPDATE("04"),
-        HELLO("05"),
-        HEARTBEAT("06"),
-        READY("07");
+        MESSAGE_CREATE(101),
+        MESSAGE_UPDATE(102),
+        MESSAGE_DELETE(103),
+        USER_UPDATE(201),
+        HELLO(301),
+        HEARTBEAT(302),
+        READY(304),
+        OTTER(1);
 
-        private final String event;
+        private final int event;
 
-        Events(final String event) {
+        Events(int event) {
             this.event = event;
         }
 
-        @Override
-        public String toString() {
+        public int getValue() {
             return event;
         }
     }
