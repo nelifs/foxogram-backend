@@ -18,6 +18,7 @@
 We would like to thank the following people and organizations for their valuable input and support in the development of the backend:
 
 - **Java** for making it possible for this project to exist
+- **Otters** they are just so cute :3
 
 Without your help, the **Foxogram Backend** project would not have been possible. We are grateful for your participation and support!
 
