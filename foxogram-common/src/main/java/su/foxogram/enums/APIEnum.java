@@ -19,6 +19,8 @@ public class APIEnum {
     }
 
     public enum Endpoints {
+        LOGIN(Routes.AUTH.route + "/login"),
+        CREATE(Routes.AUTH.route + "/create"),
         MESSAGES(Routes.DATA.route + "/messages"),  
         USERS(Routes.DATA.route + "/users"),
         ATTACHMENTS(Routes.DATA.route + "/attachments"),
