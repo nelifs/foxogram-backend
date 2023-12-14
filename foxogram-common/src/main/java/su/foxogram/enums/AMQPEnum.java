@@ -1,6 +1,6 @@
 package su.foxogram.enums;
 
-public class AMQP {
+public class AMQPEnum {
     public enum Events {
         AVATAR_UPLOAD(401),
         ATTACHMENT_UPLOAD(402);

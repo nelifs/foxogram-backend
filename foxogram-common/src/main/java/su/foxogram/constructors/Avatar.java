@@ -7,12 +7,12 @@ public class Avatar {
         this.etag = etag;
     }
 
-    public Avatar create() {
-        return null;
+    public void create() {
+
     }
 
-    public Avatar delete() {
-        return null;
+    public void delete() {
+
     }
 
     public String getEtag() {

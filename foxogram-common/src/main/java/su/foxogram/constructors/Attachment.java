@@ -8,12 +8,12 @@ public class Attachment {
         this.hash = hash;
     }
 
-    public Attachment create() {
-        return null;
+    public void create() {
+
     }
 
-    public Attachment delete() {
-        return null;
+    public void delete() {
+
     }
 
     public String getEtag() {

@@ -28,13 +28,14 @@ public class User {
     public void create() {
     }
 
-    public void modify() {
-    }
-
     public void disable() {
     }
 
     public void delete() {
+    }
+
+    public void setAvatar() {
+
     }
 
     public String getId() {

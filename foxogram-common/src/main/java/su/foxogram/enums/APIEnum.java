@@ -1,9 +1,11 @@
 package su.foxogram.enums;
 
-public class API {
+import static su.foxogram.Main.dotenv;
+
+public class APIEnum {
     public enum Routes {
-        DATA("/data"),
-        AUTH("/auth");
+        DATA("v" + dotenv.get("API_VERSION") + "/data"),
+        AUTH("v" + dotenv.get("API_VERSION") + "/auth");
 
         private final String route;
 
@@ -11,8 +13,7 @@ public class API {
             this.route = route;
         }
 
-        @Override
-        public String toString() {
+        public String getValue() {
             return route;
         }
     }
@@ -29,8 +30,7 @@ public class API {
             this.endpoint = endpoint;
         }
 
-        @Override
-        public String toString() {
+        public String getValue() {
             return endpoint;
         }
     }

@@ -1,6 +1,6 @@
 package su.foxogram.enums;
 
-public class Gateway {
+public class GatewayEnum {
     public enum Events {
         MESSAGE_CREATE(101),
         MESSAGE_UPDATE(102),

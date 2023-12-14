@@ -15,16 +15,20 @@ public class Message {
         this.attachments = attachments;
     }
 
-    public Message create() {
-        return null;
+    public void create() {
+        
     }
 
-    public Message modify() {
-        return null;
+    public void modify() {
+
     }
 
-    public Message delete() {
-        return null;
+    public void delete() {
+
+    }
+
+    public void setContent() {
+
     }
 
     public String getId() {
