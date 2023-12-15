@@ -1,6 +1,7 @@
 package su.foxogram.endpoints.auth;
 
 
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import su.foxogram.enums.APIEnum;
@@ -13,6 +14,10 @@ import java.util.HashMap;
 public class LoginEndpoint {
 
     public static void handle(HttpServerRequest request, HttpServerResponse response, HashMap<String, String> data) throws IOException {
+        HttpMethod method = request.method();
 
+        if (method == HttpMethod.POST) {
+
+        }
     }
 }

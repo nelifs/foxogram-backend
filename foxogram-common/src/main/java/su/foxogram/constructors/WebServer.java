@@ -7,6 +7,8 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CorsHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.structures.Handler;
 import su.foxogram.util.Converter;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class WebServer {
+    private static final Logger LOGGER = LogManager.getLogger(Handler.class);
     public static final VertxOptions options = new VertxOptions();
     public static final Vertx vertx = Vertx.vertx(options);
     public static final io.vertx.ext.web.Router router = io.vertx.ext.web.Router.router(vertx);
@@ -32,9 +35,9 @@ public class WebServer {
     public void start() {
         vertx.createHttpServer().requestHandler(router).listen(PORT, ar -> {
             if (ar.succeeded()) {
-                System.out.println("Server started on port " + PORT);
+                LOGGER.info("Server started on port " + PORT);
             } else {
-                System.out.println("Failed to start server: " + ar.cause().getMessage());
+                LOGGER.error("Failed to start server: " + ar.cause().getMessage());
             }
         });
     }
