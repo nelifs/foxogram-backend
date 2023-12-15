@@ -1,6 +1,7 @@
 package su.foxogram.constructors;
 
 import io.vertx.core.Handler;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
@@ -15,7 +16,7 @@ public class Router {
         router.route().handler(BodyHandler.create());
     }
 
-    public void addHandler(Handler<RoutingContext> Handler) {
-        router.post().handler(Handler);
+    public void addHandler(HttpMethod method, Handler<RoutingContext> handler) {
+        router.route().method(method).handler(handler);
     }
 }

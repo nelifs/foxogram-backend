@@ -1,7 +1,10 @@
 package su.foxogram.structures;
 
+import com.google.protobuf.Api;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import su.foxogram.Main;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.enums.PackagesEnum;
@@ -14,10 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Handler {
+    private static final Logger LOGGER = LogManager.getLogger(Handler.class);
     private static List<Class<?>> classes;
 
-    public static void initClasses(PackagesEnum.Packages name) {
-        String packageName = "su.foxogram." + name;
+    public static void initEndpointsForRoute(APIEnum.Routes route) {
+        String packageName = "su.foxogram.endpoints" + route;
         URL resourceURL = Main.class.getClassLoader().getResource(packageName.replace(".", "/"));
         classes = new ArrayList<>();
         assert resourceURL != null;

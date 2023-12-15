@@ -20,7 +20,7 @@ public class AuthRoute {
 
     public static void main(String[] args) {
         new Router(router).addHandler(AuthRoute::handlePost);
-        Handler.initClasses(PackagesEnum.Packages.ENDPOINTS);
+        Handler.initEndpointsForRoute(APIEnum.Routes.AUTH_RAW);
     }
 
     private static void handlePost(RoutingContext context) {

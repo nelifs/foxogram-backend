@@ -5,7 +5,9 @@ import static su.foxogram.Main.dotenv;
 public class APIEnum {
     public enum Routes {
         DATA("v" + dotenv.get("API_VERSION") + "/data"),
-        AUTH("v" + dotenv.get("API_VERSION") + "/auth");
+        DATA_RAW("data"),
+        AUTH("v" + dotenv.get("API_VERSION") + "/auth"),
+        AUTH_RAW("auth");
 
         private final String route;
 

@@ -1,4 +1,4 @@
-package su.foxogram.routes.auth.endpoints;
+package su.foxogram.endpoints.data;
 
 
 import io.vertx.core.http.HttpServerRequest;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 @Endpoint(path = APIEnum.Endpoints.LOGIN)
-public class LoginEndpoint {
+public class AvatarsEndpoint {
 
     public static void handle(HttpServerRequest request, HttpServerResponse response, HashMap<String, String> data) throws IOException {
 
