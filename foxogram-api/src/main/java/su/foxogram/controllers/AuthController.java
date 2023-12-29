@@ -26,20 +26,21 @@ import java.util.List;
 public class AuthController {
 
 	private final EmailService emailService;
+	private final EmailVerifyRepository emailVerifyRepository;
+	private final UserRepository userRepository;
+	private final SessionRepository sessionRepository;
 
 	@Autowired
-	public AuthController(EmailService emailService) {
+	public AuthController(
+			EmailService emailService,
+			EmailVerifyRepository emailVerifyRepository,
+			UserRepository userRepository,
+			SessionRepository sessionRepository) {
 		this.emailService = emailService;
+		this.emailVerifyRepository = emailVerifyRepository;
+		this.userRepository = userRepository;
+		this.sessionRepository = sessionRepository;
 	}
-
-	@Autowired
-	EmailVerifyRepository emailVerifyRepository;
-
-	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	SessionRepository sessionRepository;
 
 	@PostMapping("/create")
 	public ResponseEntity<String> create(@RequestBody CreateRequest body) {
@@ -74,7 +75,17 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
 		User user = userRepository.findByEmail(loginRequest.getEmail());
-		if (user != null && Encryptor.verifyPassword(loginRequest.getPassword(), user.getPassword())) {
+
+		if (user != null && !user.isEmailVerified()) {
+			return ResponseEntity
+					.status(HttpStatus.FORBIDDEN)
+					.body(new RequestMessage()
+							.setSuccess(false)
+							.addField("message", "You need to verify your email!")
+							.build());
+		}
+
+		if (user != null && Encryptor.verifyPassword(loginRequest.getPassword(), user.getPassword()) && user.isEmailVerified()) {
 			return ResponseEntity.ok(new RequestMessage()
 							.setSuccess(true)
 							.addField("message", "You have been successfully signed in!")
@@ -94,45 +105,16 @@ public class AuthController {
 		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
 		String token = request.getParameter("token");
 
-		if (verify != null) {
-			User user = userRepository.findByAccessToken(token);
 
-			if (user == null) {
-				return ResponseEntity
-						.status(HttpStatus.FORBIDDEN)
-						.body(new RequestMessage()
-								.setSuccess(false)
-								.addField("message", "You can only verify your email!")
-								.build());
+		if (verify == null) {
+			verify = emailVerifyRepository.findByDigitCode(code);
+			if (verify != null) {
+				return handleEmailVerification(code, token, verify);
+			} else {
+				return handleInvalidCode();
 			}
-
-			user.setEmailVerified(true);
-			userRepository.save(user);
-			emailVerifyRepository.delete(verify);
-
-			long id = user.getId();
-			String accessToken = user.getAccessToken();
-			String email = user.getEmail();
-			long createdAt = user.getCreatedAt();
-			long expiresAt = createdAt + TokenEnum.Lifetime.RESUME_TOKEN.getValue();
-			String resumeToken = JwtService.generate(id, TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
-
-			sessionRepository.save(new Session(id, accessToken, resumeToken, user.getCreatedAt(), expiresAt));
-
-			return ResponseEntity.ok(new RequestMessage()
-							.setSuccess(true)
-							.addField("message", "You successfully verified your email")
-							.addField("email", email)
-							.addField("accessToken", accessToken)
-							.addField("resumeToken", resumeToken)
-							.build());
 		} else {
-			return ResponseEntity
-					.status(HttpStatus.NOT_FOUND)
-					.body(new RequestMessage()
-							.setSuccess(false)
-							.addField("message", "Code is invalid!")
-							.build());
+			return handleInvalidCode();
 		}
 	}
 
@@ -164,5 +146,48 @@ public class AuthController {
 				.addField("email", email)
 				.addField("accessToken", accessToken)
 				.build());
+	}
+
+	private ResponseEntity<String> handleEmailVerification(String code, String token, EmailVerification verify) {
+		User user = userRepository.findByAccessToken(token);
+
+		if (user == null) {
+			return ResponseEntity
+					.status(HttpStatus.FORBIDDEN)
+					.body(new RequestMessage()
+							.setSuccess(false)
+							.addField("message", "You can only verify your email!")
+							.build());
+		}
+
+		user.setEmailVerified(true);
+		userRepository.save(user);
+		emailVerifyRepository.delete(verify);
+
+		long id = user.getId();
+		String accessToken = user.getAccessToken();
+		String email = user.getEmail();
+		long createdAt = user.getCreatedAt();
+		long expiresAt = createdAt + TokenEnum.Lifetime.RESUME_TOKEN.getValue();
+		String resumeToken = JwtService.generate(id, TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
+
+		sessionRepository.save(new Session(id, accessToken, resumeToken, user.getCreatedAt(), expiresAt));
+
+		return ResponseEntity.ok(new RequestMessage()
+				.setSuccess(true)
+				.addField("message", "You successfully verified your email")
+				.addField("email", email)
+				.addField("accessToken", accessToken)
+				.addField("resumeToken", resumeToken)
+				.build());
+	}
+
+	private ResponseEntity<String> handleInvalidCode() {
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(new RequestMessage()
+						.setSuccess(false)
+						.addField("message", "Code is invalid!")
+						.build());
 	}
 }
