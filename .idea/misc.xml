@@ -1,4 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="EntryPointsManager">
+    <list size="7">
+      <item index="0" class="java.lang.String" itemvalue="org.springframework.context.annotation.Bean" />
+      <item index="1" class="java.lang.String" itemvalue="org.springframework.context.annotation.Configuration" />
+      <item index="2" class="java.lang.String" itemvalue="org.springframework.data.cassandra.repository.AllowFiltering" />
+      <item index="3" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.GetMapping" />
+      <item index="4" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.PostMapping" />
+      <item index="5" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.RestController" />
+      <item index="6" class="java.lang.String" itemvalue="su.foxogram.interfaces.Endpoint" />
+    </list>
+    <writeAnnotations>
+      <writeAnnotation name="org.springframework.beans.factory.annotation.Value" />
+    </writeAnnotations>
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_X" default="true" project-jdk-name="azul-21" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />

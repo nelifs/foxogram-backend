@@ -18,4 +18,8 @@ public class Avatar {
     public String getEtag() {
         return etag;
     }
+
+    public void setEtag(String etag) {
+        this.etag = etag;
+    }
 }

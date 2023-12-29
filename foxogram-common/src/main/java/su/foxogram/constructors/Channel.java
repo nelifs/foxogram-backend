@@ -1,40 +1,45 @@
 package su.foxogram.constructors;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.Table;
+
+import java.lang.reflect.Member;
 import java.util.List;
 
+@Table("channels")
 public class Channel {
-    public String id, name;
-    public List<User> users;
-    public List<Message> messages;
 
-    public Channel(String id, String name, List<User> users, List<Message> messages) {
+    @Id
+    @PrimaryKey
+    public String id;
+
+    @Column("name")
+    public String name;
+
+    public Channel() {
+
+    }
+
+    public Channel(String id, String name) {
         this.id = id;
         this.name = name;
-        this.users = users;
-        this.messages = messages;
-    }
-
-    public void create() {
-
-    }
-
-    public void delete() {
-
     }
 
     public String getId() {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public List<Message> getMessages() {
-        return messages;
+    public void setName(String name) {
+        this.name = name;
     }
 }

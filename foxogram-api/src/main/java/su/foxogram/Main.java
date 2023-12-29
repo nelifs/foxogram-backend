@@ -1,14 +1,11 @@
 package su.foxogram;
 
-import su.foxogram.constructors.WebServer;
-import su.foxogram.enums.APIEnum;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        new WebServer()
-                .setEndpointsHandler(APIEnum.Routes.AUTH_RAW)
-                .setEndpointsHandler(APIEnum.Routes.DATA_RAW)
-                .setPort(8080)
-                .start();
+        SpringApplication.run(Main.class, args);
     }
 }
