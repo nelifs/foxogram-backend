@@ -12,24 +12,24 @@ public class EmailVerification {
 	@PrimaryKey
 	public long userId;
 
+	@Column("type")
+	public String type;
+
 	@Column("digitcode")
 	public String digitCode;
 
 	@Column("lettercode")
 	public String letterCode;
 
-	@Column("verified")
-	public boolean verified;
-
 	public EmailVerification() {
 
 	}
 
-	public EmailVerification(long userId, String digitCode, String letterCode, boolean verified) {
+	public EmailVerification(long userId, String type, String digitCode, String letterCode) {
 		this.userId = userId;
+		this.type = type;
 		this.digitCode = digitCode;
 		this.letterCode = letterCode;
-		this.verified = verified;
 	}
 
 	public long getUserId() {
@@ -38,6 +38,14 @@ public class EmailVerification {
 
 	public void setUserId(long userId) {
 		this.userId = userId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public String getDigitCode() {
@@ -54,13 +62,5 @@ public class EmailVerification {
 
 	public void setLetterCode(String letterCode) {
 		this.letterCode = letterCode;
-	}
-
-	public boolean isVerified() {
-		return verified;
-	}
-
-	public void setVerified(boolean verified) {
-		this.verified = verified;
 	}
 }

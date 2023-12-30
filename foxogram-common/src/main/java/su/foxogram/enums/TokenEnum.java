@@ -2,7 +2,7 @@ package su.foxogram.enums;
 
 public class TokenEnum {
 	public enum Lifetime {
-		ACCESS_TOKEN(604800000),
+		ACCESS_TOKEN(0),
 		REFRESH_TOKEN(2628000000L),
 		RESUME_TOKEN(604800000);
 

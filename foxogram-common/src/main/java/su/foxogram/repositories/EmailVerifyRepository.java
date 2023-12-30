@@ -31,10 +31,10 @@ public interface EmailVerifyRepository extends CrudRepository<EmailVerification,
 	List<EmailVerification> findAllByLetterCode(String letterCode);
 
 	@AllowFiltering
-	EmailVerification findByVerified(boolean verified);
+	EmailVerification findByType(boolean type);
 
 	@AllowFiltering
-	List<EmailVerification> findAllByVerified(boolean verified);
+	List<EmailVerification> findAllByType(boolean type);
 
 	@Override
 	void delete(EmailVerification emailVerification);

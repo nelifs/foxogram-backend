@@ -8,6 +8,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import su.foxogram.constructors.EmailVerification;
+import su.foxogram.enums.EmailEnum;
+import su.foxogram.repositories.EmailVerifyRepository;
 import su.foxogram.util.Env;
 
 import java.io.IOException;
@@ -18,32 +21,42 @@ import java.util.Scanner;
 @Service
 public class EmailService {
 
+	private final EmailVerifyRepository emailVerifyRepository;
 	private final ResourceLoader resourceLoader;
 	private final JavaMailSender javaMailSender;
 
 	@Autowired
-	public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader) {
+	public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, EmailVerifyRepository emailVerifyRepository) {
 		this.javaMailSender = javaMailSender;
 		this.resourceLoader = resourceLoader;
+		this.emailVerifyRepository = emailVerifyRepository;
 	}
 
-	public void sendConfirmEmail(String to, String username, String digitCode, String letterCode, String token) {
+	public void sendEmail(String to, long id, String type, String username, String digitCode, String letterCode, String token) {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+		String HTMLContent = null;
 
 		try {
 			helper.setTo(to);
 			helper.setFrom(Env.get("SMTP_EMAIL"));
-			helper.setSubject("Confirm Your Email Address");
-			String htmlContent = readHTML("welcome").replace("{0}", username).replace("{1}", digitCode).replace("{2}", letterCode).replace("{3}", token);
-			// String formattedContent = MessageFormat.format(htmlContent, username);
-			// helper.setText("Hello, " + username + "!\nHere's your confirmation code\n" + confirmationCode);
-			helper.setText(htmlContent, true);
+			if (type.equals(EmailEnum.Type.DELETE.getValue())) {
+				helper.setSubject("Confirm Your Account Deletion");
+				HTMLContent = readHTML("delete").replace("{0}", username).replace("{1}", digitCode).replace("{2}", letterCode).replace("{3}", token);
+			} else if (type.equals(EmailEnum.Type.CONFIRM.getValue())) {
+				helper.setSubject("Confirm Your Email Address");
+				HTMLContent = readHTML("confirm").replace("{0}", username).replace("{1}", digitCode).replace("{2}", letterCode).replace("{3}", token);
+			}
+
+			assert HTMLContent != null;
+			helper.setText(HTMLContent, true);
 
 			javaMailSender.send(mimeMessage);
 		} catch (MessagingException | IOException e) {
 			e.printStackTrace();
 		}
+
+		emailVerifyRepository.save(new EmailVerification(id, type, digitCode, letterCode));
 	}
 
 	private String readHTML(String name) throws IOException {

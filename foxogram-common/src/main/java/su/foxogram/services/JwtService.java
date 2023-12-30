@@ -1,7 +1,8 @@
 package su.foxogram.services;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 import su.foxogram.enums.TokenEnum;
@@ -10,25 +11,35 @@ import su.foxogram.util.Env;
 import java.security.Key;
 import java.util.*;
 
-
 @Service
 public class JwtService {
 
-    private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final String SECRET_KEY = Env.get("JWT_SECRET_KEY");
+
+    private static Key getSecretKey() {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
 
     public static String generate(long id, TokenEnum.Type tokenType, TokenEnum.Lifetime expirationMillis) {
-        Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + expirationMillis.getValue());
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("user_id", id);
-        claims.put("token_type", tokenType.getValue());
+        Date expirationDate = new Date(expirationMillis.getValue());
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
+                .setSubject(String.valueOf(id))
+                .claim("type", tokenType.getValue())
                 .setExpiration(expirationDate)
-                .signWith(SECRET_KEY)
+                .signWith(getSecretKey())
                 .compact();
+    }
+
+    public static boolean validate(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSecretKey())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

@@ -7,13 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constructors.*;
 import su.foxogram.enums.APIEnum;
+import su.foxogram.enums.EmailEnum;
 import su.foxogram.enums.TokenEnum;
 import su.foxogram.repositories.EmailVerifyRepository;
 import su.foxogram.repositories.SessionRepository;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.services.EmailService;
-import su.foxogram.structures.AuthorizationController;
 import su.foxogram.structures.Snowflake;
+import su.foxogram.services.AuthorizationService;
 import su.foxogram.util.Code;
 import su.foxogram.util.Encryptor;
 import su.foxogram.services.JwtService;
@@ -26,17 +27,15 @@ import java.util.List;
 public class AuthController {
 
 	private final EmailService emailService;
+	private final AuthorizationService authorizationService;
 	private final EmailVerifyRepository emailVerifyRepository;
 	private final UserRepository userRepository;
 	private final SessionRepository sessionRepository;
 
 	@Autowired
-	public AuthController(
-			EmailService emailService,
-			EmailVerifyRepository emailVerifyRepository,
-			UserRepository userRepository,
-			SessionRepository sessionRepository) {
+	public AuthController(EmailService emailService, AuthorizationService authorizationService, EmailVerifyRepository emailVerifyRepository, UserRepository userRepository, SessionRepository sessionRepository) {
 		this.emailService = emailService;
+		this.authorizationService = authorizationService;
 		this.emailVerifyRepository = emailVerifyRepository;
 		this.userRepository = userRepository;
 		this.sessionRepository = sessionRepository;
@@ -52,69 +51,99 @@ public class AuthController {
 		if (email.contains("@")) {
 			user = userRepository.findByEmail(email);
 		} else {
-			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST)
-					.body(new RequestMessage()
-							.setSuccess(false)
-							.addField("message", "Email is not valid")
-							.build());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestMessage().setSuccess(false).addField("message", "Email is not valid").build());
 		}
 
 		if (user == null) {
 			return createUser(username, email, password);
 		} else {
-			return ResponseEntity
-					.status(HttpStatus.CONFLICT)
-					.body(new RequestMessage()
-							.setSuccess(false)
-							.addField("message", "Account with this email already exist")
-							.build());
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(new RequestMessage().setSuccess(false).addField("message", "Account with this email already exist").build());
 		}
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-		User user = userRepository.findByEmail(loginRequest.getEmail());
+	public ResponseEntity<String> login(@RequestBody LoginRequest body) {
+		User user = userRepository.findByEmail(body.getEmail());
 
 		if (user != null && !user.isEmailVerified()) {
-			return ResponseEntity
-					.status(HttpStatus.FORBIDDEN)
-					.body(new RequestMessage()
-							.setSuccess(false)
-							.addField("message", "You need to verify your email!")
-							.build());
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "You need to verify your email!").build());
 		}
 
-		if (user != null && Encryptor.verifyPassword(loginRequest.getPassword(), user.getPassword()) && user.isEmailVerified()) {
-			return ResponseEntity.ok(new RequestMessage()
-							.setSuccess(true)
-							.addField("message", "You have been successfully signed in!")
-							.build());
+		if (user != null && Encryptor.verifyPassword(body.getPassword(), user.getPassword()) && user.isEmailVerified()) {
+			return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully signed in!").build());
 		} else {
-			return ResponseEntity
-					.status(HttpStatus.FORBIDDEN)
-					.body(new RequestMessage()
-							.setSuccess(false)
-							.addField("message", "Invalid email or password!")
-							.build());
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "Invalid email or password!").build());
 		}
 	}
 
 	@GetMapping("/email/verify/{code}")
 	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) {
 		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
-		String token = request.getParameter("token");
+		User user = authorizationService.getUserByParam(request);
 
+		System.out.println("auth " + user);
 
-		if (verify == null) {
+		if (verify != null && user != null) {
+			System.out.println("auth valid1");
+			return handleEmailVerification(user, verify);
+		} else {
+			System.out.println("auth invalid1");
 			verify = emailVerifyRepository.findByDigitCode(code);
-			if (verify != null) {
-				return handleEmailVerification(code, token, verify);
+			if (verify != null && user != null) {
+				System.out.println("auth valid2");
+				return handleEmailVerification(user, verify);
 			} else {
+				System.out.println("auth invalid2");
 				return handleInvalidCode();
 			}
+		}
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<String> logout(HttpServletRequest request) {
+		User user = authorizationService.getUserByHeader(request);
+		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
+
+		sessionRepository.delete(session);
+
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully logged out").build());
+	}
+
+
+	@GetMapping("/delete/confirm/{code}")
+	public ResponseEntity<String> deleteConfirm(@PathVariable String code, HttpServletRequest request) {
+		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
+		User user = authorizationService.getUserByParam(request);
+
+		if (verify != null && user != null) {
+			return handleAccountDeletion(user, verify);
 		} else {
-			return handleInvalidCode();
+			verify = emailVerifyRepository.findByDigitCode(code);
+			if (verify != null && user != null) {
+				return handleAccountDeletion(user, verify);
+			} else return handleInvalidCode();
+		}
+	}
+
+	@PostMapping("/delete")
+	public ResponseEntity<String> delete(@RequestBody DeleteRequest body, HttpServletRequest request) {
+		String password = body.getPassword();
+		User user = authorizationService.getUserByHeader(request);
+
+		if (Encryptor.verifyPassword(password, user.getPassword())) {
+			long id = user.getId();
+			String username = user.getUsername();
+			String email = user.getEmail();
+			String accessToken = user.getAccessToken();
+			String type = EmailEnum.Type.DELETE.getValue();
+			String digitCode = Code.generateDigitCode();
+			String letterCode = Code.generateLetterCode();
+
+			emailService.sendEmail(email, id, type, username, digitCode, letterCode, accessToken);
+
+			return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You need to confirm account deletion via email").build());
+		} else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "Password is invalid!").build());
 		}
 	}
 
@@ -132,34 +161,16 @@ public class AuthController {
 
 		userRepository.save(new User(id, avatar, username, email, emailVerified, password, accessToken, createdAt, flags, deletion, disabled, mfaEnabled));
 
+		String type = EmailEnum.Type.CONFIRM.getValue();
 		String digitCode = Code.generateDigitCode();
 		String letterCode = Code.generateLetterCode();
-		boolean verified = false;
 
-		emailVerifyRepository.save(new EmailVerification(id, digitCode, letterCode, verified));
+		emailService.sendEmail(email, id, type, username, digitCode, letterCode, accessToken);
 
-		emailService.sendConfirmEmail(email, username, digitCode, letterCode, accessToken);
-
-		return ResponseEntity.ok(new RequestMessage()
-				.setSuccess(true)
-				.addField("username", username)
-				.addField("email", email)
-				.addField("accessToken", accessToken)
-				.build());
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("username", username).addField("email", email).addField("accessToken", accessToken).build());
 	}
 
-	private ResponseEntity<String> handleEmailVerification(String code, String token, EmailVerification verify) {
-		User user = userRepository.findByAccessToken(token);
-
-		if (user == null) {
-			return ResponseEntity
-					.status(HttpStatus.FORBIDDEN)
-					.body(new RequestMessage()
-							.setSuccess(false)
-							.addField("message", "You can only verify your email!")
-							.build());
-		}
-
+	private ResponseEntity<String> handleEmailVerification(User user, EmailVerification verify) {
 		user.setEmailVerified(true);
 		userRepository.save(user);
 		emailVerifyRepository.delete(verify);
@@ -173,21 +184,20 @@ public class AuthController {
 
 		sessionRepository.save(new Session(id, accessToken, resumeToken, user.getCreatedAt(), expiresAt));
 
-		return ResponseEntity.ok(new RequestMessage()
-				.setSuccess(true)
-				.addField("message", "You successfully verified your email")
-				.addField("email", email)
-				.addField("accessToken", accessToken)
-				.addField("resumeToken", resumeToken)
-				.build());
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You successfully verified your email").addField("email", email).addField("accessToken", accessToken).addField("resumeToken", resumeToken).build());
+	}
+
+	private ResponseEntity<String> handleAccountDeletion(User user, EmailVerification verify) {
+		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
+
+		userRepository.delete(user);
+		emailVerifyRepository.delete(verify);
+		sessionRepository.delete(session);
+
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have successfully deleted your account!").build());
 	}
 
 	private ResponseEntity<String> handleInvalidCode() {
-		return ResponseEntity
-				.status(HttpStatus.NOT_FOUND)
-				.body(new RequestMessage()
-						.setSuccess(false)
-						.addField("message", "Code is invalid!")
-						.build());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestMessage().setSuccess(false).addField("message", "Code is invalid!").build());
 	}
 }

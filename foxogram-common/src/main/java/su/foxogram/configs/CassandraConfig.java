@@ -23,10 +23,10 @@ public class CassandraConfig {
 	@Bean
 	public CqlSessionFactoryBean session() {
 		CqlSessionFactoryBean session = new CqlSessionFactoryBean();
-		session.setContactPoints("srv.foxogram.su");
+		session.setContactPoints(Env.get("DATABASE_HOST"));
 		session.setPassword(Env.get("DATABASE_PASSWORD"));
-		session.setKeyspaceName("foxogram");
-		session.setLocalDatacenter("datacenter1");
+		session.setKeyspaceName(Env.get("DATABASE_KEYSPACE"));
+		session.setLocalDatacenter(Env.get("DATABASE_DATACENTER"));
 
 		return session;
 	}
