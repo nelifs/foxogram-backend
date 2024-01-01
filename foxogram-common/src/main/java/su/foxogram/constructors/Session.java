@@ -76,4 +76,8 @@ public class Session {
 	public void setExpiresAt(long expiresAt) {
 		this.expiresAt = expiresAt;
 	}
+
+	public boolean isExpired() {
+		return System.currentTimeMillis() >= this.getExpiresAt();
+	}
 }

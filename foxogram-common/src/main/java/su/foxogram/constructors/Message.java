@@ -13,7 +13,7 @@ public class Message {
     @PrimaryKey
     public long id;
 
-    @Column("channelId")
+    @Column("channelid")
     public long channelId;
 
     @Column("content")
@@ -26,13 +26,13 @@ public class Message {
     public long timestamp;
 
     @Column("attachments")
-    public List<Attachment> attachments;
+    public List<String> attachments;
 
     public Message() {
 
     }
 
-    public Message(long id, long channelId, String content, long authorId, long timestamp, List<Attachment> attachments) {
+    public Message(long id, long channelId, String content, long authorId, long timestamp, List<String> attachments) {
         this.id = id;
         this.channelId = channelId;
         this.authorId = authorId;
@@ -81,11 +81,11 @@ public class Message {
         this.timestamp = timestamp;
     }
 
-    public List<Attachment> getAttachments() {
+    public List<String> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(List<Attachment> attachments) {
+    public void setAttachments(List<String> attachments) {
         this.attachments = attachments;
     }
 }

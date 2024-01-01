@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(APIEnum.AUTH)
+@RequestMapping(value = APIEnum.AUTH, produces = "application/json")
 public class AuthController {
 
 	private final EmailService emailService;
@@ -66,7 +66,7 @@ public class AuthController {
 		User user = userRepository.findByEmail(body.getEmail());
 
 		if (user != null && !user.isEmailVerified()) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "You need to verify your email!").build());
+			return authorizationService.handleNotVerifiedEmail();
 		}
 
 		if (user != null && Encryptor.verifyPassword(body.getPassword(), user.getPassword()) && user.isEmailVerified()) {
@@ -74,6 +74,25 @@ public class AuthController {
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "Invalid email or password!").build());
 		}
+	}
+
+	@PostMapping("/resume")
+	public ResponseEntity<String> resume(@RequestBody ResumeRequest body) {
+		Session session = sessionRepository.findByResumeToken(body.getResumeToken());
+
+		if (session == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestMessage().setSuccess(false).addField("message", "This session does not exist! You need to re-login").build());
+		}
+
+		if (session.isExpired()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestMessage().setSuccess(false).addField("message", "Your session has expired. You need to re-login").build());
+		}
+
+		String newResumeToken = JwtService.generate(session.getId(), TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
+		session.setResumeToken(newResumeToken);
+		sessionRepository.save(session);
+
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "Session has been successfully resumed").build());
 	}
 
 	@GetMapping("/email/verify/{code}")

@@ -10,7 +10,7 @@ import su.foxogram.enums.APIEnum;
 import java.util.List;
 
 @RestController
-@RequestMapping(APIEnum.USERS)
+@RequestMapping(value = APIEnum.USERS, produces = "application/json")
 public class UsersController {
 
 	@GetMapping
