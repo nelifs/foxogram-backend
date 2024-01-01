@@ -16,9 +16,6 @@ public class Session {
 	@Column("accesstoken")
 	public String accessToken;
 
-	@Column("resumetoken")
-	public String resumeToken;
-
 	@Column("createdat")
 	public long createdAt;
 
@@ -29,10 +26,9 @@ public class Session {
 
 	}
 
-	public Session(long id, String accessToken, String resumeToken, long createdAt, long expiresAt) {
+	public Session(long id, String accessToken, long createdAt, long expiresAt) {
 		this.id = id;
 		this.accessToken = accessToken;
-		this.resumeToken = resumeToken;
 		this.createdAt = createdAt;
 		this.expiresAt = expiresAt;
 	}
@@ -51,14 +47,6 @@ public class Session {
 
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
-	}
-
-	public String getResumeToken() {
-		return resumeToken;
-	}
-
-	public void setResumeToken(String resumeToken) {
-		this.resumeToken = resumeToken;
 	}
 
 	public long getCreatedAt() {

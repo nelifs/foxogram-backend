@@ -14,19 +14,19 @@ public class Member extends BaseUser {
 	@PrimaryKey
 	public long id;
 
-	@Column("channel_id")
+	@Column("channelid")
 	public long channelId;
 
 	@Column("username")
 	public String username;
 
-	@Column("access_token")
+	@Column("accesstoken")
 	public String accessToken;
 
 	@Column("avatar")
 	public String avatar;
 
-	@Column("created_at")
+	@Column("createdat")
 	public long createdAt;
 
 	@Column("flags")
@@ -36,7 +36,7 @@ public class Member extends BaseUser {
 
 	}
 
-	public Member(long id, long channelId, String avatar, String username, String accessToken, long createdAt, List<String> flags) {
+	public Member(long id, long channelId, String username, String accessToken, String avatar, long createdAt, List<String> flags) {
 		super(id, avatar, username, accessToken, createdAt, flags);
 		this.channelId = channelId;
 	}

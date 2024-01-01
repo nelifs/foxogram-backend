@@ -33,6 +33,9 @@ public class User extends BaseUser {
     @Column("accesstoken")
     private String accessToken;
 
+    @Column("resumetoken")
+    private String resumeToken;
+
     @Column("flags")
     private List<String> flags;
 
@@ -51,7 +54,7 @@ public class User extends BaseUser {
     public User() {
     }
 
-    public User(long id, String avatar, String username, String email, boolean emailVerified, String password, String accessToken, long createdAt, List<String> flags, long deletion, boolean disabled, boolean mfaEnabled) {
+    public User(long id, String avatar, String username, String email, boolean emailVerified, String password, String accessToken, String resumeToken, long createdAt, List<String> flags, long deletion, boolean disabled, boolean mfaEnabled) {
         super(id, avatar, username, accessToken, createdAt, flags);
         this.id = id;
         this.avatar = avatar;
@@ -60,6 +63,7 @@ public class User extends BaseUser {
         this.emailVerified = emailVerified;
         this.password = password;
         this.accessToken = accessToken;
+        this.resumeToken = resumeToken;
         this.flags = flags;
         this.createdAt = createdAt;
         this.deletion = deletion;
@@ -121,6 +125,14 @@ public class User extends BaseUser {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getResumeToken() {
+        return resumeToken;
+    }
+
+    public void setResumeToken(String resumeToken) {
+        this.resumeToken = resumeToken;
     }
 
     public List<String> getFlags() {

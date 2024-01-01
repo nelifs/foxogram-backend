@@ -9,6 +9,9 @@ import su.foxogram.constructors.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.enums.EmailEnum;
 import su.foxogram.enums.TokenEnum;
+import su.foxogram.exceptions.UserAuthenticationNeededException;
+import su.foxogram.exceptions.UserEmailNotVerifiedException;
+import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.repositories.EmailVerifyRepository;
 import su.foxogram.repositories.SessionRepository;
 import su.foxogram.repositories.UserRepository;
@@ -21,6 +24,7 @@ import su.foxogram.services.JwtService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = APIEnum.AUTH, produces = "application/json")
@@ -77,28 +81,33 @@ public class AuthController {
 	}
 
 	@PostMapping("/resume")
-	public ResponseEntity<String> resume(@RequestBody ResumeRequest body) {
-		Session session = sessionRepository.findByResumeToken(body.getResumeToken());
+	public ResponseEntity<String> resume(@RequestBody ResumeRequest body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+		User user = authorizationService.getUser(request, false, true);
+		Session session = sessionRepository.findById(user.getId());
 
-		if (session == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestMessage().setSuccess(false).addField("message", "This session does not exist! You need to re-login").build());
+		if (!body.getResumeToken().equals(user.getResumeToken())) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "Invalid resume token").build());
 		}
 
-		if (session.isExpired()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestMessage().setSuccess(false).addField("message", "Your session has expired. You need to re-login").build());
+		if (session == null || session.isExpired()) {
+			long id = user.getId();
+			String accessToken = user.getAccessToken();
+			long createdAt = System.currentTimeMillis();
+			long expiresAt = createdAt + TokenEnum.Lifetime.RESUME_TOKEN.getValue();
+
+			session = new Session(id, accessToken, createdAt, expiresAt);
+			sessionRepository.save(session);
+
+			return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "Session has been successfully resumed").build());
+		} else {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(new RequestMessage().setSuccess(false).addField("message", "Your session already resumed").build());
 		}
-
-		String newResumeToken = JwtService.generate(session.getId(), TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
-		session.setResumeToken(newResumeToken);
-		sessionRepository.save(session);
-
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "Session has been successfully resumed").build());
 	}
 
 	@GetMapping("/email/verify/{code}")
-	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) {
+	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
 		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
-		User user = authorizationService.getUser(request);
+		User user = authorizationService.getUser(request, false, false);
 
 		if (verify != null && user != null) {
 			return handleEmailVerification(user, verify);
@@ -113,8 +122,8 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<String> logout(HttpServletRequest request) {
-		User user = authorizationService.getUser(request);
+	public ResponseEntity<String> logout(HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
+		User user = authorizationService.getUser(request, true, false);
 		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 
 		sessionRepository.delete(session);
@@ -124,9 +133,9 @@ public class AuthController {
 
 
 	@GetMapping("/delete/confirm/{code}")
-	public ResponseEntity<String> deleteConfirm(@PathVariable String code, HttpServletRequest request) {
+	public ResponseEntity<String> deleteConfirm(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
 		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
-		User user = authorizationService.getUser(request);
+		User user = authorizationService.getUser(request, false, false);
 
 		if (verify != null && user != null) {
 			return handleAccountDeletion(user, verify);
@@ -139,9 +148,9 @@ public class AuthController {
 	}
 
 	@PostMapping("/delete")
-	public ResponseEntity<String> delete(@RequestBody DeleteRequest body, HttpServletRequest request) {
+	public ResponseEntity<String> delete(@RequestBody DeleteRequest body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
 		String password = body.getPassword();
-		User user = authorizationService.getUser(request);
+		User user = authorizationService.getUser(request, false, false);
 
 		if (Encryptor.verifyPassword(password, user.getPassword())) {
 			long id = user.getId();
@@ -162,17 +171,18 @@ public class AuthController {
 
 	private ResponseEntity<String> createUser(String username, String email, String password) {
 		long id = new Snowflake(1).nextId();
-		String avatar = new Avatar("").getEtag();
-		boolean emailVerified = false;
-		String accessToken = JwtService.generate(id, TokenEnum.Type.ACCESS_TOKEN, TokenEnum.Lifetime.ACCESS_TOKEN);
 		long createdAt = System.currentTimeMillis();
-		List<String> flags = new ArrayList<>();
 		long deletion = 0;
+		String avatar = new Avatar("").getEtag();
+		String accessToken = JwtService.generate(id, TokenEnum.Type.ACCESS_TOKEN, TokenEnum.Lifetime.ACCESS_TOKEN);
+		String resumeToken = JwtService.generate(id, TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
+		List<String> flags = new ArrayList<>();
+		boolean emailVerified = false;
 		boolean disabled = false;
 		boolean mfaEnabled = false;
 		password = Encryptor.hashPassword(password);
 
-		userRepository.save(new User(id, avatar, username, email, emailVerified, password, accessToken, createdAt, flags, deletion, disabled, mfaEnabled));
+		userRepository.save(new User(id, avatar, username, email, emailVerified, password, accessToken, resumeToken, createdAt, flags, deletion, disabled, mfaEnabled));
 
 		String type = EmailEnum.Type.CONFIRM.getValue();
 		String digitCode = Code.generateDigitCode();
@@ -195,7 +205,7 @@ public class AuthController {
 		long expiresAt = createdAt + TokenEnum.Lifetime.RESUME_TOKEN.getValue();
 		String resumeToken = JwtService.generate(id, TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
 
-		sessionRepository.save(new Session(id, accessToken, resumeToken, user.getCreatedAt(), expiresAt));
+		sessionRepository.save(new Session(id, accessToken, user.getCreatedAt(), expiresAt));
 
 		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You successfully verified your email").addField("email", email).addField("accessToken", accessToken).addField("resumeToken", resumeToken).build());
 	}

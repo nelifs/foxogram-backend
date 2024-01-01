@@ -19,12 +19,6 @@ public interface SessionRepository extends CrudRepository<Session, String> {
 	List<Session> findAllBy();
 
 	@AllowFiltering
-	Session findByResumeToken(String resumeToken);
-
-	@AllowFiltering
-	List<Session> findAllByResumeToken(String resumeToken);
-
-	@AllowFiltering
 	Session findByAccessToken(String accessToken);
 
 	@AllowFiltering

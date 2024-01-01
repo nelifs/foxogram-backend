@@ -10,6 +10,9 @@ import java.util.List;
 public interface ChannelRepository extends CrudRepository<Channel, Long> {
 
 	@AllowFiltering
+	Channel findById(long id);
+
+	@AllowFiltering
 	Member findByName(String name);
 
 	@AllowFiltering

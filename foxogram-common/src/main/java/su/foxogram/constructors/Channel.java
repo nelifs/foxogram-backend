@@ -13,7 +13,7 @@ public class Channel {
 
     @Id
     @PrimaryKey
-    public String id;
+    public long id;
 
     @Column("name")
     public String name;
@@ -22,16 +22,16 @@ public class Channel {
 
     }
 
-    public Channel(String id, String name) {
+    public Channel(long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

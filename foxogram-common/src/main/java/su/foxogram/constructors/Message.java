@@ -19,7 +19,7 @@ public class Message {
     @Column("content")
     public String content;
 
-    @Column("authorId")
+    @Column("authorid")
     public long authorId;
 
     @Column("timestamp")
