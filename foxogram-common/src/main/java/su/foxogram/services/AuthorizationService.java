@@ -16,20 +16,12 @@ public class AuthorizationService {
 		this.userRepository = userRepository;
 	}
 
-	public String getTokenByHeader(HttpServletRequest request) {
+	public String getToken(HttpServletRequest request) {
 		return request.getHeader("Authorization").substring(7);
 	}
 
-	public String getTokenByParam(HttpServletRequest request) {
-		return request.getParameter("token");
-	}
-
-	public User getUserByHeader(HttpServletRequest request) {
-		return validate(getTokenByHeader(request));
-	}
-
-	public User getUserByParam(HttpServletRequest request) {
-		return validate(getTokenByParam(request));
+	public User getUser(HttpServletRequest request) {
+		return validate(getToken(request));
 	}
 
 	public User validate(String token) {

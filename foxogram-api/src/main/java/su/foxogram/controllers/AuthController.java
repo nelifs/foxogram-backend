@@ -79,21 +79,15 @@ public class AuthController {
 	@GetMapping("/email/verify/{code}")
 	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) {
 		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
-		User user = authorizationService.getUserByParam(request);
-
-		System.out.println("auth " + user);
+		User user = authorizationService.getUser(request);
 
 		if (verify != null && user != null) {
-			System.out.println("auth valid1");
 			return handleEmailVerification(user, verify);
 		} else {
-			System.out.println("auth invalid1");
 			verify = emailVerifyRepository.findByDigitCode(code);
 			if (verify != null && user != null) {
-				System.out.println("auth valid2");
 				return handleEmailVerification(user, verify);
 			} else {
-				System.out.println("auth invalid2");
 				return handleInvalidCode();
 			}
 		}
@@ -101,7 +95,7 @@ public class AuthController {
 
 	@PostMapping("/logout")
 	public ResponseEntity<String> logout(HttpServletRequest request) {
-		User user = authorizationService.getUserByHeader(request);
+		User user = authorizationService.getUser(request);
 		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 
 		sessionRepository.delete(session);
@@ -113,7 +107,7 @@ public class AuthController {
 	@GetMapping("/delete/confirm/{code}")
 	public ResponseEntity<String> deleteConfirm(@PathVariable String code, HttpServletRequest request) {
 		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
-		User user = authorizationService.getUserByParam(request);
+		User user = authorizationService.getUser(request);
 
 		if (verify != null && user != null) {
 			return handleAccountDeletion(user, verify);
@@ -128,7 +122,7 @@ public class AuthController {
 	@PostMapping("/delete")
 	public ResponseEntity<String> delete(@RequestBody DeleteRequest body, HttpServletRequest request) {
 		String password = body.getPassword();
-		User user = authorizationService.getUserByHeader(request);
+		User user = authorizationService.getUser(request);
 
 		if (Encryptor.verifyPassword(password, user.getPassword())) {
 			long id = user.getId();

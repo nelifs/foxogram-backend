@@ -8,14 +8,6 @@ public class Attachment {
 		this.hash = hash;
 	}
 
-	public void create() {
-
-	}
-
-	public void delete() {
-
-	}
-
 	public String getEtag() {
 		return etag;
 	}
