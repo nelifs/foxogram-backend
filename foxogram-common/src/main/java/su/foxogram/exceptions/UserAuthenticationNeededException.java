@@ -8,6 +8,6 @@ import su.foxogram.enums.ExceptionsEnum;
 public class UserAuthenticationNeededException extends BaseException {
 
 	public UserAuthenticationNeededException() {
-		super("You need to authenticate to perform this action", ExceptionsEnum.Codes.USER_AUTHENTICATION_NEEDED.getValue());
+		super("You need to authenticate to perform this action", UserAuthenticationNeededException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsEnum.Codes.USER_AUTHENTICATION_NEEDED.getValue());
 	}
 }

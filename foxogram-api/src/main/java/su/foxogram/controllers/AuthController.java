@@ -1,226 +1,117 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constructors.*;
 import su.foxogram.enums.APIEnum;
-import su.foxogram.enums.EmailEnum;
-import su.foxogram.enums.TokenEnum;
-import su.foxogram.exceptions.UserAuthenticationNeededException;
-import su.foxogram.exceptions.UserEmailNotVerifiedException;
-import su.foxogram.exceptions.UserNotFoundException;
-import su.foxogram.repositories.EmailVerifyRepository;
+import su.foxogram.exceptions.*;
+import su.foxogram.repositories.AuthorizationRepository;
 import su.foxogram.repositories.SessionRepository;
-import su.foxogram.repositories.UserRepository;
-import su.foxogram.services.EmailService;
-import su.foxogram.structures.Snowflake;
 import su.foxogram.services.AuthorizationService;
-import su.foxogram.util.Code;
-import su.foxogram.util.Encryptor;
-import su.foxogram.services.JwtService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping(value = APIEnum.AUTH, produces = "application/json")
 public class AuthController {
 
-	private final EmailService emailService;
 	private final AuthorizationService authorizationService;
-	private final EmailVerifyRepository emailVerifyRepository;
-	private final UserRepository userRepository;
 	private final SessionRepository sessionRepository;
+	private final AuthorizationRepository authorizationRepository;
+	Logger logger = LoggerFactory.getLogger(AuthController.class);
 
 	@Autowired
-	public AuthController(EmailService emailService, AuthorizationService authorizationService, EmailVerifyRepository emailVerifyRepository, UserRepository userRepository, SessionRepository sessionRepository) {
-		this.emailService = emailService;
+	public AuthController(AuthorizationService authorizationService, SessionRepository sessionRepository, AuthorizationRepository authorizationRepository) {
 		this.authorizationService = authorizationService;
-		this.emailVerifyRepository = emailVerifyRepository;
-		this.userRepository = userRepository;
 		this.sessionRepository = sessionRepository;
+		this.authorizationRepository = authorizationRepository;
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<String> create(@RequestBody CreateRequest body) {
+	public ResponseEntity<String> create(@RequestBody CreateRequest body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
-		User user;
+		logger.info("USER create ({}, {}) request", username, email);
 
-		if (email.contains("@")) {
-			user = userRepository.findByEmail(email);
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RequestMessage().setSuccess(false).addField("message", "Email is not valid").build());
-		}
+		User user = authorizationService.createUser(username, email, password);
 
-		if (user == null) {
-			return createUser(username, email, password);
-		} else {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(new RequestMessage().setSuccess(false).addField("message", "Account with this email already exist").build());
-		}
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("username", user.getUsername()).addField("email", user.getEmail()).addField("accessToken", user.getAccessToken()).build());
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody LoginRequest body) {
-		User user = userRepository.findByEmail(body.getEmail());
+	public ResponseEntity<String> login(@RequestBody LoginRequest body) throws UserCredentialsIsInvalidException {
+		String email = body.getEmail();
+		String password = body.getPassword();
+		logger.info("USER ({}) LOGIN request", email);
 
-		if (user != null && !user.isEmailVerified()) {
-			return authorizationService.handleNotVerifiedEmail();
-		}
+		authorizationService.loginUser(email, password);
 
-		if (user != null && Encryptor.verifyPassword(body.getPassword(), user.getPassword()) && user.isEmailVerified()) {
-			return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully signed in!").build());
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "Invalid email or password!").build());
-		}
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully signed in!").build());
 	}
 
-	@PostMapping("/resume")
-	public ResponseEntity<String> resume(@RequestBody ResumeRequest body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	/*@PostMapping("/resume")
+	public ResponseEntity<String> resumeSession(@RequestBody ResumeRequest body, HttpServletRequest request)
+	throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		User user = authorizationService.getUser(request, false, true);
-		Session session = sessionRepository.findById(user.getId());
 
-		if (!body.getResumeToken().equals(user.getResumeToken())) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "Invalid resume token").build());
-		}
+		authorizationService.resumeSession(user);
 
-		if (session == null || session.isExpired()) {
-			long id = user.getId();
-			String accessToken = user.getAccessToken();
-			long createdAt = System.currentTimeMillis();
-			long expiresAt = createdAt + TokenEnum.Lifetime.RESUME_TOKEN.getValue();
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "otter").build());
+	}*/
 
-			session = new Session(id, accessToken, createdAt, expiresAt);
-			sessionRepository.save(session);
+	@PostMapping("/refresh")
+	public ResponseEntity<String> refreshToken(@RequestBody ResumeRequest body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+		User user = authorizationService.getUser(request, false, true);
+		Authorization auth = authorizationRepository.findById(user.getId());
+		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
 
-			return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "Session has been successfully resumed").build());
-		} else {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(new RequestMessage().setSuccess(false).addField("message", "Your session already resumed").build());
-		}
+		auth = authorizationService.refreshToken(user, auth);
+
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "Your token has been refreshed").addField("accessToken", auth.getAccessToken()).addField("refreshToken", user.getRefreshToken()).addField("expiresAt", String.valueOf(auth.getExpiresAt())).build());
 	}
 
-	@GetMapping("/email/verify/{code}")
-	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
-		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
+	@PostMapping("/email/verify/{code}")
+	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
 		User user = authorizationService.getUser(request, false, false);
+		logger.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
 
-		if (verify != null && user != null) {
-			return handleEmailVerification(user, verify);
-		} else {
-			verify = emailVerifyRepository.findByDigitCode(code);
-			if (verify != null && user != null) {
-				return handleEmailVerification(user, verify);
-			} else {
-				return handleInvalidCode();
-			}
-		}
+		authorizationService.verifyEmail(user, code);
+
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully verified your email").build());
 	}
 
 	@PostMapping("/logout")
 	public ResponseEntity<String> logout(HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
 		User user = authorizationService.getUser(request, true, false);
 		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
+		logger.info("USER logout ({}, {}) request", user.getId(), user.getEmail());
 
 		sessionRepository.delete(session);
 
 		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully logged out").build());
 	}
 
-
-	@GetMapping("/delete/confirm/{code}")
-	public ResponseEntity<String> deleteConfirm(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
-		EmailVerification verify = emailVerifyRepository.findByLetterCode(code);
+	@PostMapping("/delete/confirm/{code}")
+	public ResponseEntity<String> deleteConfirm(@PathVariable String pathCode, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
 		User user = authorizationService.getUser(request, false, false);
+		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
-		if (verify != null && user != null) {
-			return handleAccountDeletion(user, verify);
-		} else {
-			verify = emailVerifyRepository.findByDigitCode(code);
-			if (verify != null && user != null) {
-				return handleAccountDeletion(user, verify);
-			} else return handleInvalidCode();
-		}
-	}
-
-	@PostMapping("/delete")
-	public ResponseEntity<String> delete(@RequestBody DeleteRequest body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
-		String password = body.getPassword();
-		User user = authorizationService.getUser(request, false, false);
-
-		if (Encryptor.verifyPassword(password, user.getPassword())) {
-			long id = user.getId();
-			String username = user.getUsername();
-			String email = user.getEmail();
-			String accessToken = user.getAccessToken();
-			String type = EmailEnum.Type.DELETE.getValue();
-			String digitCode = Code.generateDigitCode();
-			String letterCode = Code.generateLetterCode();
-
-			emailService.sendEmail(email, id, type, username, digitCode, letterCode, accessToken);
-
-			return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You need to confirm account deletion via email").build());
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RequestMessage().setSuccess(false).addField("message", "Password is invalid!").build());
-		}
-	}
-
-	private ResponseEntity<String> createUser(String username, String email, String password) {
-		long id = new Snowflake(1).nextId();
-		long createdAt = System.currentTimeMillis();
-		long deletion = 0;
-		String avatar = new Avatar("").getEtag();
-		String accessToken = JwtService.generate(id, TokenEnum.Type.ACCESS_TOKEN, TokenEnum.Lifetime.ACCESS_TOKEN);
-		String resumeToken = JwtService.generate(id, TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
-		List<String> flags = new ArrayList<>();
-		boolean emailVerified = false;
-		boolean disabled = false;
-		boolean mfaEnabled = false;
-		password = Encryptor.hashPassword(password);
-
-		userRepository.save(new User(id, avatar, username, email, emailVerified, password, accessToken, resumeToken, createdAt, flags, deletion, disabled, mfaEnabled));
-
-		String type = EmailEnum.Type.CONFIRM.getValue();
-		String digitCode = Code.generateDigitCode();
-		String letterCode = Code.generateLetterCode();
-
-		emailService.sendEmail(email, id, type, username, digitCode, letterCode, accessToken);
-
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("username", username).addField("email", email).addField("accessToken", accessToken).build());
-	}
-
-	private ResponseEntity<String> handleEmailVerification(User user, EmailVerification verify) {
-		user.setEmailVerified(true);
-		userRepository.save(user);
-		emailVerifyRepository.delete(verify);
-
-		long id = user.getId();
-		String accessToken = user.getAccessToken();
-		String email = user.getEmail();
-		long createdAt = user.getCreatedAt();
-		long expiresAt = createdAt + TokenEnum.Lifetime.RESUME_TOKEN.getValue();
-		String resumeToken = JwtService.generate(id, TokenEnum.Type.RESUME_TOKEN, TokenEnum.Lifetime.RESUME_TOKEN);
-
-		sessionRepository.save(new Session(id, accessToken, user.getCreatedAt(), expiresAt));
-
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You successfully verified your email").addField("email", email).addField("accessToken", accessToken).addField("resumeToken", resumeToken).build());
-	}
-
-	private ResponseEntity<String> handleAccountDeletion(User user, EmailVerification verify) {
-		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
-
-		userRepository.delete(user);
-		emailVerifyRepository.delete(verify);
-		sessionRepository.delete(session);
+		authorizationService.confirmUserDelete(user, pathCode);
 
 		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have successfully deleted your account!").build());
 	}
 
-	private ResponseEntity<String> handleInvalidCode() {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RequestMessage().setSuccess(false).addField("message", "Code is invalid!").build());
+	@PostMapping("/delete")
+	public ResponseEntity<String> delete(@RequestBody DeleteRequest body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
+		String password = body.getPassword();
+		User user = authorizationService.getUser(request, false, false);
+		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
+
+		authorizationService.requestUserDelete(user, password);
+
+		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You need to confirm account deletion via email").build());
 	}
 }

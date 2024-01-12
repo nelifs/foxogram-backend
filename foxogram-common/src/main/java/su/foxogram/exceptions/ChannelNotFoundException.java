@@ -8,6 +8,6 @@ import su.foxogram.enums.ExceptionsEnum;
 public class ChannelNotFoundException extends BaseException {
 
 	public ChannelNotFoundException() {
-		super("Unknown channel", ExceptionsEnum.Codes.CHANNEL_NOT_FOUND.getValue());
+		super("Unknown channel", ChannelNotFoundException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsEnum.Codes.CHANNEL_NOT_FOUND.getValue());
 	}
 }

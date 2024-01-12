@@ -8,6 +8,6 @@ import su.foxogram.enums.ExceptionsEnum;
 public class MemberInChannelNotFoundException extends BaseException {
 
 	public MemberInChannelNotFoundException() {
-		super("Can't find member in this channel", ExceptionsEnum.Codes.MEMBER_IN_CHANNEL_NOT_FOUND.getValue());
+		super("Can't find member in this channel", MemberInChannelNotFoundException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsEnum.Codes.MEMBER_IN_CHANNEL_NOT_FOUND.getValue());
 	}
 }

@@ -1,9 +1,18 @@
 package su.foxogram.exceptions;
 
+import org.springframework.http.HttpStatus;
+
 public abstract class BaseException extends Exception {
 
 	public int errorCode;
+	public HttpStatus status;
 	public String message;
+
+	public BaseException(String message, HttpStatus status, int errorCode) {
+		this.message = message;
+		this.status = status;
+		this.errorCode = errorCode;
+	}
 
 	public int getErrorCode() {
 		return errorCode;
@@ -13,12 +22,20 @@ public abstract class BaseException extends Exception {
 		this.errorCode = errorCode;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public HttpStatus getStatus() {
+		return status;
 	}
 
-	public BaseException(String message, int errorCode) {
-		super(message);
-		this.errorCode = errorCode;
+	public void setStatus(HttpStatus status) {
+		this.status = status;
+	}
+
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

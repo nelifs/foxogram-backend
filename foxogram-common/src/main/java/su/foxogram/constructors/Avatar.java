@@ -1,25 +1,17 @@
 package su.foxogram.constructors;
 
 public class Avatar {
-    public String etag;
+    public String id;
 
-    public Avatar(String etag) {
-        this.etag = etag;
+    public Avatar(String id) {
+        this.id = id;
     }
 
-    public void create() {
-
+    public String getId() {
+        return id;
     }
 
-    public void delete() {
-
-    }
-
-    public String getEtag() {
-        return etag;
-    }
-
-    public void setEtag(String etag) {
-        this.etag = etag;
+    public void setId(String id) {
+        this.id = id;
     }
 }

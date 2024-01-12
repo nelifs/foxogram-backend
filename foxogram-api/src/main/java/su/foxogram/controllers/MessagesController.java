@@ -1,6 +1,8 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +22,10 @@ public class MessagesController {
 	private final AuthorizationService authorizationService;
 	private final ChannelsService channelsService;
 	private final MessagesService messagesService;
+	Logger logger = LoggerFactory.getLogger(MessagesController.class);
 
 	@Autowired
-	public MessagesController(ChannelsService channelsService, MemberRepository memberRepository, AuthorizationService authorizationService, MessagesService messagesService) {
+	public MessagesController(ChannelsService channelsService, AuthorizationService authorizationService, MessagesService messagesService) {
 		this.channelsService = channelsService;
 		this.authorizationService = authorizationService;
 		this.messagesService = messagesService;
@@ -31,7 +34,7 @@ public class MessagesController {
 	@GetMapping("/channel/{channelId}")
 	public ResponseEntity<?> getMessages(@PathVariable long channelId, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException {
 		User user = authorizationService.getUser(request, true, true);
-
+		logger.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channelId, user.getId(), user.getEmail());
 		channelsService.getMemberInChannel(user.getId(), channelId);
 
 		List<Message> messagesArray = messagesService.getMessages(before, limit, channelId);
@@ -40,8 +43,9 @@ public class MessagesController {
 	}
 
 	@GetMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> getMessage(@PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException {
+	public ResponseEntity<?> getMessage(@PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authorizationService.getUser(request, true, true);
+		logger.info("MESSAGE ({}) from CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
 
@@ -51,8 +55,9 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public ResponseEntity<?> postMessage(@RequestBody MessageRequest body, @PathVariable long channelId, HttpServletRequest request) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException {
+	public ResponseEntity<?> postMessage(@RequestBody MessageRequest body, @PathVariable long channelId, HttpServletRequest request) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authorizationService.getUser(request, true, true);
+		logger.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
 
@@ -62,8 +67,9 @@ public class MessagesController {
 	}
 
 	@DeleteMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> deleteMessage(@PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException {
+	public ResponseEntity<?> deleteMessage(@PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authorizationService.getUser(request, true, true);
+		logger.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
 
@@ -73,8 +79,9 @@ public class MessagesController {
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> patchMessage(@RequestBody MessageRequest body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException {
+	public ResponseEntity<?> patchMessage(@RequestBody MessageRequest body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authorizationService.getUser(request, true, true);
+		logger.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
 

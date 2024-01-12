@@ -1,6 +1,8 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,7 @@ public class ChannelsController {
 
 	private final ChannelsService channelsService;
 	private final AuthorizationService authorizationService;
+	Logger logger = LoggerFactory.getLogger(ChannelsController.class);
 
 	public ChannelsController(ChannelsService channelsService, AuthorizationService authorizationService) {
 		this.channelsService = channelsService;
@@ -30,6 +33,7 @@ public class ChannelsController {
 
 	@PostMapping("/{id}/join")
 	public Member joinChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+		logger.info("CHANNEL join ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 		User user = authorizationService.getUser(request, true, true);
 

@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+import su.foxogram.enums.ChannelsEnum;
 
 import java.lang.reflect.Member;
 import java.util.List;
@@ -18,13 +19,21 @@ public class Channel {
     @Column("name")
     public String name;
 
+    @Column("type")
+    public String type;
+
+    @Column("ownerid")
+    public long ownerId;
+
     public Channel() {
 
     }
 
-    public Channel(long id, String name) {
+    public Channel(long id, String name, String type, long ownerId) {
         this.id = id;
         this.name = name;
+        this.type = type;
+        this.ownerId = ownerId;
     }
 
     public long getId() {

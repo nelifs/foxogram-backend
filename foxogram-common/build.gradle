@@ -11,6 +11,10 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    aspectjweaver
+}
+
 java {
     sourceCompatibility = '21'
 }
@@ -27,6 +31,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+    implementation 'org.aspectj:aspectjrt:1.9.7'
+    implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
@@ -40,4 +46,10 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('bootRun') {
+    doFirst {
+        jvmArgs = ["-javaagent:${configurations.aspectjweaver.singleFile} -Dspring.output.ansi.enabled=ALWAYS"]
+    }
 }

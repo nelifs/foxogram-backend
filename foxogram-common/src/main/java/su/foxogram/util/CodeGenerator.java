@@ -2,7 +2,7 @@ package su.foxogram.util;
 
 import java.util.Random;
 
-public class Code {
+public class CodeGenerator {
 	public static String generateDigitCode() {
 		Random random = new Random();
 		int min = 100000;

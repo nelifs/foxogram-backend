@@ -8,6 +8,6 @@ import su.foxogram.enums.ExceptionsEnum;
 public class UserEmailNotVerifiedException extends BaseException {
 
 	public UserEmailNotVerifiedException() {
-		super("You need to verify your email first", ExceptionsEnum.Codes.USER_EMAIL_NOT_VERIFIED.getValue());
+		super("You need to verify your email first", UserEmailNotVerifiedException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsEnum.Codes.USER_EMAIL_NOT_VERIFIED.getValue());
 	}
 }

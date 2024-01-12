@@ -39,3 +39,10 @@ jar {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+
+tasks.named('bootRun') {
+    doFirst {
+        jvmArgs = ["-Dspring.output.ansi.enabled=ALWAYS"]
+    }
+}

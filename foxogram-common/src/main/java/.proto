@@ -13,5 +13,6 @@ message ImageMessage {
 
 message ProtoMessage {
     string content = 1;
-    string access_token = 2;
+    repeated string attachments = 2;
+    string access_token = 3;
 }
