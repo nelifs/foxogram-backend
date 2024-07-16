@@ -10,90 +10,102 @@ import java.util.List;
 @Table("members")
 public class Member extends BaseUser {
 
-	@Id
-	@PrimaryKey
-	public long id;
+    @Id
+    @PrimaryKey
+    public long id;
 
-	@Column("channelid")
-	public long channelId;
+    @Column("channelid")
+    public long channelId;
 
-	@Column("username")
-	public String username;
+    @Column("username")
+    public String username;
 
-	@Column("accesstoken")
-	public String accessToken;
+    @Column("accesstoken")
+    public String accessToken;
 
-	@Column("avatar")
-	public String avatar;
+    @Column("admin")
+    public boolean admin;
 
-	@Column("createdat")
-	public long createdAt;
+    @Column("avatar")
+    public String avatar;
 
-	@Column("flags")
-	public List<String> flags;
+    @Column("createdat")
+    public long createdAt;
 
-	public Member() {
+    @Column("flags")
+    public List<String> flags;
 
-	}
+    public Member() {
 
-	public Member(long id, long channelId, String username, String accessToken, String avatar, long createdAt, List<String> flags) {
-		super(id, avatar, username, accessToken, createdAt, flags);
-		this.channelId = channelId;
-	}
+    }
 
-	public long getId() {
-		return id;
-	}
+    public Member(long id, long channelId, String username, String accessToken, boolean admin, String avatar, long createdAt, List<String> flags) {
+        super(id, avatar, username, accessToken, createdAt, flags);
+        this.channelId = channelId;
+        this.admin = admin;
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public long getChannelId() {
-		return channelId;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setChannelId(long channelId) {
-		this.channelId = channelId;
-	}
+    public long getChannelId() {
+        return channelId;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public void setChannelId(long channelId) {
+        this.channelId = channelId;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public String getAccessToken() {
-		return accessToken;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
+    public String getAccessToken() {
+        return accessToken;
+    }
 
-	public String getAvatar() {
-		return avatar;
-	}
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
 
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
-	}
+    public String getAvatar() {
+        return avatar;
+    }
 
-	public long getCreatedAt() {
-		return createdAt;
-	}
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
-	public void setCreatedAt(long createdAt) {
-		this.createdAt = createdAt;
-	}
+    public long getCreatedAt() {
+        return createdAt;
+    }
 
-	public List<String> getFlags() {
-		return flags;
-	}
+    public boolean isAdmin() {
+        return admin;
+    }
 
-	public void setFlags(List<String> flags) {
-		this.flags = flags;
-	}
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<String> getFlags() {
+        return flags;
+    }
+
+    public void setFlags(List<String> flags) {
+        this.flags = flags;
+    }
 }

@@ -1,18 +1,25 @@
 plugins {
-    id 'application'
     id 'java'
+    id 'org.springframework.boot' version '3.2.1'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'su.foxogram'
 version = '1.0.0'
+
+java {
+    sourceCompatibility = '21'
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation project(path: ':foxogram-common')
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 jar {
@@ -26,5 +33,15 @@ jar {
         configurations.runtimeClasspath.collect {
             it.isDirectory() ? it : zipTree(it)
         }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.named('bootRun') {
+    doFirst {
+        jvmArgs = ["-Dspring.output.ansi.enabled=ALWAYS", "-XX:+UseShenandoahGC"]
     }
 }

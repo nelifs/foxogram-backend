@@ -1,6 +1,6 @@
 package su.foxogram.constructors;
 
-public class DeleteRequest {
+public class UserDeleteRequest {
 	private String password;
 
 	public String getPassword() {

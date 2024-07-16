@@ -4,10 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
-import su.foxogram.enums.ChannelsEnum;
-
-import java.lang.reflect.Member;
-import java.util.List;
 
 @Table("channels")
 public class Channel {

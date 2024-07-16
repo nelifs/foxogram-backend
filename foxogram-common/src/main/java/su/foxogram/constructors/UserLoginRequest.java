@@ -1,6 +1,6 @@
 package su.foxogram.constructors;
 
-public class CreateRequest {
+public class UserLoginRequest {
 	private String username;
 	private String email;
 
@@ -28,5 +28,14 @@ public class CreateRequest {
 		this.password = password;
 	}
 
+	public String getResumeToken() {
+		return resumeToken;
+	}
+
+	public void setResumeToken(String resumeToken) {
+		this.resumeToken = resumeToken;
+	}
+
 	private String password;
+	private String resumeToken;
 }

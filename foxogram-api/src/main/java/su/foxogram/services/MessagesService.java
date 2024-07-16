@@ -6,14 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.core.query.Criteria;
 import org.springframework.data.cassandra.core.query.Query;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import su.foxogram.constructors.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MessageNotFoundException;
 import su.foxogram.repositories.ChannelRepository;
-import su.foxogram.repositories.MemberRepository;
 import su.foxogram.repositories.MessageRepository;
 import su.foxogram.structures.Snowflake;
 
