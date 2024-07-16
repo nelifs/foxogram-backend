@@ -1,6 +1,6 @@
-package su.foxogram.constructors;
+package su.foxogram.payloads;
 
-public class UserDeleteRequest {
+public class UserDeletePayload {
 	private String password;
 
 	public String getPassword() {

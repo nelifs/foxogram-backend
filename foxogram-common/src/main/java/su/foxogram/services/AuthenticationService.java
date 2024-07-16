@@ -1,5 +1,6 @@
 package su.foxogram.services;
 
+import com.google.protobuf.Any;
 import io.micrometer.core.annotation.Timed;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -41,14 +42,13 @@ public class AuthenticationService {
 		this.emailService = emailService;
 	}
 
-	public String getToken(HttpServletRequest request) {
-		String headerValue = request.getHeader("Authorization");
-		if (headerValue == null) return null;
-		else return headerValue.substring(7);
+	public String getToken(String header) {
+		if (header.toLowerCase().startsWith("authorization")) return header.substring(7);
+		else return null;
 	}
 
-	public User getUser(HttpServletRequest request, boolean validateSession, boolean validateEmail) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
-		return validate(getToken(request), validateSession, validateEmail);
+	public User getUser(String header, boolean validateSession, boolean validateEmail) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+		return validate(getToken(header), validateSession, validateEmail);
 	}
 
 	public User validate(String token, boolean validateSession, boolean validateEmail) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException {

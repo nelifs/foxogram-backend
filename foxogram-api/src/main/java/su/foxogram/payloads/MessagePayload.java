@@ -1,8 +1,8 @@
-package su.foxogram.constructors;
+package su.foxogram.payloads;
 
 import java.util.List;
 
-public class MessageRequest {
+public class MessagePayload {
 	private String content;
 	private List<String> attachments;
 
