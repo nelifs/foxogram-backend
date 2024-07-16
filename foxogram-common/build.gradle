@@ -39,6 +39,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
@@ -50,6 +52,6 @@ tasks.named('test') {
 
 tasks.named('bootRun') {
     doFirst {
-        jvmArgs = ["-javaagent:${configurations.aspectjweaver.singleFile} -Dspring.output.ansi.enabled=ALWAYS"]
+        jvmArgs = ["-javaagent:${configurations.aspectjweaver.singleFile} -Dspring.output.ansi.enabled=ALWAYS -XX:+UseShenandoahGC"]
     }
 }

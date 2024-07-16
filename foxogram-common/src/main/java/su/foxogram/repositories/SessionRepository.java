@@ -2,11 +2,13 @@ package su.foxogram.repositories;
 
 import org.springframework.data.cassandra.repository.AllowFiltering;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 import su.foxogram.constructors.Session;
 import su.foxogram.constructors.User;
 
 import java.util.List;
 
+@Repository
 public interface SessionRepository extends CrudRepository<Session, String> {
 
 	@AllowFiltering

@@ -20,6 +20,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 jar {
@@ -40,9 +43,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-
 tasks.named('bootRun') {
     doFirst {
-        jvmArgs = ["-Dspring.output.ansi.enabled=ALWAYS"]
+        jvmArgs = ["-Dspring.output.ansi.enabled=ALWAYS", "-Dmanagement.endpoints.web.exposure.include=*", "-XX:+UseShenandoahGC"]
     }
 }

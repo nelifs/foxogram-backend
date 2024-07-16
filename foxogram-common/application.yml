@@ -5,3 +5,4 @@ spring:
       port: 9042
       keyspace-name: foxogram
       schema-action: CREATE_IF_NOT_EXISTS
+      connect-timeout-millis: 15000

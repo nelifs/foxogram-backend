@@ -5,7 +5,7 @@ import java.util.Random;
 public class CodeGenerator {
 	public static String generateDigitCode() {
 		Random random = new Random();
-		int min = 100000;
+		int min = 1;
 		int max = 999999;
 
 		int generatedNumber = random.nextInt((max - min) + 1) + min;

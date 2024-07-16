@@ -1,2 +1,37 @@
 server:
   port: 8080
+management:
+  health:
+    db:
+      enabled: true
+    defaults:
+      enabled: true
+    mail:
+      enabled: true
+    redis:
+      enabled: true
+    rabbit:
+      enabled: true
+    diskspace:
+      enabled: true
+    status:
+      order: ["DOWN", "OUT_OF_SERVICE", "UNKNOWN", "UP"]
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+      defaults:
+        enabled: true
+    web:
+      server:
+        auto-time-requests: true
+  endpoints:
+    docs:
+      enabled: true
+      path: "/docs"
+    web:
+      exposure:
+        include: "*"
+logging:
+  file: "api.log"
+  path: "/resources/logs"
