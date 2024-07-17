@@ -1,6 +1,6 @@
-package su.foxogram.constructors;
+package su.foxogram.payloads;
 
-public class ChannelCreateRequest {
+public class ChannelCreatePayload {
     private String name;
     private String type;
 

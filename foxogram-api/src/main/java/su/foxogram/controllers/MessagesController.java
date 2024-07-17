@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import su.foxogram.constructors.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
+import su.foxogram.payloads.MessagePayload;
+import su.foxogram.utils.PayloadBuilder;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.ChannelsService;
 import su.foxogram.services.MessagesService;
@@ -54,7 +56,7 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public ResponseEntity<?> postMessage(@RequestBody MessageRequest body, @PathVariable long channelId, HttpServletRequest request) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> postMessage(@RequestBody MessagePayload body, @PathVariable long channelId, HttpServletRequest request) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authenticationService.getUser(request, true, true);
 		logger.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channelId, user.getId(), user.getEmail());
 
@@ -74,11 +76,11 @@ public class MessagesController {
 
 		messagesService.deleteMessage(id, channelId);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "Message has been deleted successfully").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "Message has been deleted successfully").build());
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> patchMessage(@RequestBody MessageRequest body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> patchMessage(@RequestBody MessagePayload body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authenticationService.getUser(request, true, true);
 		logger.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 

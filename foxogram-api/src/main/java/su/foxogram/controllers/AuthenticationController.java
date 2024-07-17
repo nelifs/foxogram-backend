@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import su.foxogram.constructors.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
+import su.foxogram.payloads.*;
 import su.foxogram.repositories.AuthorizationRepository;
 import su.foxogram.repositories.SessionRepository;
 import su.foxogram.services.AuthenticationService;
+import su.foxogram.utils.PayloadBuilder;
 
 @RestController
 @RequestMapping(value = APIEnum.AUTH, produces = "application/json")
@@ -30,7 +32,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<String> create(@RequestBody UserCreateRequest body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
+	public ResponseEntity<String> create(@RequestBody UserCreatePayload body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
@@ -38,18 +40,18 @@ public class AuthenticationController {
 
 		User user = authenticationService.createUser(username, email, password);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("username", user.getUsername()).addField("email", user.getEmail()).addField("accessToken", user.getAccessToken()).build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("username", user.getUsername()).addField("email", user.getEmail()).addField("accessToken", user.getAccessToken()).build());
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody UserLoginRequest body) throws UserCredentialsIsInvalidException {
+	public ResponseEntity<String> login(@RequestBody UserLoginPayload body) throws UserCredentialsIsInvalidException {
 		String email = body.getEmail();
 		String password = body.getPassword();
 		logger.info("USER ({}) LOGIN request", email);
 
 		authenticationService.loginUser(email, password);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully signed in!").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully signed in!").build());
 	}
 
 	/*@PostMapping("/resume")
@@ -63,14 +65,14 @@ public class AuthenticationController {
 	}*/
 
 	@PostMapping("/refresh")
-	public ResponseEntity<String> refreshToken(@RequestBody UserResumeRequest body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public ResponseEntity<String> refreshToken(@RequestBody UserResumePayload body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		User user = authenticationService.getUser(request, false, true);
 		Authorization auth = authorizationRepository.findById(user.getId());
 		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
 
 		auth = authenticationService.refreshToken(user, auth);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "Your token has been refreshed").addField("accessToken", auth.getAccessToken()).addField("refreshToken", user.getRefreshToken()).addField("expiresAt", String.valueOf(auth.getExpiresAt())).build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "Your token has been refreshed").addField("accessToken", auth.getAccessToken()).addField("refreshToken", user.getRefreshToken()).addField("expiresAt", String.valueOf(auth.getExpiresAt())).build());
 	}
 
 	@PostMapping("/email/verify/{code}")
@@ -80,7 +82,7 @@ public class AuthenticationController {
 
 		authenticationService.verifyEmail(user, code);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully verified your email").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully verified your email").build());
 	}
 
 	@PostMapping("/logout")
@@ -91,7 +93,7 @@ public class AuthenticationController {
 
 		sessionRepository.delete(session);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have been successfully logged out").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully logged out").build());
 	}
 
 	@PostMapping("/delete/confirm/{code}")
@@ -101,17 +103,17 @@ public class AuthenticationController {
 
 		authenticationService.confirmUserDelete(user, pathCode);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have successfully deleted your account!").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have successfully deleted your account!").build());
 	}
 
 	@PostMapping("/delete")
-	public ResponseEntity<String> delete(@RequestBody UserDeleteRequest body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
+	public ResponseEntity<String> delete(@RequestBody UserDeletePayload body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
 		String password = body.getPassword();
 		User user = authenticationService.getUser(request, false, false);
 		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.requestUserDelete(user, password);
 
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You need to confirm account deletion via email").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You need to confirm account deletion via email").build());
 	}
 }

@@ -10,13 +10,7 @@ public class MessagesController {
 
     @MessageMapping("/feed")
     @SendTo("/messages/feed")
-    public void newMessage(MessagePayload payload) {
-
-    }
-
-    @MessageMapping("/edit")
-    @SendTo("/messages/edit")
-    public void editMessage(MessagePayload payload) {
+    public void messagesFeed(MessagePayload payload) {
 
     }
 }

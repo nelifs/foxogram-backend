@@ -1,6 +1,6 @@
-package su.foxogram.constructors;
+package su.foxogram.payloads;
 
-public class UserLoginRequest {
+public class UserLoginPayload {
 	private String username;
 	private String email;
 

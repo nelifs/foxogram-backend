@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import su.foxogram.constructors.RequestMessage;
+import su.foxogram.utils.PayloadBuilder;
 import su.foxogram.exceptions.BaseException;
 
 @RestControllerAdvice
@@ -28,6 +28,6 @@ public class ExceptionController {
 	}
 
 	private ResponseEntity<String> Message(String errorCode, HttpStatus status, String message) {
-		return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(new RequestMessage().setSuccess(false).addField("errorCode", errorCode).addField("message", message).build());
+		return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(new PayloadBuilder().setSuccess(false).addField("errorCode", errorCode).addField("message", message).build());
 	}
 }

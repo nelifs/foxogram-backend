@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import su.foxogram.constructors.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MessageNotFoundException;
+import su.foxogram.payloads.MessagePayload;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MessageRepository;
 import su.foxogram.structures.Snowflake;
@@ -70,7 +71,7 @@ public class MessagesService {
 		return message;
 	}
 
-	public Message addMessage(long channelId, User user, MessageRequest body) throws ChannelNotFoundException {
+	public Message addMessage(long channelId, User user, MessagePayload body) throws ChannelNotFoundException {
 		Channel channel = channelRepository.findById(channelId);
 
 		if (channel == null) {
@@ -108,7 +109,7 @@ public class MessagesService {
 		logger.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channelId);
 	}
 
-	public Message editMessage(long id, long channelId, MessageRequest body) throws MessageNotFoundException, ChannelNotFoundException {
+	public Message editMessage(long id, long channelId, MessagePayload body) throws MessageNotFoundException, ChannelNotFoundException {
 		Channel channel = channelRepository.findById(channelId);
 
 		if (channel == null) {

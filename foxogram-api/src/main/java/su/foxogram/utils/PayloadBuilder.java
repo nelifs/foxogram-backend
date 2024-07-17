@@ -1,24 +1,24 @@
-package su.foxogram.constructors;
+package su.foxogram.utils;
 
 import su.foxogram.util.Converter;
 
 import java.util.HashMap;
 
-public class RequestMessage {
+public class PayloadBuilder {
     public HashMap<String, String> hashMap;
     public boolean success;
 
-    public RequestMessage() {
+    public PayloadBuilder() {
         hashMap = new HashMap<>();
     }
 
-    public RequestMessage setSuccess(boolean value) {
+    public PayloadBuilder setSuccess(boolean value) {
         hashMap.put("success", String.valueOf(value));
 
         return this;
     }
 
-    public RequestMessage addField(String key, String value) {
+    public PayloadBuilder addField(String key, String value) {
         hashMap.put(key, value);
 
         return this;

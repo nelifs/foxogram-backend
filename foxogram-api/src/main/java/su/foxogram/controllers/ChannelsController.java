@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import su.foxogram.constructors.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
+import su.foxogram.payloads.ChannelCreatePayload;
+import su.foxogram.utils.PayloadBuilder;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.ChannelsService;
 
@@ -25,7 +27,7 @@ public class ChannelsController {
 	}
 
 	@PostMapping("/create")
-	public Channel createChannel(@RequestBody ChannelCreateRequest body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel createChannel(@RequestBody ChannelCreatePayload body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL create ({}) request");
 		User user = authenticationService.getUser(request, true, true);
 
@@ -56,7 +58,7 @@ public class ChannelsController {
 		User user = authenticationService.getUser(request, true, true);
 
 		channelsService.leaveUser(channel, user);
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "You have successfully left the channel!").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have successfully left the channel!").build());
 	}
 
 	@PatchMapping("/{id}")

@@ -1,6 +1,8 @@
 package su.foxogram.payloads;
 
-import su.foxogram.constructors.Message;
+public class MessagePayload extends BasePayload {
 
-public class MessagePayload extends Message {
+    public MessagePayload(int code, String name) {
+        super(code, name);
+    }
 }

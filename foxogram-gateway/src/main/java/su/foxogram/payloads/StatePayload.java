@@ -1,4 +1,8 @@
 package su.foxogram.payloads;
 
-public class StatePayload {
+public class StatePayload extends BasePayload {
+
+    public StatePayload(int code, String name) {
+        super(code, name);
+    }
 }
