@@ -29,7 +29,7 @@ public class ChannelsController {
 	@PostMapping("/create")
 	public Channel createChannel(@RequestBody ChannelCreatePayload body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL create ({}) request");
-		User user = authenticationService.getUser(request, true, true);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.createChannel(user, body.getType(), body.getName());
 	}
@@ -37,7 +37,7 @@ public class ChannelsController {
 	@GetMapping("/{id}")
 	public Channel getChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL info ({}) request", id);
-		authenticationService.getUser(request, true, true);
+		authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.getChannel(id);
 	}
@@ -46,7 +46,7 @@ public class ChannelsController {
 	public Member joinChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL join ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
-		User user = authenticationService.getUser(request, true, true);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.joinUser(channel, user);
 	}
@@ -55,7 +55,7 @@ public class ChannelsController {
 	public ResponseEntity<String> leaveChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL leave ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
-		User user = authenticationService.getUser(request, true, true);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		channelsService.leaveUser(channel, user);
 		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have successfully left the channel!").build());
@@ -64,7 +64,7 @@ public class ChannelsController {
 	@PatchMapping("/{id}")
 	public Channel editChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL edit ({}) request", id);
-		authenticationService.getUser(request, true, true);
+		authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.getChannel(id);
 	}
@@ -73,7 +73,7 @@ public class ChannelsController {
 	public ResponseEntity<String> deleteChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException, MissingPermissionsException {
 		logger.info("CHANNEL delete ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
-		User user = authenticationService.getUser(request, true, true);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.deleteChannel(channel, user);
 	}

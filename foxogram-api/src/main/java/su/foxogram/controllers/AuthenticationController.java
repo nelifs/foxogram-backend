@@ -66,7 +66,7 @@ public class AuthenticationController {
 
 	@PostMapping("/refresh")
 	public ResponseEntity<String> refreshToken(@RequestBody UserResumePayload body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
-		User user = authenticationService.getUser(request, false, true);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), false, true);
 		Authorization auth = authorizationRepository.findById(user.getId());
 		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
 
@@ -77,7 +77,7 @@ public class AuthenticationController {
 
 	@PostMapping("/email/verify/{code}")
 	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
-		User user = authenticationService.getUser(request, false, false);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
 		logger.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.verifyEmail(user, code);
@@ -87,7 +87,7 @@ public class AuthenticationController {
 
 	@PostMapping("/logout")
 	public ResponseEntity<String> logout(HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
-		User user = authenticationService.getUser(request, true, false);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), true, false);
 		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 		logger.info("USER logout ({}, {}) request", user.getId(), user.getEmail());
 
@@ -98,7 +98,7 @@ public class AuthenticationController {
 
 	@PostMapping("/delete/confirm/{code}")
 	public ResponseEntity<String> deleteConfirm(@PathVariable String pathCode, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
-		User user = authenticationService.getUser(request, false, false);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
 		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.confirmUserDelete(user, pathCode);
@@ -109,7 +109,7 @@ public class AuthenticationController {
 	@PostMapping("/delete")
 	public ResponseEntity<String> delete(@RequestBody UserDeletePayload body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
 		String password = body.getPassword();
-		User user = authenticationService.getUser(request, false, false);
+		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
 		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.requestUserDelete(user, password);

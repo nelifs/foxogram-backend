@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import su.foxogram.constructors.Code;
 import su.foxogram.enums.EmailEnum;
 import su.foxogram.repositories.CodeRepository;
-import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Env;
 
 import java.io.IOException;
