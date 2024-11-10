@@ -1,10 +1,10 @@
-package su.foxogram.repositories;
+package su.foxogram.repositories.cassandra;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.AllowFiltering;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import su.foxogram.constructors.Authorization;
-import su.foxogram.constructors.Session;
+import su.foxogram.models.Authorization;
 
 import java.util.List;
 
@@ -27,5 +27,5 @@ public interface AuthorizationRepository extends CrudRepository<Authorization, S
 	List<Authorization> findAllByAccessToken(String accessToken);
 
 	@Override
-	void delete(Authorization authorization);
+	void delete(@NotNull Authorization authorization);
 }

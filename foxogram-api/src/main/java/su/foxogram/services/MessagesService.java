@@ -7,12 +7,12 @@ import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.core.query.Criteria;
 import org.springframework.data.cassandra.core.query.Query;
 import org.springframework.stereotype.Service;
-import su.foxogram.constructors.*;
+import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MessageNotFoundException;
-import su.foxogram.payloads.MessagePayload;
-import su.foxogram.repositories.ChannelRepository;
-import su.foxogram.repositories.MessageRepository;
+import su.foxogram.dtos.MessageDTO;
+import su.foxogram.repositories.cassandra.ChannelRepository;
+import su.foxogram.repositories.cassandra.MessageRepository;
 import su.foxogram.structures.Snowflake;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class MessagesService {
 	private final MessageRepository messageRepository;
 	private final ChannelRepository channelRepository;
 	private final CassandraTemplate cassandraTemplate;
-	Logger logger = LoggerFactory.getLogger(MessagesService.class);
+	final Logger logger = LoggerFactory.getLogger(MessagesService.class);
 
 	@Autowired
 	public MessagesService(MessageRepository messageRepository, ChannelRepository channelRepository, CassandraTemplate cassandraTemplate) {
@@ -71,7 +71,7 @@ public class MessagesService {
 		return message;
 	}
 
-	public Message addMessage(long channelId, User user, MessagePayload body) throws ChannelNotFoundException {
+	public Message addMessage(long channelId, User user, MessageDTO body) throws ChannelNotFoundException {
 		Channel channel = channelRepository.findById(channelId);
 
 		if (channel == null) {
@@ -109,7 +109,7 @@ public class MessagesService {
 		logger.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channelId);
 	}
 
-	public Message editMessage(long id, long channelId, MessagePayload body) throws MessageNotFoundException, ChannelNotFoundException {
+	public Message editMessage(long id, long channelId, MessageDTO body) throws MessageNotFoundException, ChannelNotFoundException {
 		Channel channel = channelRepository.findById(channelId);
 
 		if (channel == null) {

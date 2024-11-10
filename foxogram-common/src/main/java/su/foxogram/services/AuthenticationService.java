@@ -1,21 +1,19 @@
 package su.foxogram.services;
 
-import com.google.protobuf.Any;
 import io.micrometer.core.annotation.Timed;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import su.foxogram.constructors.*;
+import su.foxogram.models.*;
 import su.foxogram.enums.CodesEnum;
 import su.foxogram.enums.EmailEnum;
 import su.foxogram.enums.TokenEnum;
 import su.foxogram.exceptions.*;
-import su.foxogram.repositories.AuthorizationRepository;
-import su.foxogram.repositories.CodeRepository;
-import su.foxogram.repositories.SessionRepository;
-import su.foxogram.repositories.UserRepository;
+import su.foxogram.repositories.cassandra.AuthorizationRepository;
+import su.foxogram.repositories.cassandra.CodeRepository;
+import su.foxogram.repositories.cassandra.UserRepository;
+import su.foxogram.repositories.cassandra.SessionRepository;
 import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
@@ -31,7 +29,7 @@ public class AuthenticationService {
 	private final AuthorizationRepository authorizationRepository;
 	private final CodeRepository codeRepository;
 	private final EmailService emailService;
-	Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+	final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
 	@Autowired
 	public AuthenticationService(UserRepository userRepository, SessionRepository sessionRepository, AuthorizationRepository authorizationRepository, CodeRepository codeRepository, EmailService emailService) {
@@ -57,14 +55,14 @@ public class AuthenticationService {
 
 		if (!user.isEmailVerified() && validateEmail) throw new UserEmailNotVerifiedException();
 
-		Session session = sessionRepository.findById(user.getId());
+		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 		if (session == null && validateSession) throw new UserAuthenticationNeededException();
 
 		return userRepository.findByAccessToken(token);
 	}
 
 	@Timed(value = "services.auth.create_user", description = "Time taken to execute MyService method")
-	public User createUser(String username, String email, String password) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
+	public User userSignUp(String username, String email, String password) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
 		if (userRepository.findByEmail(email) != null) throw new UserWithThisEmailAlreadyExistException();
 
 		if (!email.contains("@")) throw new EmailIsNotValidException();
@@ -97,7 +95,7 @@ public class AuthenticationService {
 		return user;
 	}
 
-	public void loginUser(String email, String password) throws UserCredentialsIsInvalidException {
+	public User loginUser(String email, String password) throws UserCredentialsIsInvalidException {
 		User user = userRepository.findByEmail(email);
 
 		if (user == null) throw new UserCredentialsIsInvalidException();
@@ -105,6 +103,7 @@ public class AuthenticationService {
 		if (Encryptor.verifyPassword(password, user.getPassword()) && user.isEmailVerified())
 			logger.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
 		else throw new UserCredentialsIsInvalidException();
+		return user;
 	}
 
 	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
@@ -114,7 +113,7 @@ public class AuthenticationService {
 			throw new CodeIsInvalidException();
 		} else {
 			long id = user.getId();
-			Session session = sessionRepository.findById(id);
+			Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 
 			userRepository.delete(user);
 			logger.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
@@ -192,7 +191,7 @@ public class AuthenticationService {
 			codeRepository.delete(code);
 			logger.info("CODE record deleted ({}, {}) successfully", user.getId(), user.getEmail());
 
-			long id = user.getId();
+			long id = user.getId() + new Snowflake(1).nextId();
 			String accessToken = user.getAccessToken();
 			long createdAt = user.getCreatedAt();
 			long expiresAt = createdAt + TokenEnum.Lifetime.REFRESH_TOKEN.getValue();

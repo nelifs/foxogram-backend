@@ -1,12 +1,11 @@
-package su.foxogram.repositories;
+package su.foxogram.repositories.cassandra;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.AllowFiltering;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import su.foxogram.constructors.Channel;
-import su.foxogram.constructors.Message;
-import su.foxogram.constructors.User;
+import su.foxogram.models.Message;
 
 import java.util.List;
 
@@ -35,5 +34,5 @@ public interface MessageRepository extends CrudRepository<Message, Long> {
 	Message findByChannelIdAndId(long channelId, long id);
 
 	@Override
-	void delete(Message message);
+	void delete(@NotNull Message message);
 }

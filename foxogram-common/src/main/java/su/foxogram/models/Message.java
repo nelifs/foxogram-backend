@@ -1,4 +1,4 @@
-package su.foxogram.constructors;
+package su.foxogram.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.mapping.Column;

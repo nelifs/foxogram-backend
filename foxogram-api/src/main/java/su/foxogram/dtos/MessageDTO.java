@@ -1,8 +1,8 @@
-package su.foxogram.payloads;
+package su.foxogram.dtos;
 
 import java.util.List;
 
-public class MessagePayload {
+public class MessageDTO {
 	private String content;
 	private List<String> attachments;
 

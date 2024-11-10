@@ -9,9 +9,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import su.foxogram.constructors.Code;
+import su.foxogram.models.Code;
 import su.foxogram.enums.EmailEnum;
-import su.foxogram.repositories.CodeRepository;
+import su.foxogram.repositories.cassandra.CodeRepository;
 import su.foxogram.util.Env;
 
 import java.io.IOException;

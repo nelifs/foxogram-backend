@@ -25,16 +25,16 @@ public class APIEnum {
     }
 
     public enum Prometheus {
-        AUTH(PROMETHEUS_BASE + "auth."),
-        CHANNELS(PROMETHEUS_BASE + "auth."),
-        EXCEPTIONS(PROMETHEUS_BASE + "auth."),
-        MESSAGES(PROMETHEUS_BASE + "auth."),
-        USERS(PROMETHEUS_BASE + "auth.");
+        AUTH(),
+        CHANNELS(),
+        EXCEPTIONS(),
+        MESSAGES(),
+        USERS();
 
         private final String value;
 
-        Prometheus(String value) {
-            this.value = value;
+        Prometheus() {
+            this.value = "api.requests.auth.";
         }
 
         public String getValue() {

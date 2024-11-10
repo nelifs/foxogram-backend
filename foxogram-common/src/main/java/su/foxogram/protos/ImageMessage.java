@@ -27,7 +27,7 @@ private static final long serialVersionUID = 0L;
     return new ImageMessage();
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
+  public static com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
     return su.foxogram.protos.Protos.internal_static_foxoproto_ImageMessage_descriptor;
   }
@@ -64,7 +64,7 @@ private static final long serialVersionUID = 0L;
 
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
-  public final boolean isInitialized() {
+  public boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
     if (isInitialized == 1) return true;
     if (isInitialized == 0) return false;
@@ -118,8 +118,7 @@ private static final long serialVersionUID = 0L;
         != other.getType()) return false;
     if (!getBytes()
         .equals(other.getBytes())) return false;
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-    return true;
+      return getUnknownFields().equals(other.getUnknownFields());
   }
 
   @java.lang.Override
@@ -237,7 +236,7 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:foxoproto.ImageMessage)
       su.foxogram.protos.ImageMessageOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return su.foxogram.protos.Protos.internal_static_foxoproto_ImageMessage_descriptor;
     }
@@ -363,7 +362,7 @@ private static final long serialVersionUID = 0L;
     }
 
     @java.lang.Override
-    public final boolean isInitialized() {
+    public boolean isInitialized() {
       return true;
     }
 
@@ -474,14 +473,14 @@ private static final long serialVersionUID = 0L;
       return this;
     }
     @java.lang.Override
-    public final Builder setUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+    public Builder setUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.setUnknownFields(unknownFields);
     }
 
     @java.lang.Override
-    public final Builder mergeUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+    public Builder mergeUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
 

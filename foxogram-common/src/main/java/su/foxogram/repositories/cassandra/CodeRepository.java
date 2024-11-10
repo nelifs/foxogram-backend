@@ -1,9 +1,10 @@
-package su.foxogram.repositories;
+package su.foxogram.repositories.cassandra;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.AllowFiltering;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import su.foxogram.constructors.Code;
+import su.foxogram.models.Code;
 
 import java.util.List;
 
@@ -32,5 +33,5 @@ public interface CodeRepository extends CrudRepository<Code, Long> {
 	List<Code> findAllByType(boolean type);
 
 	@Override
-	void delete(Code code);
+	void delete(@NotNull Code code);
 }

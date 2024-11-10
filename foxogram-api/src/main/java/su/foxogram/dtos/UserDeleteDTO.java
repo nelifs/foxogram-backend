@@ -1,6 +1,6 @@
-package su.foxogram.payloads;
+package su.foxogram.dtos;
 
-public class UserDeletePayload {
+public class UserDeleteDTO {
 	private String password;
 
 	public String getPassword() {

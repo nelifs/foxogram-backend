@@ -1,6 +1,6 @@
-package su.foxogram.payloads;
+package su.foxogram.dtos;
 
-public class UserResumePayload {
+public class UserResumeDTO {
 	public String getResumeToken() {
 		return resumeToken;
 	}

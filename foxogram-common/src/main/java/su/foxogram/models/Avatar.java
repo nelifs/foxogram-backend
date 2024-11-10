@@ -1,4 +1,4 @@
-package su.foxogram.constructors;
+package su.foxogram.models;
 
 public class Avatar {
     public String id;

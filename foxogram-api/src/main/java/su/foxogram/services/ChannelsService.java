@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import su.foxogram.constructors.*;
+import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MemberInChannelNotFoundException;
 import su.foxogram.exceptions.MissingPermissionsException;
 import su.foxogram.utils.PayloadBuilder;
-import su.foxogram.repositories.ChannelRepository;
-import su.foxogram.repositories.MemberRepository;
+import su.foxogram.repositories.cassandra.ChannelRepository;
+import su.foxogram.repositories.cassandra.MemberRepository;
 import su.foxogram.structures.Snowflake;
 
 @Service
@@ -18,13 +18,11 @@ public class ChannelsService {
 
     private final ChannelRepository channelRepository;
     private final MemberRepository memberRepository;
-    private final CassandraTemplate cassandraTemplate;
 
     @Autowired
     public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, AuthenticationService authenticationService, CassandraTemplate cassandraTemplate) {
         this.channelRepository = channelRepository;
         this.memberRepository = memberRepository;
-        this.cassandraTemplate = cassandraTemplate;
     }
 
     public Channel createChannel(User user, String type, String name) {

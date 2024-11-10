@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import su.foxogram.constructors.*;
+import su.foxogram.models.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
-import su.foxogram.payloads.*;
-import su.foxogram.repositories.AuthorizationRepository;
-import su.foxogram.repositories.SessionRepository;
+import su.foxogram.dtos.*;
+import su.foxogram.repositories.cassandra.AuthorizationRepository;
+import su.foxogram.repositories.cassandra.SessionRepository;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.utils.PayloadBuilder;
 
@@ -22,7 +22,7 @@ public class AuthenticationController {
 	private final AuthenticationService authenticationService;
 	private final SessionRepository sessionRepository;
 	private final AuthorizationRepository authorizationRepository;
-	Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+	final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
 	@Autowired
 	public AuthenticationController(AuthenticationService authenticationService, SessionRepository sessionRepository, AuthorizationRepository authorizationRepository) {
@@ -31,41 +31,31 @@ public class AuthenticationController {
 		this.authorizationRepository = authorizationRepository;
 	}
 
-	@PostMapping("/create")
-	public ResponseEntity<String> create(@RequestBody UserCreatePayload body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
+	@PostMapping("/signup")
+	public ResponseEntity<String> signup(@RequestBody UserSignUpDTO body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
-		logger.info("USER create ({}, {}) request", username, email);
+		logger.info("USER signup ({}, {}) request", username, email);
 
-		User user = authenticationService.createUser(username, email, password);
+		User user = authenticationService.userSignUp(username, email, password);
 
 		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("username", user.getUsername()).addField("email", user.getEmail()).addField("accessToken", user.getAccessToken()).build());
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody UserLoginPayload body) throws UserCredentialsIsInvalidException {
+	public ResponseEntity<String> login(@RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
 		String email = body.getEmail();
 		String password = body.getPassword();
 		logger.info("USER ({}) LOGIN request", email);
 
-		authenticationService.loginUser(email, password);
+		User user = authenticationService.loginUser(email, password);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully signed in!").build());
+		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully signed in!").addField("accessToken", user.getAccessToken()).build());
 	}
 
-	/*@PostMapping("/resume")
-	public ResponseEntity<String> resumeSession(@RequestBody ResumeRequest body, HttpServletRequest request)
-	throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
-		User user = authorizationService.getUser(request, false, true);
-
-		authorizationService.resumeSession(user);
-
-		return ResponseEntity.ok(new RequestMessage().setSuccess(true).addField("message", "otter").build());
-	}*/
-
 	@PostMapping("/refresh")
-	public ResponseEntity<String> refreshToken(@RequestBody UserResumePayload body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public ResponseEntity<String> refreshToken(@RequestBody UserResumeDTO body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		User user = authenticationService.getUser(request.getHeader("Authorization"), false, true);
 		Authorization auth = authorizationRepository.findById(user.getId());
 		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
@@ -97,17 +87,17 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/delete/confirm/{code}")
-	public ResponseEntity<String> deleteConfirm(@PathVariable String pathCode, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
+	public ResponseEntity<String> deleteConfirm(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
 		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
 		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
-		authenticationService.confirmUserDelete(user, pathCode);
+		authenticationService.confirmUserDelete(user, code);
 
 		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have successfully deleted your account!").build());
 	}
 
 	@PostMapping("/delete")
-	public ResponseEntity<String> delete(@RequestBody UserDeletePayload body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
+	public ResponseEntity<String> delete(@RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
 		String password = body.getPassword();
 		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
 		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());

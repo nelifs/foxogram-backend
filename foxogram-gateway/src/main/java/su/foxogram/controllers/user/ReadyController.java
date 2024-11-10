@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.*;
-import su.foxogram.constructors.User;
+import su.foxogram.models.User;
 import su.foxogram.exceptions.UserNotFoundException;
-import su.foxogram.payloads.ReadyPayload;
+import su.foxogram.dtos.ReadyPayload;
 import su.foxogram.services.AuthenticationService;
 
 import java.util.List;
@@ -17,10 +17,10 @@ import java.util.Map;
 @Controller
 public class ReadyController implements WebSocketHandler {
 
-    AuthenticationService authenticationService;
+    final AuthenticationService authenticationService;
 
-    Logger logger = LoggerFactory.getLogger(ReadyController.class);
-    ObjectMapper mapper = new ObjectMapper();
+    final Logger logger = LoggerFactory.getLogger(ReadyController.class);
+    final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     public ReadyController(AuthenticationService authenticationService) {
@@ -28,7 +28,7 @@ public class ReadyController implements WebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         logger.info("Session CREATED with ID {} and with URI {}", session.getId(), session.getUri());
     }
 
@@ -51,7 +51,7 @@ public class ReadyController implements WebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
         logger.info("Session DESTROYED with STATUS {} ({}) and with ID {} and with URI {}", closeStatus.getReason(), closeStatus.getCode(), session.getId(), session.getUri());
     }
 

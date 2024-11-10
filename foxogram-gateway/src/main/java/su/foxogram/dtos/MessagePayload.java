@@ -1,8 +1,8 @@
-package su.foxogram.payloads;
+package su.foxogram.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ReadyPayload {
+public class MessagePayload {
     @JsonProperty("code")
     int code;
     @JsonProperty("name")

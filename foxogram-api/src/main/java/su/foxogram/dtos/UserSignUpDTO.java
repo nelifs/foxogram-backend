@@ -1,6 +1,6 @@
-package su.foxogram.payloads;
+package su.foxogram.dtos;
 
-public class UserLoginPayload {
+public class UserSignUpDTO {
 	private String username;
 	private String email;
 
@@ -28,14 +28,5 @@ public class UserLoginPayload {
 		this.password = password;
 	}
 
-	public String getResumeToken() {
-		return resumeToken;
-	}
-
-	public void setResumeToken(String resumeToken) {
-		this.resumeToken = resumeToken;
-	}
-
 	private String password;
-	private String resumeToken;
 }

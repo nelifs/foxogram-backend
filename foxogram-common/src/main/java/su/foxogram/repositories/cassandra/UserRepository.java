@@ -1,9 +1,10 @@
-package su.foxogram.repositories;
+package su.foxogram.repositories.cassandra;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.AllowFiltering;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import su.foxogram.constructors.User;
+import su.foxogram.models.User;
 
 import java.util.List;
 
@@ -32,5 +33,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	List<User> findAllByAccessToken(String accessToken);
 
 	@Override
-	void delete(User user);
+	void delete(@NotNull User user);
 }

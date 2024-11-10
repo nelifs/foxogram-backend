@@ -1,6 +1,6 @@
-package su.foxogram.payloads;
+package su.foxogram.dtos;
 
-public class ChannelCreatePayload {
+public class ChannelCreateDTO {
     private String name;
     private String type;
 

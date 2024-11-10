@@ -3,22 +3,19 @@ package su.foxogram.controllers.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.*;
 import su.foxogram.controllers.message.MessageCreatedController;
-import su.foxogram.payloads.MessagePayload;
-import su.foxogram.payloads.StatePayload;
+import su.foxogram.dtos.MessagePayload;
 
 @Controller
 public class StatesController implements WebSocketHandler {
 
-    Logger logger = LoggerFactory.getLogger(MessageCreatedController.class);
-    ObjectMapper mapper = new ObjectMapper();
+    final Logger logger = LoggerFactory.getLogger(StatesController.class);
+    final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) {
         logger.info("Session CREATED with ID {} and with URI {}", session.getId(), session.getUri());
     }
 
@@ -36,7 +33,7 @@ public class StatesController implements WebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
         logger.info("Session DESTROYED with STATUS {} ({}) and with ID {} and with URI {}", closeStatus.getReason(), closeStatus.getCode(), session.getId(), session.getUri());
     }
 

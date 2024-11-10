@@ -1,7 +1,7 @@
 package su.foxogram.controllers;
 
 import org.springframework.web.bind.annotation.*;
-import su.foxogram.constructors.User;
+import su.foxogram.models.User;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.services.UsersService;
@@ -31,7 +31,7 @@ public class UsersController {
 	}
 
 	@PatchMapping("/{id}")
-	public User editUser(@PathVariable long id) throws UserNotFoundException {
+	public User editUser(@PathVariable long id) {
 
 		return usersService.editUser(id);
 	}

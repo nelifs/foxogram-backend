@@ -1,6 +1,5 @@
-package su.foxogram.constructors;
+package su.foxogram.models;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;

@@ -6,10 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import su.foxogram.constructors.*;
+import su.foxogram.models.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
-import su.foxogram.payloads.MessagePayload;
+import su.foxogram.dtos.MessageDTO;
 import su.foxogram.utils.PayloadBuilder;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.ChannelsService;
@@ -23,7 +23,7 @@ public class MessagesController {
 	private final AuthenticationService authenticationService;
 	private final ChannelsService channelsService;
 	private final MessagesService messagesService;
-	Logger logger = LoggerFactory.getLogger(MessagesController.class);
+	final Logger logger = LoggerFactory.getLogger(MessagesController.class);
 
 	@Autowired
 	public MessagesController(ChannelsService channelsService, AuthenticationService authenticationService, MessagesService messagesService) {
@@ -56,7 +56,7 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public ResponseEntity<?> postMessage(@RequestBody MessagePayload body, @PathVariable long channelId, HttpServletRequest request) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> postMessage(@RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 		logger.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channelId, user.getId(), user.getEmail());
 
@@ -80,7 +80,7 @@ public class MessagesController {
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> patchMessage(@RequestBody MessagePayload body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> patchMessage(@RequestBody MessageDTO body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 		logger.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 

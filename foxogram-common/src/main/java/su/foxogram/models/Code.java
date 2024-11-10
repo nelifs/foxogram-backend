@@ -1,9 +1,8 @@
-package su.foxogram.constructors;
+package su.foxogram.models;
 
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
-import org.springframework.data.cassandra.repository.CountQuery;
 
 @Table("codes")
 public class Code {

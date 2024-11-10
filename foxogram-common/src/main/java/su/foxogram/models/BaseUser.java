@@ -1,4 +1,4 @@
-package su.foxogram.constructors;
+package su.foxogram.models;
 
 import java.util.List;
 

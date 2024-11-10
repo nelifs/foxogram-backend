@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-import su.foxogram.controllers.message.MessageCreatedController;
 import su.foxogram.controllers.user.ReadyController;
 import su.foxogram.services.AuthenticationService;
 
@@ -17,16 +16,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(readyHandler(), "/ready"); //.setHandshakeHandler(handshakeHandler());
-        registry.addHandler(messageCreatedHandler(), "/message-created");
+        registry.addHandler(rootHandler(), "/");
     }
 
-    private WebSocketHandler readyHandler() {
+    private WebSocketHandler rootHandler() {
         return new ReadyController(authenticationService);
-    }
-
-    private WebSocketHandler messageCreatedHandler() {
-        return new MessageCreatedController();
     }
 
     @Bean

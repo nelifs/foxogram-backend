@@ -63,11 +63,9 @@ public class Snowflake {
 
         lastTimestamp = currentTimestamp;
 
-        long id = currentTimestamp << (NODE_ID_BITS + SEQUENCE_BITS)
+        return currentTimestamp << (NODE_ID_BITS + SEQUENCE_BITS)
                 | (nodeId << SEQUENCE_BITS)
                 | sequence;
-
-        return id;
     }
 
 

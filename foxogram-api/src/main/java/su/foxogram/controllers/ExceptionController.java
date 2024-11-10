@@ -13,7 +13,7 @@ import su.foxogram.exceptions.BaseException;
 @RestControllerAdvice
 public class ExceptionController {
 
-	Logger logger = LoggerFactory.getLogger(ExceptionController.class);
+	final Logger logger = LoggerFactory.getLogger(ExceptionController.class);
 
 	@ExceptionHandler({ BaseException.class })
 	public ResponseEntity<String> handleBaseException(BaseException exception) {

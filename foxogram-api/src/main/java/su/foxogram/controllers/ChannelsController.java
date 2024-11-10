@@ -5,10 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import su.foxogram.constructors.*;
+import su.foxogram.models.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
-import su.foxogram.payloads.ChannelCreatePayload;
+import su.foxogram.dtos.ChannelCreateDTO;
 import su.foxogram.utils.PayloadBuilder;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.ChannelsService;
@@ -19,7 +19,7 @@ public class ChannelsController {
 
 	private final ChannelsService channelsService;
 	private final AuthenticationService authenticationService;
-	Logger logger = LoggerFactory.getLogger(ChannelsController.class);
+	final Logger logger = LoggerFactory.getLogger(ChannelsController.class);
 
 	public ChannelsController(ChannelsService channelsService, AuthenticationService authenticationService) {
 		this.channelsService = channelsService;
@@ -27,7 +27,7 @@ public class ChannelsController {
 	}
 
 	@PostMapping("/create")
-	public Channel createChannel(@RequestBody ChannelCreatePayload body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel createChannel(@RequestBody ChannelCreateDTO body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL create ({}) request");
 		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 

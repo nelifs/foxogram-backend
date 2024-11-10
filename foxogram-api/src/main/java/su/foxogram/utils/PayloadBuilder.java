@@ -5,7 +5,7 @@ import su.foxogram.util.Converter;
 import java.util.HashMap;
 
 public class PayloadBuilder {
-    public HashMap<String, String> hashMap;
+    public final HashMap<String, String> hashMap;
     public boolean success;
 
     public PayloadBuilder() {
