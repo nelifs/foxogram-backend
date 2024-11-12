@@ -1,11 +1,30 @@
 package su.foxogram.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+
 import java.util.List;
 
 public class BaseUser {
+
+    @Id
+    @PrimaryKey
     public long id;
-    public String username, accessToken, avatar;
+
+    @Column("username")
+    public String username;
+
+    @Column("accesstoken")
+    public String accessToken;
+
+    @Column("avatar")
+    public String avatar;
+
+    @Column("flags")
     public List<String> flags;
+
+    @Column("createdat")
     public long createdAt;
 
     public BaseUser() {

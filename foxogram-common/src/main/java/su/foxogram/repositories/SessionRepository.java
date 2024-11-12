@@ -1,4 +1,4 @@
-package su.foxogram.repositories.cassandra;
+package su.foxogram.repositories;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisHash;

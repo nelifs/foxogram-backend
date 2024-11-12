@@ -1,9 +1,12 @@
 package su.foxogram.configs;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.cassandra.SessionFactory;
+import org.springframework.data.cassandra.config.AbstractCassandraConfiguration;
 import org.springframework.data.cassandra.config.CqlSessionFactoryBean;
 import org.springframework.data.cassandra.config.SchemaAction;
 import org.springframework.data.cassandra.config.SessionFactoryFactoryBean;
@@ -17,43 +20,29 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 import su.foxogram.util.Env;
 
 @Configuration
-@EnableCassandraRepositories(basePackages = {"su.foxogram.repositories.cassandra"})
-public class CassandraConfig {
+@EnableCassandraRepositories(basePackages = {"su.foxogram.repositories"})
+public class CassandraConfig extends AbstractCassandraConfiguration {
 
-	@Bean
-	public CqlSessionFactoryBean session() {
-		CqlSessionFactoryBean session = new CqlSessionFactoryBean();
-		session.setContactPoints(Env.get("DATABASE_HOST"));
-		session.setPassword(Env.get("DATABASE_PASSWORD"));
-		session.setKeyspaceName(Env.get("DATABASE_KEYSPACE"));
-		session.setLocalDatacenter(Env.get("DATABASE_DATACENTER"));
+	@NotNull
+	@Override
+	protected String getKeyspaceName() {
+		return Env.get("DATABASE_KEYSPACE");
+	}
 
-		return session;
+	@NotNull
+	@Override
+	public SchemaAction getSchemaAction() {
+		return SchemaAction.CREATE_IF_NOT_EXISTS;
 	}
 
 	@Bean
-	public SessionFactoryFactoryBean sessionFactory(CqlSession session, CassandraConverter converter) {
-
+	@Primary
+	public SessionFactoryFactoryBean sessionFactory(CqlSession cassandraSession, CassandraConverter converter) {
 		SessionFactoryFactoryBean sessionFactory = new SessionFactoryFactoryBean();
-		sessionFactory.setSession(session);
+		sessionFactory.setSession(cassandraSession);
 		sessionFactory.setConverter(converter);
 		sessionFactory.setSchemaAction(SchemaAction.CREATE_IF_NOT_EXISTS);
-
 		return sessionFactory;
-	}
-
-	@Bean
-	public CassandraMappingContext mappingContext() {
-		return new CassandraMappingContext();
-	}
-
-	@Bean
-	public CassandraConverter converter(CqlSession cqlSession, CassandraMappingContext mappingContext) {
-
-		MappingCassandraConverter cassandraConverter = new MappingCassandraConverter(mappingContext);
-		cassandraConverter.setUserTypeResolver(new SimpleUserTypeResolver(cqlSession));
-
-		return cassandraConverter;
 	}
 
 	@Bean

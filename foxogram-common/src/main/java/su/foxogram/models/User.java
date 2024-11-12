@@ -11,16 +11,6 @@ import java.util.List;
 @Table("users")
 public class User extends BaseUser {
 
-    @Id
-    @PrimaryKey
-    private long id;
-
-    @Column("avatar")
-    private String avatar;
-
-    @Column("username")
-    private String username;
-
     @Column("email")
     private String email;
 
@@ -30,17 +20,8 @@ public class User extends BaseUser {
     @Column("password")
     private String password;
 
-    @Column("accesstoken")
-    private String accessToken;
-
     @Column("refreshtoken")
     private String refreshToken;
-
-    @Column("flags")
-    private List<String> flags;
-
-    @Column("createdat")
-    private long createdAt;
 
     @Column("deletion")
     private long deletion;

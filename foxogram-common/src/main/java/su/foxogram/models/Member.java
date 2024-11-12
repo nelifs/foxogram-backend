@@ -10,30 +10,11 @@ import java.util.List;
 @Table("members")
 public class Member extends BaseUser {
 
-    @Id
-    @PrimaryKey
-    public long id;
-
     @Column("channelid")
     public long channelId;
 
-    @Column("username")
-    public String username;
-
-    @Column("accesstoken")
-    public String accessToken;
-
     @Column("admin")
     public boolean admin;
-
-    @Column("avatar")
-    public String avatar;
-
-    @Column("createdat")
-    public long createdAt;
-
-    @Column("flags")
-    public List<String> flags;
 
     public Member() {
 

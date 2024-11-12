@@ -5,7 +5,7 @@ import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Service;
 import su.foxogram.models.User;
 import su.foxogram.exceptions.UserNotFoundException;
-import su.foxogram.repositories.cassandra.UserRepository;
+import su.foxogram.repositories.UserRepository;
 
 @Service
 public class UsersService {

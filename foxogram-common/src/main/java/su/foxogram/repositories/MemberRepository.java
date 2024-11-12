@@ -1,4 +1,4 @@
-package su.foxogram.repositories.cassandra;
+package su.foxogram.repositories;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.AllowFiltering;
@@ -11,7 +11,6 @@ import java.util.List;
 
 @Repository
 public interface MemberRepository extends CrudRepository<Member, Long> {
-
 
 	@AllowFiltering
 	@Query("SELECT * FROM members WHERE channelid = ?0 AND id = ?1 ALLOW FILTERING")

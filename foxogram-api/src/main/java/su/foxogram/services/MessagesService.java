@@ -11,8 +11,8 @@ import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MessageNotFoundException;
 import su.foxogram.dtos.MessageDTO;
-import su.foxogram.repositories.cassandra.ChannelRepository;
-import su.foxogram.repositories.cassandra.MessageRepository;
+import su.foxogram.repositories.ChannelRepository;
+import su.foxogram.repositories.MessageRepository;
 import su.foxogram.structures.Snowflake;
 
 import java.util.List;

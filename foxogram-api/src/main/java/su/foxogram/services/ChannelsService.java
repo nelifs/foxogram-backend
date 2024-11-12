@@ -9,8 +9,8 @@ import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MemberInChannelNotFoundException;
 import su.foxogram.exceptions.MissingPermissionsException;
 import su.foxogram.utils.PayloadBuilder;
-import su.foxogram.repositories.cassandra.ChannelRepository;
-import su.foxogram.repositories.cassandra.MemberRepository;
+import su.foxogram.repositories.ChannelRepository;
+import su.foxogram.repositories.MemberRepository;
 import su.foxogram.structures.Snowflake;
 
 @Service
