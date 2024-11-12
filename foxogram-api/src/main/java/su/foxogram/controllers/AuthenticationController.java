@@ -10,8 +10,8 @@ import su.foxogram.models.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
 import su.foxogram.dtos.*;
-import su.foxogram.repositories.cassandra.AuthorizationRepository;
-import su.foxogram.repositories.cassandra.SessionRepository;
+import su.foxogram.repositories.AuthorizationRepository;
+import su.foxogram.repositories.SessionRepository;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.utils.PayloadBuilder;
 
@@ -55,8 +55,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/refresh")
-	public ResponseEntity<String> refreshToken(@RequestBody UserResumeDTO body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
-		User user = authenticationService.getUser(request.getHeader("Authorization"), false, true);
+	public ResponseEntity<String> refreshToken(@RequestAttribute(value = "user") User user, @RequestBody UserResumeDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException {
 		Authorization auth = authorizationRepository.findById(user.getId());
 		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
 
@@ -66,8 +65,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/email/verify/{code}")
-	public ResponseEntity<String> emailVerify(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
-		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
+	public ResponseEntity<String> emailVerify(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException, CodeExpiredException {
 		logger.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.verifyEmail(user, code);
@@ -76,8 +74,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<String> logout(HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
-		User user = authenticationService.getUser(request.getHeader("Authorization"), true, false);
+	public ResponseEntity<String> logout(@RequestAttribute(value = "user") User user, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
 		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 		logger.info("USER logout ({}, {}) request", user.getId(), user.getEmail());
 
@@ -87,8 +84,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/delete/confirm/{code}")
-	public ResponseEntity<String> deleteConfirm(@PathVariable String code, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
-		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
+	public ResponseEntity<String> deleteConfirm(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
 		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.confirmUserDelete(user, code);
@@ -97,9 +93,8 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/delete")
-	public ResponseEntity<String> delete(@RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserNotFoundException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
+	public ResponseEntity<String> delete(@RequestAttribute(value = "user") User user, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
 		String password = body.getPassword();
-		User user = authenticationService.getUser(request.getHeader("Authorization"), false, false);
 		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.requestUserDelete(user, password);

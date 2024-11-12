@@ -27,53 +27,47 @@ public class ChannelsController {
 	}
 
 	@PostMapping("/create")
-	public Channel createChannel(@RequestBody ChannelCreateDTO body, HttpServletRequest request) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel createChannel(@RequestAttribute(value = "user") User user, @RequestBody ChannelCreateDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL create ({}) request");
-		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.createChannel(user, body.getType(), body.getName());
 	}
 
 	@GetMapping("/{id}")
-	public Channel getChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel getChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL info ({}) request", id);
-		authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.getChannel(id);
 	}
 
 	@PostMapping("/{id}/join")
-	public Member joinChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Member joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL join ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
-		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.joinUser(channel, user);
 	}
 
 	@PostMapping("/{id}/leave")
-	public ResponseEntity<String> leaveChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public ResponseEntity<String> leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL leave ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
-		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		channelsService.leaveUser(channel, user);
 		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have successfully left the channel!").build());
 	}
 
 	@PatchMapping("/{id}")
-	public Channel editChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel editChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
 		logger.info("CHANNEL edit ({}) request", id);
-		authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.getChannel(id);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteChannel(@PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException, MissingPermissionsException {
+	public ResponseEntity<String> deleteChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException, MissingPermissionsException {
 		logger.info("CHANNEL delete ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
-		User user = authenticationService.getUser(request.getHeader("Authorization"), true, true);
 
 		return channelsService.deleteChannel(channel, user);
 	}

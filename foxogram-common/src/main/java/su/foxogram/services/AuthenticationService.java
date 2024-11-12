@@ -1,6 +1,5 @@
 package su.foxogram.services;
 
-import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +9,10 @@ import su.foxogram.enums.CodesEnum;
 import su.foxogram.enums.EmailEnum;
 import su.foxogram.enums.TokenEnum;
 import su.foxogram.exceptions.*;
-import su.foxogram.repositories.cassandra.AuthorizationRepository;
-import su.foxogram.repositories.cassandra.CodeRepository;
-import su.foxogram.repositories.cassandra.UserRepository;
-import su.foxogram.repositories.cassandra.SessionRepository;
+import su.foxogram.repositories.AuthorizationRepository;
+import su.foxogram.repositories.CodeRepository;
+import su.foxogram.repositories.UserRepository;
+import su.foxogram.repositories.SessionRepository;
 import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
@@ -40,28 +39,22 @@ public class AuthenticationService {
 		this.emailService = emailService;
 	}
 
-	public String getToken(String header) {
-		if (header.toLowerCase().startsWith("authorization")) return header.substring(7);
-		else return null;
+	public User getUser(String header) throws UserUnauthorizedException {
+		return validate(header.substring(7));
 	}
 
-	public User getUser(String header, boolean validateSession, boolean validateEmail) throws UserNotFoundException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
-		return validate(getToken(header), validateSession, validateEmail);
-	}
-
-	public User validate(String token, boolean validateSession, boolean validateEmail) throws UserEmailNotVerifiedException, UserNotFoundException, UserAuthenticationNeededException {
+	public User validate(String token) throws UserUnauthorizedException {
 		User user = userRepository.findByAccessToken(token);
-		if (user == null) throw new UserNotFoundException();
+		if (user == null) throw new UserUnauthorizedException();
 
-		if (!user.isEmailVerified() && validateEmail) throw new UserEmailNotVerifiedException();
-
-		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
-		if (session == null && validateSession) throw new UserAuthenticationNeededException();
+//		if (!user.isEmailVerified() && validateEmail) throw new UserEmailNotVerifiedException();
+//
+//		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
+//		if (session == null && validateSession) throw new UserAuthenticationNeededException();
 
 		return userRepository.findByAccessToken(token);
 	}
 
-	@Timed(value = "services.auth.create_user", description = "Time taken to execute MyService method")
 	public User userSignUp(String username, String email, String password) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
 		if (userRepository.findByEmail(email) != null) throw new UserWithThisEmailAlreadyExistException();
 
@@ -140,8 +133,8 @@ public class AuthenticationService {
 		} else throw new UserCredentialsIsInvalidException();
 	}
 
-	public Authorization refreshToken(User user, Authorization auth) throws UserNotFoundException, UserAuthenticationNeededException {
-		if (user == null) throw new UserNotFoundException();
+	public Authorization refreshToken(User user, Authorization auth) throws UserUnauthorizedException, UserAuthenticationNeededException {
+		if (user == null) throw new UserUnauthorizedException();
 		if (auth == null) throw new UserAuthenticationNeededException();
 
 		long id = user.getId();
@@ -179,11 +172,13 @@ public class AuthenticationService {
 		return session;
 	}*/
 
-	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException {
+	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
 		Code code = codeRepository.findByValue(pathCode);
 
 		if (code == null) {
 			throw new CodeIsInvalidException();
+		} else if (code.expiresAt <= System.currentTimeMillis()) {
+			throw new CodeExpiredException();
 		} else {
 			user.setEmailVerified(true);
 			userRepository.save(user);
