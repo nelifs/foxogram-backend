@@ -28,6 +28,6 @@ public class ExceptionController {
 	}
 
 	private ResponseEntity<String> Message(String errorCode, HttpStatus status, String message) {
-		return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(new PayloadBuilder().setSuccess(false).addField("errorCode", errorCode).addField("message", message).build());
+		return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(new PayloadBuilder().setSuccess(false).addField("code", errorCode).addField("message", message).build());
 	}
 }

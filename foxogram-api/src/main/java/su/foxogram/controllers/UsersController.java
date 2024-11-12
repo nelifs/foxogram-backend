@@ -3,7 +3,7 @@ package su.foxogram.controllers;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.models.User;
 import su.foxogram.enums.APIEnum;
-import su.foxogram.exceptions.UserNotFoundException;
+import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.services.UsersService;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class UsersController {
 	}
 
 	@GetMapping("/{id}")
-	public User getUser(@PathVariable long id) throws UserNotFoundException {
+	public User getUser(@PathVariable long id) throws UserUnauthorizedException {
 
 		return usersService.getUser(id);
 	}

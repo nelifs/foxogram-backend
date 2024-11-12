@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import su.foxogram.enums.ExceptionsEnum;
 
-@ResponseStatus(HttpStatus.FORBIDDEN)
+@ResponseStatus(HttpStatus.NOT_FOUND)
 public class CodeIsInvalidException extends BaseException {
 
 	public CodeIsInvalidException() {

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.*;
 import su.foxogram.models.User;
-import su.foxogram.exceptions.UserNotFoundException;
+import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.dtos.ReadyPayload;
 import su.foxogram.services.AuthenticationService;
 
@@ -35,9 +36,9 @@ public class ReadyController implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         Map<String, List<String>> headers = session.getHandshakeHeaders();
-        User user = authenticationService.getUser(headers.get("authorization").toString(), false, false);
+        User user = authenticationService.getUser(headers.get(HttpHeaders.AUTHORIZATION).toString());
 
-        if (user == null) throw new UserNotFoundException();
+        if (user == null) throw new UserUnauthorizedException();
 
         ReadyPayload payload = mapper.readValue((String) message.getPayload(), ReadyPayload.class);
         logger.info("got READY event with CODE {} and NAME {}", payload.getCode(), payload.getName());

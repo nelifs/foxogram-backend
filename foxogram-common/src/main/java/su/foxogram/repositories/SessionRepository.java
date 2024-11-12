@@ -1,6 +1,7 @@
 package su.foxogram.repositories;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.cassandra.repository.AllowFiltering;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -9,7 +10,6 @@ import su.foxogram.models.Session;
 import java.util.List;
 
 @Repository
-@RedisHash("sessions")
 public interface SessionRepository extends CrudRepository<Session, Long> {
 
 	Session findById(long id);
@@ -18,6 +18,7 @@ public interface SessionRepository extends CrudRepository<Session, Long> {
 
 	List<Session> findAllBy();
 
+	@AllowFiltering
 	Session findByAccessToken(String accessToken);
 
 	List<Session> findAllByAccessToken(String accessToken);

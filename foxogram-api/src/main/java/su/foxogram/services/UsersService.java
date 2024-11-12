@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Service;
 import su.foxogram.models.User;
-import su.foxogram.exceptions.UserNotFoundException;
+import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.repositories.UserRepository;
 
 @Service
@@ -17,11 +17,11 @@ public class UsersService {
 		this.userRepository = userRepository;
     }
 
-	public User getUser(long id) throws UserNotFoundException {
+	public User getUser(long id) throws UserUnauthorizedException {
 		User user = userRepository.findById(id);
 
 		if (user == null) {
-			throw new UserNotFoundException();
+			throw new UserUnauthorizedException();
 		}
 
 		return user;
