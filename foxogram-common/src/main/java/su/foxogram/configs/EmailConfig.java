@@ -1,24 +1,34 @@
 package su.foxogram.configs;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import su.foxogram.util.Env;
 
 import java.util.Properties;
 
 @Configuration
+@ConfigurationProperties("smtp")
+@Getter
+@Setter
 public class EmailConfig {
+
+	private String host;
+	private String port;
+	private String username;
+	private String password;
 
 	@Bean
 	public JavaMailSender javaMailSender() {
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-		mailSender.setHost(Env.get("SMTP_HOST"));
-		mailSender.setPort(Integer.parseInt(Env.get("SMTP_PORT")));
+		mailSender.setHost(host);
+		mailSender.setPort(Integer.parseInt(port));
 
-		mailSender.setUsername(Env.get("SMTP_USERNAME"));
-		mailSender.setPassword(Env.get("SMTP_PASSWORD"));
+		mailSender.setUsername(username);
+		mailSender.setPassword(password);
 
 		Properties props = mailSender.getJavaMailProperties();
 		props.put("mail.transport.protocol", "smtp");

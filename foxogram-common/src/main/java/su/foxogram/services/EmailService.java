@@ -3,6 +3,7 @@ package su.foxogram.services;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import su.foxogram.models.Code;
 import su.foxogram.enums.EmailEnum;
 import su.foxogram.repositories.CodeRepository;
-import su.foxogram.util.Env;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +25,9 @@ public class EmailService {
     private final CodeRepository codeRepository;
     private final ResourceLoader resourceLoader;
     private final JavaMailSender javaMailSender;
+
+    @Value("smtp.email")
+    private String email;
 
     @Autowired
     public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, CodeRepository codeRepository) {
@@ -41,7 +44,7 @@ public class EmailService {
 
         try {
             helper.setTo(to);
-            helper.setFrom(Env.get("SMTP_EMAIL"));
+            helper.setFrom(email);
             if (type.equals(EmailEnum.Type.DELETE.getValue())) {
                 helper.setSubject("Confirm Your Account Deletion");
                 HTMLContent = readHTML("delete").replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);

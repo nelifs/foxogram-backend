@@ -1,7 +1,10 @@
 package su.foxogram.configs;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -13,16 +16,20 @@ import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.core.convert.CassandraConverter;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
-import su.foxogram.util.Env;
 
 @Configuration
 @EnableCassandraRepositories(basePackages = {"su.foxogram.repositories"})
+@ConfigurationProperties(prefix = "cassandra")
+@Getter
+@Setter
 public class CassandraConfig extends AbstractCassandraConfiguration {
+
+	private String keyspace;
 
 	@NotNull
 	@Override
 	protected String getKeyspaceName() {
-		return Env.get("DATABASE_KEYSPACE");
+		return keyspace;
 	}
 
 	@NotNull

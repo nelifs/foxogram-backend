@@ -20,11 +20,11 @@ java {
 }
 
 dependencies {
+    implementation 'org.jetbrains:annotations:16.0.2'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'javax.json:javax.json-api:1.1.4'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'com.google.protobuf:protobuf-java:4.28.2'
-    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
     implementation 'org.mindrot:jbcrypt:0.4'
     implementation 'org.slf4j:slf4j-api:1.7.32'
     implementation 'ch.qos.logback:logback-classic:1.4.12'
@@ -49,6 +49,7 @@ dependencies {
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 tasks.named('test') {

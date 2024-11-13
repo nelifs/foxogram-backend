@@ -20,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = APIEnum.MESSAGES, produces = "application/json")
 public class MessagesController {
+
     private final ChannelsService channelsService;
 	private final MessagesService messagesService;
 	final Logger logger = LoggerFactory.getLogger(MessagesController.class);

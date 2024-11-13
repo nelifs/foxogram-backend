@@ -28,15 +28,17 @@ public class AuthenticationService {
 	private final AuthorizationRepository authorizationRepository;
 	private final CodeRepository codeRepository;
 	private final EmailService emailService;
+	private final JwtService jwtService;
 	final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, SessionRepository sessionRepository, AuthorizationRepository authorizationRepository, CodeRepository codeRepository, EmailService emailService) {
+	public AuthenticationService(UserRepository userRepository, SessionRepository sessionRepository, AuthorizationRepository authorizationRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
 		this.userRepository = userRepository;
 		this.sessionRepository = sessionRepository;
 		this.authorizationRepository = authorizationRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
+		this.jwtService = jwtService;
 	}
 
 	public User getUser(String header) throws UserUnauthorizedException {
@@ -64,8 +66,8 @@ public class AuthenticationService {
 		long createdAt = System.currentTimeMillis();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
-		String accessToken = JwtService.generate(id, TokenEnum.Type.ACCESS_TOKEN, TokenEnum.Lifetime.ACCESS_TOKEN);
-		String refreshToken = JwtService.generate(id, TokenEnum.Type.REFRESH_TOKEN, TokenEnum.Lifetime.REFRESH_TOKEN);
+		String accessToken = jwtService.generate(id, TokenEnum.Type.ACCESS_TOKEN, TokenEnum.Lifetime.ACCESS_TOKEN);
+		String refreshToken = jwtService.generate(id, TokenEnum.Type.REFRESH_TOKEN, TokenEnum.Lifetime.REFRESH_TOKEN);
 		List<String> flags = new ArrayList<>();
 		boolean emailVerified = false;
 		boolean disabled = false;
@@ -141,12 +143,12 @@ public class AuthenticationService {
 		TokenEnum.Lifetime accessTokenLifetime = TokenEnum.Lifetime.ACCESS_TOKEN;
 		TokenEnum.Type accessTokenType = TokenEnum.Type.ACCESS_TOKEN;
 
-		String newAccessToken = JwtService.generate(id, accessTokenType, accessTokenLifetime);
+		String newAccessToken = jwtService.generate(id, accessTokenType, accessTokenLifetime);
 
 		TokenEnum.Lifetime refreshTokenLifetime = TokenEnum.Lifetime.ACCESS_TOKEN;
 		TokenEnum.Type refreshTokenType = TokenEnum.Type.ACCESS_TOKEN;
 
-		String newRefreshToken = JwtService.generate(id, refreshTokenType, refreshTokenLifetime);
+		String newRefreshToken = jwtService.generate(id, refreshTokenType, refreshTokenLifetime);
 
 		user.setAccessToken(newAccessToken);
 		user.setRefreshToken(newRefreshToken);
