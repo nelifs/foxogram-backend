@@ -1,11 +1,16 @@
 package su.foxogram.exceptions;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
+@Setter
 public abstract class BaseException extends Exception {
 
-	public int errorCode;
-	public HttpStatus status;
+	@Getter
+    public int errorCode;
+	@Getter
+    public HttpStatus status;
 	public String message;
 
 	public BaseException(String message, HttpStatus status, int errorCode) {
@@ -14,28 +19,9 @@ public abstract class BaseException extends Exception {
 		this.errorCode = errorCode;
 	}
 
-	public int getErrorCode() {
-		return errorCode;
-	}
-
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
-	}
-
-	public HttpStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(HttpStatus status) {
-		this.status = status;
-	}
-
-	@Override
+    @Override
 	public String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
 }

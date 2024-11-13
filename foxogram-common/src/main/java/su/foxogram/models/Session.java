@@ -1,10 +1,14 @@
 package su.foxogram.models;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+@Setter
+@Getter
 @Table("sessions")
 public class Session {
 
@@ -32,39 +36,7 @@ public class Session {
 		this.expiresAt = expiresAt;
 	}
 
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public long getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(long createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public long getExpiresAt() {
-		return expiresAt;
-	}
-
-	public void setExpiresAt(long expiresAt) {
-		this.expiresAt = expiresAt;
-	}
-
-	public boolean isExpired() {
+    public boolean isExpired() {
 		return System.currentTimeMillis() >= this.getExpiresAt();
 	}
 }

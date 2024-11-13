@@ -1,13 +1,10 @@
 package su.foxogram.dtos;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class UserResumeDTO {
-	public String getResumeToken() {
-		return resumeToken;
-	}
-
-	public void setResumeToken(String resumeToken) {
-		this.resumeToken = resumeToken;
-	}
-
-	private String resumeToken;
+    private String resumeToken;
 }

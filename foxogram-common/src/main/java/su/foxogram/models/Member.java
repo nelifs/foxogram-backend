@@ -1,12 +1,14 @@
 package su.foxogram.models;
 
-import org.springframework.data.annotation.Id;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 
+@Setter
+@Getter
 @Table("members")
 public class Member extends BaseUser {
 
@@ -32,14 +34,6 @@ public class Member extends BaseUser {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(long channelId) {
-        this.channelId = channelId;
     }
 
     public String getUsername() {
@@ -68,14 +62,6 @@ public class Member extends BaseUser {
 
     public long getCreatedAt() {
         return createdAt;
-    }
-
-    public boolean isAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
     }
 
     public void setCreatedAt(long createdAt) {

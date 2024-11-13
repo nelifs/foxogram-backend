@@ -1,5 +1,7 @@
 package su.foxogram.enums;
 
+import lombok.Getter;
+
 public class APIEnum {
     public static final String MESSAGES = "/v1/messages";
     public static final String USERS = "/v1/users";
@@ -8,6 +10,7 @@ public class APIEnum {
 
     public static final String PROMETHEUS_BASE = "api.requests.";
 
+    @Getter
     public enum RateLimit {
         CAPACITY(20),
         TOKENS(20),
@@ -19,11 +22,9 @@ public class APIEnum {
             this.value = value;
         }
 
-        public int getValue() {
-            return value;
-        }
     }
 
+    @Getter
     public enum Prometheus {
         AUTH(),
         CHANNELS(),
@@ -37,9 +38,6 @@ public class APIEnum {
             this.value = "api.requests.auth.";
         }
 
-        public String getValue() {
-            return value;
-        }
     }
 
 

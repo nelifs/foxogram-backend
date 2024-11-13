@@ -1,9 +1,13 @@
 package su.foxogram.models;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
+@Getter
+@Setter
 @Table("codes")
 public class Code {
 
@@ -29,29 +33,5 @@ public class Code {
 		this.type = type;
 		this.value = value;
 		this.expiresAt = expiresAt;
-	}
-
-	public long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(long userId) {
-		this.userId = userId;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
 }
