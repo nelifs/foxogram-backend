@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.*;
-import su.foxogram.controllers.message.MessageCreatedController;
 import su.foxogram.dtos.MessagePayload;
 
 @Controller

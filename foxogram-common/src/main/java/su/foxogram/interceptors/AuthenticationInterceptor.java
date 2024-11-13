@@ -18,7 +18,7 @@ import su.foxogram.services.AuthenticationService;
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
-    AuthenticationService authenticationService;
+    final AuthenticationService authenticationService;
     final Logger logger = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 
     @Autowired
@@ -27,8 +27,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
-        logger.info("Auth token: {}", request.getHeader(HttpHeaders.AUTHORIZATION));
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws UserUnauthorizedException {
         User user = authenticationService.getUser(request.getHeader(HttpHeaders.AUTHORIZATION));
         request.setAttribute("user", user);
         return true;

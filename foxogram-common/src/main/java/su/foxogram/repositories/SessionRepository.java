@@ -2,7 +2,6 @@ package su.foxogram.repositories;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.cassandra.repository.AllowFiltering;
-import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import su.foxogram.models.Session;

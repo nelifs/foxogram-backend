@@ -20,20 +20,18 @@ import java.util.List;
 @RestController
 @RequestMapping(value = APIEnum.MESSAGES, produces = "application/json")
 public class MessagesController {
-	private final AuthenticationService authenticationService;
-	private final ChannelsService channelsService;
+    private final ChannelsService channelsService;
 	private final MessagesService messagesService;
 	final Logger logger = LoggerFactory.getLogger(MessagesController.class);
 
 	@Autowired
 	public MessagesController(ChannelsService channelsService, AuthenticationService authenticationService, MessagesService messagesService) {
 		this.channelsService = channelsService;
-		this.authenticationService = authenticationService;
-		this.messagesService = messagesService;
+        this.messagesService = messagesService;
 	}
 
 	@GetMapping("/channel/{channelId}")
-	public ResponseEntity<?> getMessages(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, MemberInChannelNotFoundException {
+	public ResponseEntity<?> getMessages(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit, HttpServletRequest request) throws MessageNotFoundException, MemberInChannelNotFoundException {
 		logger.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channelId, user.getId(), user.getEmail());
 		channelsService.getMemberInChannel(user.getId(), channelId);
 
@@ -43,7 +41,7 @@ public class MessagesController {
 	}
 
 	@GetMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> getMessage(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> getMessage(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		logger.info("MESSAGE ({}) from CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
@@ -54,7 +52,7 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public ResponseEntity<?> postMessage(@RequestAttribute(value = "user") User user, @RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws UserEmailNotVerifiedException, UserUnauthorizedException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> postMessage(@RequestAttribute(value = "user") User user, @RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws MemberInChannelNotFoundException, ChannelNotFoundException {
 		logger.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
@@ -65,7 +63,7 @@ public class MessagesController {
 	}
 
 	@DeleteMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> deleteMessage(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws UserEmailNotVerifiedException, MessageNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> deleteMessage(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		logger.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
@@ -76,7 +74,7 @@ public class MessagesController {
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public ResponseEntity<?> patchMessage(@RequestAttribute(value = "user") User user, @RequestBody MessageDTO body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, UserEmailNotVerifiedException, UserUnauthorizedException, UserAuthenticationNeededException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public ResponseEntity<?> patchMessage(@RequestAttribute(value = "user") User user, @RequestBody MessageDTO body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		logger.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);

@@ -18,30 +18,28 @@ import su.foxogram.services.ChannelsService;
 public class ChannelsController {
 
 	private final ChannelsService channelsService;
-	private final AuthenticationService authenticationService;
-	final Logger logger = LoggerFactory.getLogger(ChannelsController.class);
+    final Logger logger = LoggerFactory.getLogger(ChannelsController.class);
 
 	public ChannelsController(ChannelsService channelsService, AuthenticationService authenticationService) {
 		this.channelsService = channelsService;
-		this.authenticationService = authenticationService;
-	}
+    }
 
 	@PostMapping("/create")
-	public Channel createChannel(@RequestAttribute(value = "user") User user, @RequestBody ChannelCreateDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel createChannel(@RequestAttribute(value = "user") User user, @RequestBody ChannelCreateDTO body, HttpServletRequest request) {
 		logger.info("CHANNEL create ({}) request");
 
 		return channelsService.createChannel(user, body.getType(), body.getName());
 	}
 
 	@GetMapping("/{id}")
-	public Channel getChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel getChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL info ({}) request", id);
 
 		return channelsService.getChannel(id);
 	}
 
 	@PostMapping("/{id}/join")
-	public Member joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Member joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL join ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 
@@ -49,7 +47,7 @@ public class ChannelsController {
 	}
 
 	@PostMapping("/{id}/leave")
-	public ResponseEntity<String> leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public ResponseEntity<String> leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL leave ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 
@@ -58,14 +56,14 @@ public class ChannelsController {
 	}
 
 	@PatchMapping("/{id}")
-	public Channel editChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException {
+	public Channel editChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL edit ({}) request", id);
 
 		return channelsService.getChannel(id);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, UserUnauthorizedException, UserAuthenticationNeededException, UserEmailNotVerifiedException, MissingPermissionsException {
+	public ResponseEntity<String> deleteChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, MissingPermissionsException {
 		logger.info("CHANNEL delete ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 

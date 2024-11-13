@@ -65,7 +65,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/email/verify/{code}")
-	public ResponseEntity<String> emailVerify(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException, CodeExpiredException {
+	public ResponseEntity<String> emailVerify(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException, CodeExpiredException {
 		logger.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.verifyEmail(user, code);
@@ -74,7 +74,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<String> logout(@RequestAttribute(value = "user") User user, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException {
+	public ResponseEntity<String> logout(@RequestAttribute(value = "user") User user, HttpServletRequest request) {
 		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 		logger.info("USER logout ({}, {}) request", user.getId(), user.getEmail());
 
@@ -84,7 +84,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/delete/confirm/{code}")
-	public ResponseEntity<String> deleteConfirm(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException, CodeIsInvalidException {
+	public ResponseEntity<String> deleteConfirm(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException {
 		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.confirmUserDelete(user, code);
@@ -93,7 +93,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/delete")
-	public ResponseEntity<String> delete(@RequestAttribute(value = "user") User user, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException, UserAuthenticationNeededException, UserCredentialsIsInvalidException {
+	public ResponseEntity<String> delete(@RequestAttribute(value = "user") User user, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException {
 		String password = body.getPassword();
 		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 

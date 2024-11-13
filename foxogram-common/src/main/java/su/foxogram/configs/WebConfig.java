@@ -12,7 +12,7 @@ import su.foxogram.services.AuthenticationService;
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
-    AuthenticationService authenticationService;
+    final AuthenticationService authenticationService;
 
     @Autowired
     public WebConfig(AuthenticationService authenticationService) {
