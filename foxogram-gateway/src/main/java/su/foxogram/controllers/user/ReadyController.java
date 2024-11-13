@@ -14,6 +14,7 @@ import su.foxogram.services.AuthenticationService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 public class ReadyController implements WebSocketHandler {
@@ -36,7 +37,7 @@ public class ReadyController implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         Map<String, List<String>> headers = session.getHandshakeHeaders();
-        User user = authenticationService.getUser(headers.get(HttpHeaders.AUTHORIZATION).toString());
+        User user = authenticationService.getUser(Objects.requireNonNull(headers.get(HttpHeaders.AUTHORIZATION)).toString());
 
         if (user == null) throw new UserUnauthorizedException();
 
