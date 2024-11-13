@@ -3,13 +3,12 @@ package su.foxogram.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.models.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
-import su.foxogram.dtos.ChannelCreateDTO;
-import su.foxogram.utils.PayloadBuilder;
+import su.foxogram.dtos.request.ChannelCreateDTO;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.ChannelsService;
 
@@ -47,12 +46,12 @@ public class ChannelsController {
 	}
 
 	@PostMapping("/{id}/leave")
-	public ResponseEntity<String> leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
+	public OkDTO leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL leave ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 
 		channelsService.leaveUser(channel, user);
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have successfully left the channel!").build());
+		return new OkDTO(true);
 	}
 
 	@PatchMapping("/{id}")
@@ -63,10 +62,12 @@ public class ChannelsController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, MissingPermissionsException {
+	public OkDTO deleteChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, MissingPermissionsException {
 		logger.info("CHANNEL delete ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 
-		return channelsService.deleteChannel(channel, user);
+		channelsService.deleteChannel(channel, user);
+
+		return new OkDTO(true);
 	}
 }

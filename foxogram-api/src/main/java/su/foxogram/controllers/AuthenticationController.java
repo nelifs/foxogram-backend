@@ -4,16 +4,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import su.foxogram.dtos.request.UserDeleteDTO;
+import su.foxogram.dtos.request.UserLoginDTO;
+import su.foxogram.dtos.request.UserResumeDTO;
+import su.foxogram.dtos.request.UserSignUpDTO;
+import su.foxogram.dtos.response.OkDTO;
+import su.foxogram.dtos.response.RefreshDTO;
+import su.foxogram.dtos.response.TokenDTO;
 import su.foxogram.models.*;
 import su.foxogram.enums.APIEnum;
 import su.foxogram.exceptions.*;
-import su.foxogram.dtos.*;
 import su.foxogram.repositories.AuthorizationRepository;
 import su.foxogram.repositories.SessionRepository;
 import su.foxogram.services.AuthenticationService;
-import su.foxogram.utils.PayloadBuilder;
 
 @RestController
 @RequestMapping(value = APIEnum.AUTH, produces = "application/json")
@@ -32,7 +36,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<String> signup(@RequestBody UserSignUpDTO body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
+	public TokenDTO signup(@RequestBody UserSignUpDTO body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
@@ -40,65 +44,67 @@ public class AuthenticationController {
 
 		User user = authenticationService.userSignUp(username, email, password);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("username", user.getUsername()).addField("email", user.getEmail()).addField("accessToken", user.getAccessToken()).build());
+		return new TokenDTO(user.getAccessToken());
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
+	public TokenDTO login(@RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
 		String email = body.getEmail();
 		String password = body.getPassword();
 		logger.info("USER ({}) LOGIN request", email);
 
 		User user = authenticationService.loginUser(email, password);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully signed in!").addField("accessToken", user.getAccessToken()).build());
+		return new TokenDTO(user.getAccessToken());
 	}
 
 	@PostMapping("/refresh")
-	public ResponseEntity<String> refreshToken(@RequestAttribute(value = "user") User user, @RequestBody UserResumeDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException {
+	public RefreshDTO refreshToken(@RequestAttribute(value = "user") User user, @RequestBody UserResumeDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException {
 		Authorization auth = authorizationRepository.findById(user.getId());
 		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
 
 		auth = authenticationService.refreshToken(user, auth);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "Your token has been refreshed").addField("accessToken", auth.getAccessToken()).addField("refreshToken", user.getRefreshToken()).addField("expiresAt", String.valueOf(auth.getExpiresAt())).build());
+		return new RefreshDTO(auth.getAccessToken(), user.getRefreshToken(), auth.getExpiresAt());
 	}
 
 	@PostMapping("/email/verify/{code}")
-	public ResponseEntity<String> emailVerify(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException, CodeExpiredException {
+	public OkDTO emailVerify(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException, CodeExpiredException {
 		logger.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.verifyEmail(user, code);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully verified your email").build());
+		return new OkDTO(true);
 	}
 
 	@PostMapping("/logout")
-	public ResponseEntity<String> logout(@RequestAttribute(value = "user") User user, HttpServletRequest request) {
+	public OkDTO logout(@RequestAttribute(value = "user") User user, HttpServletRequest request) {
 		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 		logger.info("USER logout ({}, {}) request", user.getId(), user.getEmail());
 
 		sessionRepository.delete(session);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have been successfully logged out").build());
+		return new OkDTO(true);
 	}
 
 	@PostMapping("/delete/confirm/{code}")
-	public ResponseEntity<String> deleteConfirm(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException {
+	public OkDTO deleteConfirm(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException {
 		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.confirmUserDelete(user, code);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You have successfully deleted your account!").build());
+
+		return new OkDTO(true);
 	}
 
 	@PostMapping("/delete")
-	public ResponseEntity<String> delete(@RequestAttribute(value = "user") User user, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException {
+	public OkDTO delete(@RequestAttribute(value = "user") User user, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException {
 		String password = body.getPassword();
 		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.requestUserDelete(user, password);
 
-		return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "You need to confirm account deletion via email").build());
+
+		return new OkDTO(true);
 	}
 }

@@ -2,13 +2,11 @@ package su.foxogram.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MemberInChannelNotFoundException;
 import su.foxogram.exceptions.MissingPermissionsException;
-import su.foxogram.utils.PayloadBuilder;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MemberRepository;
 import su.foxogram.structures.Snowflake;
@@ -42,11 +40,10 @@ public class ChannelsService {
         return channel;
     }
 
-    public ResponseEntity<String> deleteChannel(Channel channel, User user) throws MissingPermissionsException {
+    public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
         Member member = memberRepository.findByChannelIdAndId(channel.getId(), user.getId());
         if (member.isAdmin()) {
             channelRepository.delete(channel);
-            return ResponseEntity.ok(new PayloadBuilder().setSuccess(true).addField("message", "Channel has been successfully deleted!").build());
         } else {
             throw new MissingPermissionsException();
         }

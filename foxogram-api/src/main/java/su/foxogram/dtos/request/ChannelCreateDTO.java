@@ -1,4 +1,4 @@
-package su.foxogram.dtos;
+package su.foxogram.dtos.request;
 
 import lombok.Getter;
 import lombok.Setter;

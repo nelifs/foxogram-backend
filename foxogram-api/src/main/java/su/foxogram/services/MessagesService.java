@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MessageNotFoundException;
-import su.foxogram.dtos.MessageDTO;
+import su.foxogram.dtos.request.MessageDTO;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MessageRepository;
 import su.foxogram.structures.Snowflake;
