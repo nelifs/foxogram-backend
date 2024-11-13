@@ -1,6 +1,8 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import su.foxogram.services.AuthenticationService;
 @RequestMapping(value = APIEnum.AUTH, produces = "application/json")
 public class AuthenticationController {
 
+
 	private final AuthenticationService authenticationService;
 	private final SessionRepository sessionRepository;
 	private final AuthorizationRepository authorizationRepository;
@@ -36,7 +39,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signup")
-	public TokenDTO signup(@RequestBody UserSignUpDTO body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
+	public TokenDTO signup(@Valid @RequestBody UserSignUpDTO body) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
@@ -48,7 +51,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/login")
-	public TokenDTO login(@RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
+	public TokenDTO login(@Valid @RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
 		String email = body.getEmail();
 		String password = body.getPassword();
 		logger.info("USER ({}) LOGIN request", email);
@@ -59,7 +62,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/refresh")
-	public RefreshDTO refreshToken(@RequestAttribute(value = "user") User user, @RequestBody UserResumeDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException {
+	public RefreshDTO refreshToken(@RequestAttribute(value = "user") User user, @Valid @RequestBody UserResumeDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException {
 		Authorization auth = authorizationRepository.findById(user.getId());
 		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
 

@@ -1,6 +1,7 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class ChannelsController {
     }
 
 	@PostMapping("/create")
-	public Channel createChannel(@RequestAttribute(value = "user") User user, @RequestBody ChannelCreateDTO body, HttpServletRequest request) {
+	public Channel createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body, HttpServletRequest request) {
 		logger.info("CHANNEL create ({}) request");
 
 		return channelsService.createChannel(user, body.getType(), body.getName());

@@ -1,6 +1,7 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public MessagesDTO postMessage(@RequestAttribute(value = "user") User user, @RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws MemberInChannelNotFoundException, ChannelNotFoundException {
+	public MessagesDTO postMessage(@RequestAttribute(value = "user") User user, @Valid @RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws MemberInChannelNotFoundException, ChannelNotFoundException {
 		logger.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
@@ -75,7 +76,7 @@ public class MessagesController {
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public MessagesDTO patchMessage(@RequestAttribute(value = "user") User user, @RequestBody MessageDTO body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MemberInChannelNotFoundException, ChannelNotFoundException {
+	public MessagesDTO patchMessage(@RequestAttribute(value = "user") User user, @Valid @RequestBody MessageDTO body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MemberInChannelNotFoundException, ChannelNotFoundException {
 		logger.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
