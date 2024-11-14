@@ -1,7 +1,6 @@
 package su.foxogram.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Service;
 import su.foxogram.models.User;
 import su.foxogram.exceptions.UserUnauthorizedException;
@@ -13,7 +12,7 @@ public class UsersService {
 	private final UserRepository userRepository;
 
     @Autowired
-	public UsersService(UserRepository userRepository, AuthenticationService authenticationService, CassandraTemplate cassandraTemplate) {
+	public UsersService(UserRepository userRepository, AuthenticationService authenticationService) {
 		this.userRepository = userRepository;
     }
 

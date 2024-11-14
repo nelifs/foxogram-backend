@@ -1,27 +1,25 @@
 package su.foxogram.models;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
 
 @Getter
 @Setter
-@Table("channels")
+@Entity
+@Table(name = "channels")
 public class Channel {
     @Id
-    @PrimaryKey
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
-    @Column("name")
+    @Column()
     public String name;
 
-    @Column("type")
+    @Column()
     public String type;
 
-    @Column("ownerid")
+    @Column()
     public long ownerId;
 
     public Channel() {

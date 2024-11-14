@@ -1,30 +1,30 @@
 package su.foxogram.models;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import jakarta.persistence.*;
 
 import java.util.List;
 
+@MappedSuperclass
 public class BaseUser {
-
     @Id
-    @PrimaryKey
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
-    @Column("username")
+    @Column()
     public String username;
 
-    @Column("accesstoken")
+    @Column()
     public String accessToken;
 
-    @Column("avatar")
+    @Column()
     public String avatar;
 
-    @Column("flags")
+    @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = "flags", joinColumns = @JoinColumn(name = "user_id"))
+    @Column()
     public List<String> flags;
 
-    @Column("createdat")
+    @Column()
     public long createdAt;
 
     public BaseUser() {

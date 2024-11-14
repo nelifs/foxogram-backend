@@ -1,35 +1,35 @@
 package su.foxogram.models;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 
 @Setter
 @Getter
-@Table("messages")
+@Entity
+@Table(name = "messages")
 public class Message {
     @Id
-    @PrimaryKey
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
-    @Column("channelid")
+    @Column()
     public long channelId;
 
-    @Column("content")
+    @Column()
     public String content;
 
-    @Column("authorid")
+    @Column()
     public long authorId;
 
-    @Column("timestamp")
+    @Column()
     public long timestamp;
 
-    @Column("attachments")
+    @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = "attachments", joinColumns = @JoinColumn(name = "message_id"))
+    @Column()
     public List<String> attachments;
 
     public Message() {

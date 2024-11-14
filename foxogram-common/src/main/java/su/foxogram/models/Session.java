@@ -1,28 +1,26 @@
 package su.foxogram.models;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
 
 @Setter
 @Getter
-@Table("sessions")
+@Entity
+@Table(name = "sessions")
 public class Session {
 
 	@Id
-	@PrimaryKey
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	public long id;
 
-	@Column("accesstoken")
+	@Column()
 	public String accessToken;
 
-	@Column("createdat")
+	@Column()
 	public long createdAt;
 
-	@Column("expiresat")
+	@Column()
 	public long expiresAt;
 
 	public Session() {

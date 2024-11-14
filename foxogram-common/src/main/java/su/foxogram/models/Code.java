@@ -1,27 +1,24 @@
 package su.foxogram.models;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
 
 @Getter
 @Setter
-@Table("codes")
+@Entity
+@Table(name = "codes")
 public class Code {
-
-	@Column("userid")
-	@PrimaryKey
+	@Id()
 	public long userId;
 
-	@Column("type")
+	@Column()
 	public String type;
 
-	@Column("value")
+	@Column()
 	public String value;
 
-	@Column("expiresat")
+	@Column()
 	public long expiresAt;
 
 	public Code() {

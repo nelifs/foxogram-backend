@@ -1,7 +1,6 @@
 package su.foxogram.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Service;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
@@ -18,7 +17,7 @@ public class ChannelsService {
     private final MemberRepository memberRepository;
 
     @Autowired
-    public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, AuthenticationService authenticationService, CassandraTemplate cassandraTemplate) {
+    public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, AuthenticationService authenticationService) {
         this.channelRepository = channelRepository;
         this.memberRepository = memberRepository;
     }

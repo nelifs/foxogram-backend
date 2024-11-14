@@ -22,7 +22,6 @@ import java.util.List;
 
 @Service
 public class AuthenticationService {
-
 	private final UserRepository userRepository;
 	private final SessionRepository sessionRepository;
 	private final AuthorizationRepository authorizationRepository;

@@ -1,9 +1,9 @@
 package su.foxogram.repositories;
 
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.cassandra.repository.AllowFiltering;
-import org.springframework.data.cassandra.repository.Query;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import su.foxogram.models.Message;
 
@@ -11,26 +11,24 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends CrudRepository<Message, Long> {
+	@Query("SELECT m FROM Message m WHERE m.channelId = :chId AND m.timestamp > :ts")
+	List<Message> findAll(@Param("chId") long channelId, @Param("ts") long timestamp);
 
-	@AllowFiltering
-	@Query("SELECT * FROM messages WHERE channelid = ?0 AND timestamp > ?1 LIMIT ?2 ALLOW FILTERING")
-	List<Message> findAll(long channelId, long timestamp, int limit);
-
-	@AllowFiltering
+	
 	Message findByContent(String content);
 
-	@AllowFiltering
+	
 	List<Message> findAllByContent(String content);
 
-	@AllowFiltering
-	Message findByChannelId(String channelId);
+	
+	Message findByChannelId(long channelId);
 
-	@AllowFiltering
-	List<Message> findAllByChannelId(String channelId);
+	
+	List<Message> findAllByChannelId(long channelId);
 
-	@AllowFiltering
-	@Query("SELECT * FROM messages WHERE channelid = ?0 AND id = ?1 ALLOW FILTERING")
-	Message findByChannelIdAndId(long channelId, long id);
+	
+	@Query("SELECT m FROM Message m WHERE m.channelId = :chId AND m.id = :id")
+	Message findByChannelIdAndId(@Param("chId") long channelId, @Param("id") long id);
 
 	@Override
 	void delete(@NotNull Message message);

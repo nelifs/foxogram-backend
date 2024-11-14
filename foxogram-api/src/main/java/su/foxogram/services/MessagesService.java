@@ -3,9 +3,6 @@ package su.foxogram.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.cassandra.core.CassandraTemplate;
-import org.springframework.data.cassandra.core.query.Criteria;
-import org.springframework.data.cassandra.core.query.Query;
 import org.springframework.stereotype.Service;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
@@ -22,32 +19,21 @@ public class MessagesService {
 
 	private final MessageRepository messageRepository;
 	private final ChannelRepository channelRepository;
-	private final CassandraTemplate cassandraTemplate;
-	final Logger logger = LoggerFactory.getLogger(MessagesService.class);
+    final Logger logger = LoggerFactory.getLogger(MessagesService.class);
 
 	@Autowired
-	public MessagesService(MessageRepository messageRepository, ChannelRepository channelRepository, CassandraTemplate cassandraTemplate) {
+	public MessagesService(MessageRepository messageRepository, ChannelRepository channelRepository) {
 		this.messageRepository = messageRepository;
 		this.channelRepository = channelRepository;
-		this.cassandraTemplate = cassandraTemplate;
-	}
+    }
 
 	public List<Message> getMessages(long before, int limit, long channelId) throws MessageNotFoundException {
-		Query query = Query.query(Criteria.where("channelId").is(channelId)).withAllowFiltering();
-
-		if (before > 0) {
-			query = query.and(Criteria.where("timestamp").gt(before));
-		}
-
-		if (limit > 0) {
-			query = query.limit(limit);
-		}
-
-		List<Message> messagesArray = cassandraTemplate.select(query, Message.class);
+		List<Message> messagesArray = messageRepository.findAllByChannelId(channelId);
 
 		if (messagesArray.isEmpty()) {
 			throw new MessageNotFoundException();
 		}
+
 		logger.info("MESSAGES ({}, {}) in CHANNEL ({}) found successfully", limit, before, channelId);
 
 		return messagesArray;

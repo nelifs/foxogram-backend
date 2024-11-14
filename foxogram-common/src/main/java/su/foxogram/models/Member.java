@@ -1,21 +1,22 @@
 package su.foxogram.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 
 @Setter
 @Getter
-@Table("members")
+@Entity
+@Table(name = "members")
 public class Member extends BaseUser {
-
-    @Column("channelid")
+    @Column()
     public long channelId;
 
-    @Column("admin")
+    @Column()
     public boolean admin;
 
     public Member() {

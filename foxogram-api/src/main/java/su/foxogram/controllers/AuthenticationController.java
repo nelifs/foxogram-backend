@@ -23,11 +23,10 @@ import su.foxogram.services.AuthenticationService;
 @RestController
 @RequestMapping(value = APIEnum.AUTH, produces = "application/json")
 public class AuthenticationController {
-
-
 	private final AuthenticationService authenticationService;
 	private final SessionRepository sessionRepository;
 	private final AuthorizationRepository authorizationRepository;
+
 	final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
 	@Autowired

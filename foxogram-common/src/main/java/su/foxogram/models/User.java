@@ -1,37 +1,39 @@
 package su.foxogram.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.util.List;
 
 
 @Setter
 @Getter
-@Table("users")
+@Entity
+@Table(name = "users")
 public class User extends BaseUser {
 
-    @Column("email")
+    @Column()
     private String email;
 
-    @Column("emailverified")
+    @Column()
     private boolean emailVerified;
 
-    @Column("password")
+    @Column()
     private String password;
 
-    @Column("refreshtoken")
+    @Column()
     private String refreshToken;
 
-    @Column("deletion")
+    @Column()
     private long deletion;
 
-    @Column("disabled")
+    @Column()
     private boolean disabled;
 
-    @Column("mfaenabled")
+    @Column()
     private boolean mfaEnabled;
 
     public User() {

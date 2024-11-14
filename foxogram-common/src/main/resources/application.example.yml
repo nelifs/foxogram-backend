@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: foxogram
+    password: passwd
+    url: jdbc:postgresql://localhost:5432/foxogram
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+smtp:
+  host: smtp.mailersend.net
+  port: 587
+  username: user
+  password: pass
+  email: noreply@foxogram.su
+
+jwt:
+  secret: 123
+
+api:
+  version: 1
