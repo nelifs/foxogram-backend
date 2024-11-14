@@ -18,7 +18,7 @@ import su.foxogram.services.ChannelsService;
 public class ChannelsController {
 
 	private final ChannelsService channelsService;
-    final Logger logger = LoggerFactory.getLogger(ChannelsController.class);
+	final Logger logger = LoggerFactory.getLogger(ChannelsController.class);
 
 	public ChannelsController(ChannelsService channelsService, AuthenticationService authenticationService) {
 		this.channelsService = channelsService;
@@ -26,7 +26,7 @@ public class ChannelsController {
 
 	@PostMapping("/create")
 	public Channel createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body, HttpServletRequest request) {
-		logger.info("CHANNEL create ({}) request");
+		logger.info("CHANNEL create ({}, {}) request", body.getName(), body.getType());
 
 		return channelsService.createChannel(user, body.getType(), body.getName());
 	}

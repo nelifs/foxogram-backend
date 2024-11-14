@@ -41,26 +41,24 @@ public class AuthenticationService {
 		this.jwtService = jwtService;
 	}
 
-	public User getUser(String header) throws UserUnauthorizedException {
+	public User getUser(String header) throws UserUnauthorizedException, UserEmailNotVerifiedException {
 		return validate(header.substring(7));
 	}
 
-	public User validate(String token) throws UserUnauthorizedException {
+	public User validate(String token) throws UserUnauthorizedException, UserEmailNotVerifiedException {
 		User user = userRepository.findByAccessToken(token);
 		if (user == null) throw new UserUnauthorizedException();
 
-//		if (!user.isEmailVerified() && validateEmail) throw new UserEmailNotVerifiedException();
-//
+		if (!user.isEmailVerified()) throw new UserEmailNotVerifiedException();
+
 //		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 //		if (session == null && validateSession) throw new UserAuthenticationNeededException();
 
 		return userRepository.findByAccessToken(token);
 	}
 
-	public User userSignUp(String username, String email, String password) throws EmailIsNotValidException, UserWithThisEmailAlreadyExistException {
+	public User userSignUp(String username, String email, String password) throws UserWithThisEmailAlreadyExistException {
 		if (userRepository.findByEmail(email) != null) throw new UserWithThisEmailAlreadyExistException();
-
-		if (!email.contains("@")) throw new EmailIsNotValidException();
 
 		long id = new Snowflake(1).nextId();
 		long createdAt = System.currentTimeMillis();
@@ -106,17 +104,17 @@ public class AuthenticationService {
 
 		if (code == null) {
 			throw new CodeIsInvalidException();
-		} else {
-			long id = user.getId();
-			Session session = sessionRepository.findByAccessToken(user.getAccessToken());
-
-			userRepository.delete(user);
-			logger.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
-			codeRepository.delete(code);
-			logger.info("CODE record deleted ({}, {}) successfully", id, user.getEmail());
-			sessionRepository.delete(session);
-			logger.info("SESSION record deleted ({}, {}) successfully", id, user.getEmail());
 		}
+
+		long id = user.getId();
+		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
+
+		userRepository.delete(user);
+		logger.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
+		codeRepository.delete(code);
+		logger.info("CODE record deleted ({}, {}) successfully", id, user.getEmail());
+		sessionRepository.delete(session);
+		logger.info("SESSION record deleted ({}, {}) successfully", id, user.getEmail());
 	}
 
 	public void requestUserDelete(User user, String password) throws UserCredentialsIsInvalidException {
