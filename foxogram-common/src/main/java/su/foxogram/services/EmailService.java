@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,7 +12,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import su.foxogram.models.Code;
-import su.foxogram.enums.EmailEnum;
+import su.foxogram.constants.EmailConstants;
 import su.foxogram.repositories.CodeRepository;
 
 import java.io.IOException;
@@ -22,12 +23,13 @@ import java.util.Scanner;
 @Service
 public class EmailService {
 
+    @Autowired
+    private Environment env;
     private final CodeRepository codeRepository;
     private final ResourceLoader resourceLoader;
     private final JavaMailSender javaMailSender;
 
-    @Value("smtp.email")
-    private String email;
+    public String email = env.getProperty("smtp.email");
 
     @Autowired
     public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, CodeRepository codeRepository) {
@@ -45,10 +47,10 @@ public class EmailService {
         try {
             helper.setTo(to);
             helper.setFrom(email);
-            if (type.equals(EmailEnum.Type.DELETE.getValue())) {
+            if (type.equals(EmailConstants.Type.DELETE.getValue())) {
                 helper.setSubject("Confirm Your Account Deletion");
                 HTMLContent = readHTML("delete").replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);
-            } else if (type.equals(EmailEnum.Type.CONFIRM.getValue())) {
+            } else if (type.equals(EmailConstants.Type.CONFIRM.getValue())) {
                 helper.setSubject("Confirm Your Email Address");
                 HTMLContent = readHTML("confirm").replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);
             }

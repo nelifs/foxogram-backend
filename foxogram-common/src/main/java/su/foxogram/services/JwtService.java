@@ -4,7 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import su.foxogram.enums.TokenEnum;
+import su.foxogram.constants.TokenConstants;
 
 import java.util.*;
 
@@ -14,7 +14,7 @@ public class JwtService {
     @Value("jwt.secret")
     private String secretKey;
 
-    public String generate(long id, TokenEnum.Type tokenType, TokenEnum.Lifetime expirationMillis) {
+    public String generate(long id, TokenConstants.Type tokenType, TokenConstants.Lifetime expirationMillis) {
         Date expirationDate = new Date(expirationMillis.getValue());
 
         return Jwts.builder()

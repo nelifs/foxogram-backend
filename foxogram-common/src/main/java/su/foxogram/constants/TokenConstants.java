@@ -1,6 +1,6 @@
-package su.foxogram.enums;
+package su.foxogram.constants;
 
-public class TokenEnum {
+public class TokenConstants {
 	public enum Lifetime {
 		ACCESS_TOKEN(0),
 		REFRESH_TOKEN(2628000000L);

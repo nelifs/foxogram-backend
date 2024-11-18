@@ -14,14 +14,14 @@ import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.dtos.response.RefreshDTO;
 import su.foxogram.dtos.response.TokenDTO;
 import su.foxogram.models.*;
-import su.foxogram.enums.APIEnum;
+import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
 import su.foxogram.repositories.AuthorizationRepository;
 import su.foxogram.repositories.SessionRepository;
 import su.foxogram.services.AuthenticationService;
 
 @RestController
-@RequestMapping(value = APIEnum.AUTH, produces = "application/json")
+@RequestMapping(value = APIConstants.AUTH, produces = "application/json")
 public class AuthenticationController {
 	private final AuthenticationService authenticationService;
 	private final SessionRepository sessionRepository;

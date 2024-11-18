@@ -1,6 +1,6 @@
-package su.foxogram.enums;
+package su.foxogram.constants;
 
-public class CodesEnum {
+public class CodesConstants {
 	public enum Lifetime {
 		DELETE(900000),
 		VERIFY(600000);

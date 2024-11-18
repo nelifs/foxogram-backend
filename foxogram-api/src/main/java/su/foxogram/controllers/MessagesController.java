@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.MessagesDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.models.*;
-import su.foxogram.enums.APIEnum;
+import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
 import su.foxogram.dtos.request.MessageDTO;
 import su.foxogram.services.AuthenticationService;
@@ -19,7 +19,7 @@ import su.foxogram.services.MessagesService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = APIEnum.MESSAGES, produces = "application/json")
+@RequestMapping(value = APIConstants.MESSAGES, produces = "application/json")
 public class MessagesController {
 
     private final ChannelsService channelsService;

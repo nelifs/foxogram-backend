@@ -1,6 +1,6 @@
-package su.foxogram.enums;
+package su.foxogram.constants;
 
-public class ValidationEnum {
+public class ValidationConstants {
     public static class Lengths {
         public static final int MIN = 4;
         public static final int PASSWORD = 128;

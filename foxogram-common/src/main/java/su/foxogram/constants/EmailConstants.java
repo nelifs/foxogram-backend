@@ -1,10 +1,9 @@
-package su.foxogram.enums;
+package su.foxogram.constants;
 
-public class ChannelsEnum {
+public class EmailConstants {
 	public enum Type {
-		GROUP("group"),
-		CHANNEL("channel"),
-		DM("dm");
+		CONFIRM("confirm"),
+		DELETE("delete");
 
 		private final String type;
 

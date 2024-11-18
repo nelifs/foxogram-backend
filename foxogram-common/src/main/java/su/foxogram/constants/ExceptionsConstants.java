@@ -1,6 +1,6 @@
-package su.foxogram.enums;
+package su.foxogram.constants;
 
-public class ExceptionsEnum {
+public class ExceptionsConstants {
 	public enum Codes {
 		MESSAGE_NOT_FOUND(101),
 		CHANNEL_NOT_FOUND(201),
