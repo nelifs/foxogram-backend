@@ -3,7 +3,6 @@ package su.foxogram.services;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -29,7 +28,7 @@ public class EmailService {
     private final ResourceLoader resourceLoader;
     private final JavaMailSender javaMailSender;
 
-    public String email = env.getProperty("smtp.email");
+    public final String email = env.getProperty("smtp.email");
 
     @Autowired
     public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, CodeRepository codeRepository) {

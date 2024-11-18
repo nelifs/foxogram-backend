@@ -28,7 +28,7 @@ public class UsersController {
 	}
 
 	@GetMapping("/{id}")
-	public UserDTO getUser(@RequestAttribute(value = "user") User user, @PathVariable String id, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+	public UserDTO getUser(@RequestAttribute(value = "user") User user, @PathVariable String id, HttpServletRequest request) throws UserUnauthorizedException {
 		user = usersService.getUser(id, user);
 
 		return new UserDTO(user);

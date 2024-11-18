@@ -6,8 +6,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 
 @Setter
 @Getter
