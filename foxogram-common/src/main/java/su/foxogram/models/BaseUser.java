@@ -1,13 +1,15 @@
 package su.foxogram.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import su.foxogram.constants.UserConstants;
 
-import java.util.List;
-
+@Getter
+@Setter
 @MappedSuperclass
 public class BaseUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
     @Column()
@@ -19,10 +21,11 @@ public class BaseUser {
     @Column()
     public String avatar;
 
-    @ElementCollection(targetClass = String.class)
-    @CollectionTable(name = "flags", joinColumns = @JoinColumn(name = "user_id"))
     @Column()
-    public List<String> flags;
+    public long flags;
+
+    @Column()
+    public int type;
 
     @Column()
     public long createdAt;
@@ -31,12 +34,25 @@ public class BaseUser {
 
     }
 
-    public BaseUser(long id, String avatar, String username, String accessToken, long createdAt, List<String> flags) {
+    public BaseUser(long id, String avatar, String username, String accessToken, long createdAt, long flags, int type) {
         this.id = id;
         this.avatar = avatar;
         this.username = username;
         this.createdAt = createdAt;
         this.flags = flags;
+        this.type = type;
         this.accessToken = accessToken;
+    }
+
+    public void addFlag(UserConstants.Flags flag) {
+        this.flags |= flag.getBit();
+    }
+
+    public void removeFlag(UserConstants.Flags flag) {
+        this.flags &= ~flag.getBit();
+    }
+
+    public boolean hasFlag(UserConstants.Flags flag) {
+        return (this.flags & flag.getBit()) != 0;
     }
 }

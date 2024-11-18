@@ -4,10 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import su.foxogram.constants.UserConstants;
 import su.foxogram.models.*;
-import su.foxogram.enums.CodesEnum;
-import su.foxogram.enums.EmailEnum;
-import su.foxogram.enums.TokenEnum;
+import su.foxogram.constants.CodesConstants;
+import su.foxogram.constants.EmailConstants;
+import su.foxogram.constants.TokenConstants;
 import su.foxogram.exceptions.*;
 import su.foxogram.repositories.AuthorizationRepository;
 import su.foxogram.repositories.CodeRepository;
@@ -16,9 +17,6 @@ import su.foxogram.repositories.SessionRepository;
 import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class AuthenticationService {
@@ -63,24 +61,25 @@ public class AuthenticationService {
 		long createdAt = System.currentTimeMillis();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
-		String accessToken = jwtService.generate(id, TokenEnum.Type.ACCESS_TOKEN, TokenEnum.Lifetime.ACCESS_TOKEN);
-		String refreshToken = jwtService.generate(id, TokenEnum.Type.REFRESH_TOKEN, TokenEnum.Lifetime.REFRESH_TOKEN);
-		List<String> flags = new ArrayList<>();
+		String accessToken = jwtService.generate(id, TokenConstants.Type.ACCESS_TOKEN, TokenConstants.Lifetime.ACCESS_TOKEN);
+		String refreshToken = jwtService.generate(id, TokenConstants.Type.REFRESH_TOKEN, TokenConstants.Lifetime.REFRESH_TOKEN);
+		long flags = 0;
+		int type = UserConstants.Type.USER.getType();
 		boolean emailVerified = false;
 		boolean disabled = false;
 		boolean mfaEnabled = false;
 		password = Encryptor.hashPassword(password);
 
-		User user = new User(id, avatar, username, email, emailVerified, password, accessToken, refreshToken, createdAt, flags, deletion, disabled, mfaEnabled);
+		User user = new User(id, avatar, username, email, emailVerified, password, accessToken, refreshToken, createdAt, flags, type, deletion, disabled, mfaEnabled);
 
 		userRepository.save(user);
 		logger.info("USER record saved ({}, {}) successfully", username, email);
 
-		String type = EmailEnum.Type.CONFIRM.getValue();
+		String emailType = EmailConstants.Type.CONFIRM.getValue();
 		String digitCode = CodeGenerator.generateDigitCode();
-		long expiresAt = System.currentTimeMillis() + CodesEnum.Lifetime.VERIFY.getValue();
+		long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.VERIFY.getValue();
 
-		emailService.sendEmail(email, id, type, username, digitCode, expiresAt, accessToken);
+		emailService.sendEmail(email, id, emailType, username, digitCode, expiresAt, accessToken);
 		logger.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
 
 		logger.info("USER created ({}, {}) successfully", username, email);
@@ -122,9 +121,9 @@ public class AuthenticationService {
 			String username = user.getUsername();
 			String email = user.getEmail();
 			String accessToken = user.getAccessToken();
-			String type = EmailEnum.Type.DELETE.getValue();
+			String type = EmailConstants.Type.DELETE.getValue();
 			String code = CodeGenerator.generateDigitCode();
-			long expiresAt = System.currentTimeMillis() + CodesEnum.Lifetime.DELETE.getValue();
+			long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.DELETE.getValue();
 
 			emailService.sendEmail(email, id, type, username, code, expiresAt, accessToken);
 			logger.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, code, id, email);
@@ -137,13 +136,13 @@ public class AuthenticationService {
 		if (auth == null) throw new UserAuthenticationNeededException();
 
 		long id = user.getId();
-		TokenEnum.Lifetime accessTokenLifetime = TokenEnum.Lifetime.ACCESS_TOKEN;
-		TokenEnum.Type accessTokenType = TokenEnum.Type.ACCESS_TOKEN;
+		TokenConstants.Lifetime accessTokenLifetime = TokenConstants.Lifetime.ACCESS_TOKEN;
+		TokenConstants.Type accessTokenType = TokenConstants.Type.ACCESS_TOKEN;
 
 		String newAccessToken = jwtService.generate(id, accessTokenType, accessTokenLifetime);
 
-		TokenEnum.Lifetime refreshTokenLifetime = TokenEnum.Lifetime.ACCESS_TOKEN;
-		TokenEnum.Type refreshTokenType = TokenEnum.Type.ACCESS_TOKEN;
+		TokenConstants.Lifetime refreshTokenLifetime = TokenConstants.Lifetime.ACCESS_TOKEN;
+		TokenConstants.Type refreshTokenType = TokenConstants.Type.ACCESS_TOKEN;
 
 		String newRefreshToken = jwtService.generate(id, refreshTokenType, refreshTokenLifetime);
 
@@ -188,7 +187,7 @@ public class AuthenticationService {
 			long id = user.getId() + new Snowflake(1).nextId();
 			String accessToken = user.getAccessToken();
 			long createdAt = user.getCreatedAt();
-			long expiresAt = createdAt + TokenEnum.Lifetime.REFRESH_TOKEN.getValue();
+			long expiresAt = createdAt + TokenConstants.Lifetime.REFRESH_TOKEN.getValue();
 
 			sessionRepository.save(new Session(id, accessToken, createdAt, expiresAt));
 			logger.info("SESSION created ({}, {}) successfully", user.getId(), user.getEmail());

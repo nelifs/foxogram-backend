@@ -7,14 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.models.*;
-import su.foxogram.enums.APIEnum;
+import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
 import su.foxogram.dtos.request.ChannelCreateDTO;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.ChannelsService;
 
 @RestController
-@RequestMapping(value = APIEnum.CHANNELS, produces = "application/json")
+@RequestMapping(value = APIConstants.CHANNELS, produces = "application/json")
 public class ChannelsController {
 
 	private final ChannelsService channelsService;

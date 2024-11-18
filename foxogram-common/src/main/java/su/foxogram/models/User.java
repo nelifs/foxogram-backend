@@ -39,8 +39,8 @@ public class User extends BaseUser {
     public User() {
     }
 
-    public User(long id, String avatar, String username, String email, boolean emailVerified, String password, String accessToken, String refreshToken, long createdAt, List<String> flags, long deletion, boolean disabled, boolean mfaEnabled) {
-        super(id, avatar, username, accessToken, createdAt, flags);
+    public User(long id, String avatar, String username, String email, boolean emailVerified, String password, String accessToken, String refreshToken, long createdAt, long flags, int type, long deletion, boolean disabled, boolean mfaEnabled) {
+        super(id, avatar, username, accessToken, createdAt, flags, type);
         this.id = id;
         this.avatar = avatar;
         this.username = username;
@@ -50,58 +50,10 @@ public class User extends BaseUser {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.flags = flags;
+        this.type = type;
         this.createdAt = createdAt;
         this.deletion = deletion;
         this.disabled = disabled;
         this.mfaEnabled = mfaEnabled;
     }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public List<String> getFlags() {
-        return flags;
-    }
-
-    public void setFlags(List<String> flags) {
-        this.flags = flags;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
-
 }
