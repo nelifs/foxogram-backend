@@ -46,7 +46,7 @@ public class AuthenticationService {
 		User user = userRepository.findByAccessToken(token);
 		if (user == null) throw new UserUnauthorizedException();
 
-		if (!user.isEmailVerified()) throw new UserEmailNotVerifiedException();
+		if (!user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED)) throw new UserEmailNotVerifiedException();
 
 //		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
 //		if (session == null && validateSession) throw new UserAuthenticationNeededException();
@@ -65,12 +65,9 @@ public class AuthenticationService {
 		String refreshToken = jwtService.generate(id, TokenConstants.Type.REFRESH_TOKEN, TokenConstants.Lifetime.REFRESH_TOKEN);
 		long flags = 0;
 		int type = UserConstants.Type.USER.getType();
-		boolean emailVerified = false;
-		boolean disabled = false;
-		boolean mfaEnabled = false;
 		password = Encryptor.hashPassword(password);
 
-		User user = new User(id, avatar, username, email, emailVerified, password, accessToken, refreshToken, createdAt, flags, type, deletion, disabled, mfaEnabled);
+		User user = new User(id, avatar, username, email, password, accessToken, refreshToken, createdAt, flags, type, deletion);
 
 		userRepository.save(user);
 		logger.info("USER record saved ({}, {}) successfully", username, email);
@@ -91,7 +88,7 @@ public class AuthenticationService {
 
 		if (user == null) throw new UserCredentialsIsInvalidException();
 
-		if (Encryptor.verifyPassword(password, user.getPassword()) && user.isEmailVerified())
+		if (Encryptor.verifyPassword(password, user.getPassword()) && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED))
 			logger.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
 		else throw new UserCredentialsIsInvalidException();
 		return user;
@@ -178,7 +175,7 @@ public class AuthenticationService {
 		} else if (code.expiresAt <= System.currentTimeMillis()) {
 			throw new CodeExpiredException();
 		} else {
-			user.setEmailVerified(true);
+			user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
 			userRepository.save(user);
 			logger.info("USER record updated ({}, {}) SET emailverify to TRUE", user.getId(), user.getEmail());
 			codeRepository.delete(code);

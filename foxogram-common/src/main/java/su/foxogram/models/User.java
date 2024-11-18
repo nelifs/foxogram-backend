@@ -17,9 +17,6 @@ public class User extends BaseUser {
     private String email;
 
     @Column()
-    private boolean emailVerified;
-
-    @Column()
     private String password;
 
     @Column()
@@ -28,22 +25,15 @@ public class User extends BaseUser {
     @Column()
     private long deletion;
 
-    @Column()
-    private boolean disabled;
-
-    @Column()
-    private boolean mfaEnabled;
-
     public User() {
     }
 
-    public User(long id, String avatar, String username, String email, boolean emailVerified, String password, String accessToken, String refreshToken, long createdAt, long flags, int type, long deletion, boolean disabled, boolean mfaEnabled) {
+    public User(long id, String avatar, String username, String email, String password, String accessToken, String refreshToken, long createdAt, long flags, int type, long deletion) {
         super(id, avatar, username, accessToken, createdAt, flags, type);
         this.id = id;
         this.avatar = avatar;
         this.username = username;
         this.email = email;
-        this.emailVerified = emailVerified;
         this.password = password;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -51,7 +41,5 @@ public class User extends BaseUser {
         this.type = type;
         this.createdAt = createdAt;
         this.deletion = deletion;
-        this.disabled = disabled;
-        this.mfaEnabled = mfaEnabled;
     }
 }

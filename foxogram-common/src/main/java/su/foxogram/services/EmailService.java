@@ -3,6 +3,8 @@ package su.foxogram.services;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -22,13 +24,11 @@ import java.util.Scanner;
 @Service
 public class EmailService {
 
-    @Autowired
-    private Environment env;
     private final CodeRepository codeRepository;
     private final ResourceLoader resourceLoader;
     private final JavaMailSender javaMailSender;
 
-    public final String email = env.getProperty("smtp.email");
+    public String email = "noreply@foxogram.su"; // temp solution, fix asap
 
     @Autowired
     public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, CodeRepository codeRepository) {
