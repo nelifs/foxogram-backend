@@ -1,15 +1,18 @@
 package su.foxogram.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
+import su.foxogram.dtos.response.UserDTO;
+import su.foxogram.exceptions.UserEmailNotVerifiedException;
 import su.foxogram.models.User;
-import su.foxogram.enums.APIEnum;
+import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.services.UsersService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(value = APIEnum.USERS, produces = "application/json")
+@RequestMapping(value = APIConstants.USERS, produces = "application/json")
 public class UsersController {
 
 	private final UsersService usersService;
@@ -25,14 +28,15 @@ public class UsersController {
 	}
 
 	@GetMapping("/{id}")
-	public User getUser(@PathVariable long id) throws UserUnauthorizedException {
+	public UserDTO getUser(@RequestAttribute(value = "user") User user, @PathVariable String id, HttpServletRequest request) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+		user = usersService.getUser(id, user);
 
-		return usersService.getUser(id);
+		return new UserDTO(user);
 	}
 
-	@PatchMapping("/{id}")
-	public User editUser(@PathVariable long id) {
+	@PatchMapping("/@me")
+	public User editUser(@RequestAttribute(value = "user") User user) {
 
-		return usersService.editUser(id);
+		return usersService.editUser(user);
 	}
 }

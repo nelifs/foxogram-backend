@@ -12,12 +12,12 @@ public class UsersService {
 	private final UserRepository userRepository;
 
     @Autowired
-	public UsersService(UserRepository userRepository, AuthenticationService authenticationService) {
+	public UsersService(UserRepository userRepository) {
 		this.userRepository = userRepository;
     }
 
-	public User getUser(long id) throws UserUnauthorizedException {
-		User user = userRepository.findById(id);
+	public User getUser(String id, User user) throws UserUnauthorizedException {
+		if (!id.equals("@me")) user = userRepository.findById(Long.parseLong(id));
 
 		if (user == null) {
 			throw new UserUnauthorizedException();
@@ -26,7 +26,7 @@ public class UsersService {
 		return user;
 	}
 
-	public User editUser(long id) {
+	public User editUser(User user) {
 		return null;
 	}
 }
