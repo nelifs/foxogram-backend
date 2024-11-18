@@ -57,7 +57,7 @@ public class ChannelsService {
     }
 
     public Member joinUser(Channel channel, User user) {
-        Member member = new Member(user.getId(), channel.getId(), user.getUsername(), user.getAccessToken(), false, user.getAvatar(), user.getCreatedAt(), user.getFlags());
+        Member member = new Member(user.getId(), channel.getId(), user.getUsername(), user.getAccessToken(), false, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
         return memberRepository.save(member);
     }
 
