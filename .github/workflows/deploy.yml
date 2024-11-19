@@ -17,7 +17,7 @@ jobs:
               driver-class-name: org.postgresql.Driver
               username: ${{ secrets.DB_USERNAME }}
               password: ${{ secrets.DB_PASSWORD }}
-              url: jdbc:postgresql://localhost:5432/postgres
+              url: jdbc:postgresql://foxogram-db:5432/postgres
           jpa:
             hibernate:
               ddl-auto: update
