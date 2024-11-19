@@ -10,6 +10,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: |
+          echo >> foxogram-common/src/resources/application.yml << EOF
+          spring:
+            datasource:
+              driver-class-name: org.postgresql.Driver
+              username: ${{ secrets.DB_USERNAME }}
+              password: ${{ secrets.DB_PASSWORD }}
+              url: jdbc:postgresql://localhost:5432/postgres
+          jpa:
+            hibernate:
+              ddl-auto: update
+        
+          smtp:
+            host: ${{ secrets.SMTP_HOSTNAME }}
+            port: 587
+            username: ${{ secrets.SMTP_USERNAME }}
+            password: ${{ secrets.SMTP_PASSWORD }}
+            email: noreply@foxogram.su
+          
+          jwt:
+            secret: ${{ secrets.JWT_SECRET }}
+          
+          api:
+            version: 1
+          EOF
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
