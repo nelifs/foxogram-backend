@@ -11,8 +11,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - run: |
-          touch ./foxogram-common/src/resources/application.yml
-          echo >> foxogram-common/src/resources/application.yml << EOF
+          echo >> foxogram-common/src/main/resources/application.yml << EOF
           spring:
             datasource:
               driver-class-name: org.postgresql.Driver
