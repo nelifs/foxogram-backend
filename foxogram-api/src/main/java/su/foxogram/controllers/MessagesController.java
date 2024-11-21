@@ -54,14 +54,14 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public MessagesDTO postMessage(@RequestAttribute(value = "user") User user, @Valid @RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws MemberInChannelNotFoundException, ChannelNotFoundException {
+	public OkDTO postMessage(@RequestAttribute(value = "user") User user, @Valid @RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws MemberInChannelNotFoundException, ChannelNotFoundException {
 		logger.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channelId, user.getId(), user.getEmail());
 
 		channelsService.getMemberInChannel(user.getId(), channelId);
 
-		List<Message> message = List.of(messagesService.addMessage(channelId, user, body));
+		messagesService.addMessage(channelId, user, body);
 
-		return new MessagesDTO(message);
+		return new OkDTO(true);
 	}
 
 	@DeleteMapping("/channel/{channelId}/{id}")

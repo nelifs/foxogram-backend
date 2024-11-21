@@ -12,7 +12,6 @@ import java.util.List;
 @Table(name = "messages")
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
     @Column()
