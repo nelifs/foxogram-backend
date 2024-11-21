@@ -1,6 +1,6 @@
-name: foxogram
 services:
-  api:
+  foxogram-api:
+    container_name: foxogram-api
     build:
       context: ./foxogram-api
     restart: always
