@@ -10,7 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: echo -e "spring.datasource.driver-class-name=org.postgresql.Driver\n
+      - name: Create config
+        run: echo -e "spring.datasource.driver-class-name=org.postgresql.Driver\n
           spring.datasource.username=${{ secrets.DB_USERNAME }}\n
           spring.datasource.password=${{ secrets.DB_PASSWORD }}\n
           spring.datasource.url=jdbc:postgresql://foxogram-db:5432/postgres\n
@@ -21,7 +22,7 @@ jobs:
           smtp.password=${{ secrets.SMTP_PASSWORD }}\n
           smtp.email=noreply@foxogram.su\n
           jwt.secret=${{ secrets.JWT_SECRET }}\n
-          api.version=1" >> foxogram-common/src/main/resources/application.properties
+          api.version=1" >> foxogram-api/src/main/resources/application.properties
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
