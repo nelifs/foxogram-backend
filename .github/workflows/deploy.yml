@@ -14,15 +14,15 @@ jobs:
         run: echo -e "spring.datasource.driver-class-name=org.postgresql.Driver\n
           spring.datasource.username=${{ secrets.DB_USERNAME }}\n
           spring.datasource.password=${{ secrets.DB_PASSWORD }}\n
-          spring.datasource.url=jdbc:postgresql://foxogram-db:5432/postgres\n
+          spring.datasource.url=jdbc:postgresql://${{ secrets.DB_HOSTNAME }}:${{ secrets.DB_PORT }}/${{ secrets.DB_DATABASE }}\n
           spring.jpa.hibernate.ddl-auto=update\n
           smtp.host=${{ secrets.SMTP_HOSTNAME }}\n
-          smtp.port=587\n
+          smtp.port=${{ secrets.SMTP_PORT }}\n
           smtp.username=${{ secrets.SMTP_USERNAME }}\n
           smtp.password=${{ secrets.SMTP_PASSWORD }}\n
-          smtp.email=noreply@foxogram.su\n
+          smtp.email=${{ secrets.SMTP_EMAIL }}\n
           jwt.secret=${{ secrets.JWT_SECRET }}\n
-          api.version=1" >> foxogram-api/src/main/resources/application.properties
+          api.version=1" >> foxogram-common/src/main/resources/application.properties
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
