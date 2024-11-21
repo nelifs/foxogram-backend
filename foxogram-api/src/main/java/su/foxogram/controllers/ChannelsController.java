@@ -20,7 +20,7 @@ public class ChannelsController {
 	private final ChannelsService channelsService;
 	final Logger logger = LoggerFactory.getLogger(ChannelsController.class);
 
-	public ChannelsController(ChannelsService channelsService, AuthenticationService authenticationService) {
+	public ChannelsController(ChannelsService channelsService) {
 		this.channelsService = channelsService;
     }
 
