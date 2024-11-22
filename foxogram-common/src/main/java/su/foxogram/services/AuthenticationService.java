@@ -32,7 +32,7 @@ public class AuthenticationService {
 	}
 
 	public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header.substring(7), checkIfEmailVerified);
+		return validate(header, checkIfEmailVerified);
 	}
 
 	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
