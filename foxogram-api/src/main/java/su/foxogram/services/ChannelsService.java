@@ -26,7 +26,10 @@ public class ChannelsService {
         long id = new Snowflake(1).nextId();
         long ownerId = user.getId();
 
-        return new Channel(id, name, type, ownerId);
+        Channel channel = new Channel(id, name, type, ownerId);
+        channelRepository.save(channel);
+
+        return channel;
     }
 
     public Channel getChannel(long id) throws ChannelNotFoundException {

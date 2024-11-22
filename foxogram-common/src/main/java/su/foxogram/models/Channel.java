@@ -10,7 +10,6 @@ import lombok.Setter;
 @Table(name = "channels")
 public class Channel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
 
     @Column()
