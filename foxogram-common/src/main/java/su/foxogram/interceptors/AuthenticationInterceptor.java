@@ -1,5 +1,6 @@
 package su.foxogram.interceptors;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
@@ -12,22 +13,34 @@ import su.foxogram.exceptions.UserEmailNotVerifiedException;
 import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.models.User;
 import su.foxogram.services.AuthenticationService;
+import su.foxogram.services.JwtService;
+
+import java.util.Date;
 
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
     final AuthenticationService authenticationService;
+    final JwtService jwtService;
 
     @Autowired
-    public AuthenticationInterceptor(AuthenticationService authenticationService) {
+    public AuthenticationInterceptor(AuthenticationService authenticationService, JwtService jwtService) {
         this.authenticationService = authenticationService;
+        this.jwtService = jwtService;
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
         boolean checkIfEmailVerified = request.getRequestURI().contains("email/verify");
-        User user = authenticationService.getUser(request.getHeader(HttpHeaders.AUTHORIZATION), checkIfEmailVerified);
+        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        Claims claims = jwtService.validate(accessToken);
+
+        if (claims.getExpiration().before(new Date())) throw new UserEmailNotVerifiedException();
+
+        User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
+
         request.setAttribute("user", user);
+        request.setAttribute("accessToken", accessToken);
         return true;
     }
 

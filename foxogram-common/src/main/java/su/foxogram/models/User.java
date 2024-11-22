@@ -20,23 +20,18 @@ public class User extends BaseUser {
     private String password;
 
     @Column()
-    private String refreshToken;
-
-    @Column()
     private long deletion;
 
     public User() {
     }
 
-    public User(long id, String avatar, String username, String email, String password, String accessToken, String refreshToken, long createdAt, long flags, int type, long deletion) {
-        super(id, avatar, username, accessToken, createdAt, flags, type);
+    public User(long id, String avatar, String username, String email, String password, long createdAt, long flags, int type, long deletion) {
+        super(id, avatar, username, createdAt, flags, type);
         this.id = id;
         this.avatar = avatar;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         this.flags = flags;
         this.type = type;
         this.createdAt = createdAt;

@@ -7,20 +7,23 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import su.foxogram.interceptors.AuthenticationInterceptor;
 import su.foxogram.services.AuthenticationService;
+import su.foxogram.services.JwtService;
 
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
     final AuthenticationService authenticationService;
+    private final JwtService jwtService;
 
     @Autowired
-    public WebConfig(AuthenticationService authenticationService) {
+    public WebConfig(AuthenticationService authenticationService, JwtService jwtService) {
         this.authenticationService = authenticationService;
+        this.jwtService = jwtService;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticationInterceptor(authenticationService)).excludePathPatterns("/v1/auth/signup", "/v1/auth/login");
+        registry.addInterceptor(new AuthenticationInterceptor(authenticationService, jwtService)).excludePathPatterns("/v1/auth/signup", "/v1/auth/login");
     }
 }

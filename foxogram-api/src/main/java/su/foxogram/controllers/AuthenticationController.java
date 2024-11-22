@@ -8,15 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.request.UserDeleteDTO;
 import su.foxogram.dtos.request.UserLoginDTO;
-import su.foxogram.dtos.request.UserResumeDTO;
 import su.foxogram.dtos.request.UserSignUpDTO;
 import su.foxogram.dtos.response.OkDTO;
-import su.foxogram.dtos.response.RefreshDTO;
 import su.foxogram.dtos.response.TokenDTO;
 import su.foxogram.models.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
-import su.foxogram.repositories.AuthorizationRepository;
 import su.foxogram.repositories.SessionRepository;
 import su.foxogram.services.AuthenticationService;
 
@@ -25,15 +22,13 @@ import su.foxogram.services.AuthenticationService;
 public class AuthenticationController {
 	private final AuthenticationService authenticationService;
 	private final SessionRepository sessionRepository;
-	private final AuthorizationRepository authorizationRepository;
 
 	final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
 	@Autowired
-	public AuthenticationController(AuthenticationService authenticationService, SessionRepository sessionRepository, AuthorizationRepository authorizationRepository) {
+	public AuthenticationController(AuthenticationService authenticationService, SessionRepository sessionRepository) {
 		this.authenticationService = authenticationService;
 		this.sessionRepository = sessionRepository;
-		this.authorizationRepository = authorizationRepository;
 	}
 
 	@PostMapping("/signup")
@@ -43,9 +38,9 @@ public class AuthenticationController {
 		String password = body.getPassword();
 		logger.info("USER signup ({}, {}) request", username, email);
 
-		User user = authenticationService.userSignUp(username, email, password);
+		String accessToken = authenticationService.userSignUp(username, email, password);
 
-		return new TokenDTO(user.getAccessToken());
+		return new TokenDTO(accessToken);
 	}
 
 	@PostMapping("/login")
@@ -54,19 +49,9 @@ public class AuthenticationController {
 		String password = body.getPassword();
 		logger.info("USER ({}) LOGIN request", email);
 
-		User user = authenticationService.loginUser(email, password);
+		String accessToken = authenticationService.loginUser(email, password);
 
-		return new TokenDTO(user.getAccessToken());
-	}
-
-	@PostMapping("/refresh")
-	public RefreshDTO refreshToken(@RequestAttribute(value = "user") User user, @Valid @RequestBody UserResumeDTO body, HttpServletRequest request) throws UserUnauthorizedException, UserAuthenticationNeededException {
-		Authorization auth = authorizationRepository.findById(user.getId());
-		logger.info("TOKEN refresh for USER ({}, {}) request", user.getId(), user.getEmail());
-
-		auth = authenticationService.refreshToken(user, auth);
-
-		return new RefreshDTO(auth.getAccessToken(), user.getRefreshToken(), auth.getExpiresAt());
+		return new TokenDTO(accessToken);
 	}
 
 	@PostMapping("/email/verify/{code}")
@@ -79,8 +64,8 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/logout")
-	public OkDTO logout(@RequestAttribute(value = "user") User user, HttpServletRequest request) {
-		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
+	public OkDTO logout(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, HttpServletRequest request) {
+		Session session = sessionRepository.findByAccessToken(accessToken);
 		logger.info("USER logout ({}, {}) request", user.getId(), user.getEmail());
 
 		sessionRepository.delete(session);
@@ -89,21 +74,21 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/delete/confirm/{code}")
-	public OkDTO deleteConfirm(@RequestAttribute(value = "user") User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException {
+	public OkDTO deleteConfirm(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException, UserUnauthorizedException {
 		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
-		authenticationService.confirmUserDelete(user, code);
+		authenticationService.confirmUserDelete(user, code, accessToken);
 
 
 		return new OkDTO(true);
 	}
 
 	@PostMapping("/delete")
-	public OkDTO delete(@RequestAttribute(value = "user") User user, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException {
+	public OkDTO delete(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException {
 		String password = body.getPassword();
 		logger.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 
-		authenticationService.requestUserDelete(user, password);
+		authenticationService.requestUserDelete(user, password, accessToken);
 
 
 		return new OkDTO(true);

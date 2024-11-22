@@ -10,7 +10,6 @@ import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.TokenConstants;
 import su.foxogram.exceptions.*;
-import su.foxogram.repositories.AuthorizationRepository;
 import su.foxogram.repositories.CodeRepository;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.repositories.SessionRepository;
@@ -22,17 +21,15 @@ import su.foxogram.util.Encryptor;
 public class AuthenticationService {
 	private final UserRepository userRepository;
 	private final SessionRepository sessionRepository;
-	private final AuthorizationRepository authorizationRepository;
 	private final CodeRepository codeRepository;
 	private final EmailService emailService;
 	private final JwtService jwtService;
 	final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, SessionRepository sessionRepository, AuthorizationRepository authorizationRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
+	public AuthenticationService(UserRepository userRepository, SessionRepository sessionRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
 		this.userRepository = userRepository;
 		this.sessionRepository = sessionRepository;
-		this.authorizationRepository = authorizationRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
@@ -43,28 +40,29 @@ public class AuthenticationService {
 	}
 
 	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		User user = userRepository.findByAccessToken(token);
+		String userId = jwtService.validate(token).getId();
+		User user = userRepository.findById(Long.parseLong(userId));
+
 		if (user == null) throw new UserUnauthorizedException();
 
 		if (!user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED) && !checkIfEmailVerified) throw new UserEmailNotVerifiedException();
 
-		return userRepository.findByAccessToken(token);
+		return userRepository.findById(Long.parseLong(userId));
 	}
 
-	public User userSignUp(String username, String email, String password) throws UserWithThisEmailAlreadyExistException {
+	public String userSignUp(String username, String email, String password) throws UserWithThisEmailAlreadyExistException {
 		if (userRepository.findByEmail(email) != null) throw new UserWithThisEmailAlreadyExistException();
 
 		long id = new Snowflake(1).nextId();
 		long createdAt = System.currentTimeMillis();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
-		String accessToken = jwtService.generate(id, TokenConstants.Type.ACCESS_TOKEN, TokenConstants.Lifetime.ACCESS_TOKEN);
-		String refreshToken = jwtService.generate(id, TokenConstants.Type.REFRESH_TOKEN, TokenConstants.Lifetime.REFRESH_TOKEN);
+		String accessToken = jwtService.generate(id, TokenConstants.Lifetime.ACCESS_TOKEN);
 		long flags = 0;
 		int type = UserConstants.Type.USER.getType();
 		password = Encryptor.hashPassword(password);
 
-		User user = new User(id, avatar, username, email, password, accessToken, refreshToken, createdAt, flags, type, deletion);
+		User user = new User(id, avatar, username, email, password, createdAt, flags, type, deletion);
 
 		userRepository.save(user);
 		logger.info("USER record saved ({}, {}) successfully", username, email);
@@ -77,30 +75,34 @@ public class AuthenticationService {
 		logger.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
 
 		logger.info("USER created ({}, {}) successfully", username, email);
-		return user;
+		return accessToken;
 	}
 
-	public User loginUser(String email, String password) throws UserCredentialsIsInvalidException {
+	public String loginUser(String email, String password) throws UserCredentialsIsInvalidException {
 		User user = userRepository.findByEmail(email);
 
 		if (user == null) throw new UserCredentialsIsInvalidException();
 
-		if (Encryptor.verifyPassword(password, user.getPassword()) && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED))
+		String accessToken;
+		if (Encryptor.verifyPassword(password, user.getPassword()) && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED)) {
 			logger.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
+			accessToken = jwtService.generate(user.getId(), TokenConstants.Lifetime.ACCESS_TOKEN);
+		}
 		else throw new UserCredentialsIsInvalidException();
 		
-		return user;
+		return accessToken;
 	}
 
-	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
+	public void confirmUserDelete(User user, String pathCode, String accessToken) throws CodeIsInvalidException, UserUnauthorizedException {
 		Code code = codeRepository.findByValue(pathCode);
+		String userId = jwtService.validate(accessToken).getId();
 
 		if (code == null) {
 			throw new CodeIsInvalidException();
 		}
 
 		long id = user.getId();
-		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
+		Session session = sessionRepository.findById(Long.parseLong(userId));
 
 		userRepository.delete(user);
 		logger.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
@@ -110,12 +112,12 @@ public class AuthenticationService {
 		logger.info("SESSION record deleted ({}, {}) successfully", id, user.getEmail());
 	}
 
-	public void requestUserDelete(User user, String password) throws UserCredentialsIsInvalidException {
+	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException {
 		if (Encryptor.verifyPassword(password, user.getPassword())) {
+
 			long id = user.getId();
 			String username = user.getUsername();
 			String email = user.getEmail();
-			String accessToken = user.getAccessToken();
 			String type = EmailConstants.Type.DELETE.getValue();
 			String code = CodeGenerator.generateDigitCode();
 			long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.DELETE.getValue();
@@ -125,45 +127,6 @@ public class AuthenticationService {
 			logger.info("USER deletion requested ({}, {}) successfully", id, email);
 		} else throw new UserCredentialsIsInvalidException();
 	}
-
-	public Authorization refreshToken(User user, Authorization auth) throws UserUnauthorizedException, UserAuthenticationNeededException {
-		if (user == null) throw new UserUnauthorizedException();
-		if (auth == null) throw new UserAuthenticationNeededException();
-
-		long id = user.getId();
-		TokenConstants.Lifetime accessTokenLifetime = TokenConstants.Lifetime.ACCESS_TOKEN;
-		TokenConstants.Type accessTokenType = TokenConstants.Type.ACCESS_TOKEN;
-
-		String newAccessToken = jwtService.generate(id, accessTokenType, accessTokenLifetime);
-
-		TokenConstants.Lifetime refreshTokenLifetime = TokenConstants.Lifetime.ACCESS_TOKEN;
-		TokenConstants.Type refreshTokenType = TokenConstants.Type.ACCESS_TOKEN;
-
-		String newRefreshToken = jwtService.generate(id, refreshTokenType, refreshTokenLifetime);
-
-		user.setAccessToken(newAccessToken);
-		user.setRefreshToken(newRefreshToken);
-		userRepository.save(user);
-		logger.info("USER record updated ({}, {}) SET new REFRESH/ACCESS token", user.getId(), user.getEmail());
-
-		long createdAt = System.currentTimeMillis();
-		long expiresAt = createdAt + accessTokenLifetime.getValue();
-
-		auth.setAccessToken(newAccessToken);
-		auth.setCreatedAt(createdAt);
-		auth.setExpiresAt(expiresAt);
-		authorizationRepository.save(auth);
-		logger.info("AUTH record updated ({}, {}) SET new ACCESS token", user.getId(), user.getEmail());
-
-		logger.info("USER token refreshed ({}, {}) successfully", user.getId(), user.getEmail());
-		return auth;
-	}
-
-	/*public Session resumeSession(User user) {
-		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
-
-		return session;
-	}*/
 
 	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
 		Code code = codeRepository.findByValue(pathCode);
@@ -179,13 +142,6 @@ public class AuthenticationService {
 			codeRepository.delete(code);
 			logger.info("CODE record deleted ({}, {}) successfully", user.getId(), user.getEmail());
 
-			long id = user.getId() + new Snowflake(1).nextId();
-			String accessToken = user.getAccessToken();
-			long createdAt = user.getCreatedAt();
-			long expiresAt = createdAt + TokenConstants.Lifetime.REFRESH_TOKEN.getValue();
-
-			sessionRepository.save(new Session(id, accessToken, createdAt, expiresAt));
-			logger.info("SESSION created ({}, {}) successfully", user.getId(), user.getEmail());
 			logger.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
 		}
 	}

@@ -13,13 +13,6 @@ import java.util.List;
 public interface MemberRepository extends CrudRepository<Member, Long> {
 	@Query(value = "SELECT m FROM Member m WHERE m.channelId = :chId AND m.id = :id")
 	Member findByChannelIdAndId(@Param("chId") long channelId, @Param("id") long id);
-
-	
-	Member findByAccessToken(String accessToken);
-
-	
-	List<Member> findAllByAccessToken(String accessToken);
-
 	
 	Member findByChannelId(long channelId);
 

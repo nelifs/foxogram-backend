@@ -21,8 +21,8 @@ public class Member extends BaseUser {
 
     }
 
-    public Member(long id, long channelId, String username, String accessToken, boolean admin, String avatar, long createdAt, long flags, int type) {
-        super(id, avatar, username, accessToken, createdAt, flags, type);
+    public Member(long id, long channelId, String username, boolean admin, String avatar, long createdAt, long flags, int type) {
+        super(id, avatar, username, createdAt, flags, type);
         this.channelId = channelId;
         this.admin = admin;
         this.type = type;

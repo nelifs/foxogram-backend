@@ -18,10 +18,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	User findByEmail(String email);
 	
 	List<User> findAllByEmail(String email);
-	
-	User findByAccessToken(String accessToken);
-
-	List<User> findAllByAccessToken(String accessToken);
 
 	@Override
 	void delete(@NotNull User user);

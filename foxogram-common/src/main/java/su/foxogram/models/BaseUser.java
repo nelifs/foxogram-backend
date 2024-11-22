@@ -16,9 +16,6 @@ public class BaseUser {
     public String username;
 
     @Column()
-    public String accessToken;
-
-    @Column()
     public String avatar;
 
     @Column()
@@ -34,14 +31,13 @@ public class BaseUser {
 
     }
 
-    public BaseUser(long id, String avatar, String username, String accessToken, long createdAt, long flags, int type) {
+    public BaseUser(long id, String avatar, String username, long createdAt, long flags, int type) {
         this.id = id;
         this.avatar = avatar;
         this.username = username;
         this.createdAt = createdAt;
         this.flags = flags;
         this.type = type;
-        this.accessToken = accessToken;
     }
 
     public void addFlag(UserConstants.Flags flag) {

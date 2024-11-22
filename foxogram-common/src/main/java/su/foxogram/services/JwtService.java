@@ -1,38 +1,51 @@
 package su.foxogram.services;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
+import su.foxogram.configs.JwtConfig;
 import su.foxogram.constants.TokenConstants;
+import su.foxogram.exceptions.UserUnauthorizedException;
 
+import java.security.Key;
 import java.util.*;
 
 @Service
 public class JwtService {
+    private final JwtConfig jwtConfig;
 
-    @Value("jwt.secret")
-    private String secretKey;
+    public JwtService(JwtConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
 
-    public String generate(long id, TokenConstants.Type tokenType, TokenConstants.Lifetime expirationMillis) {
+    public String generate(long id, TokenConstants.Lifetime expirationMillis) {
         Date expirationDate = new Date(expirationMillis.getValue());
 
         return Jwts.builder()
-                .setSubject(String.valueOf(id))
-                .claim("type", tokenType.getValue())
+                .setId(String.valueOf(id))
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
+                .signWith(getSigningKey())
                 .compact();
     }
 
-    public boolean validate(String token) {
+    public Claims validate(String token) throws UserUnauthorizedException {
         try {
-            Jwts.parser()
-                    .setSigningKey(secretKey.getBytes())
+            Jws<Claims> claimsJws = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
                     .parseClaimsJws(token);
-            return true;
+
+            return claimsJws.getBody();
         } catch (Exception e) {
-            return false;
+            throw new UserUnauthorizedException();
         }
+    }
+
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecret());
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
