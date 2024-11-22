@@ -21,8 +21,9 @@ public class JwtService {
         this.jwtConfig = jwtConfig;
     }
 
-    public String generate(long id, TokenConstants.Lifetime expirationMillis) {
-        Date expirationDate = new Date(expirationMillis.getValue());
+    public String generate(long id) {
+        long now = System.currentTimeMillis();
+        Date expirationDate = new Date(now + TokenConstants.LIFETIME);
 
         return Jwts.builder()
                 .setId(String.valueOf(id))
@@ -40,7 +41,8 @@ public class JwtService {
 
             return claimsJws.getBody();
         } catch (Exception e) {
-            throw new UserUnauthorizedException();
+            e.printStackTrace();
+            return null;
         }
     }
 

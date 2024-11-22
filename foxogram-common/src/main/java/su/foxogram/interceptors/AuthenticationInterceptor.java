@@ -33,9 +33,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
         boolean checkIfEmailVerified = request.getRequestURI().contains("email/verify");
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Claims claims = jwtService.validate(accessToken);
-
-        if (claims.getExpiration().before(new Date())) throw new UserEmailNotVerifiedException();
 
         User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
 

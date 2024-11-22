@@ -57,7 +57,7 @@ public class AuthenticationService {
 		long createdAt = System.currentTimeMillis();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
-		String accessToken = jwtService.generate(id, TokenConstants.Lifetime.ACCESS_TOKEN);
+		String accessToken = jwtService.generate(id);
 		long flags = 0;
 		int type = UserConstants.Type.USER.getType();
 		password = Encryptor.hashPassword(password);
@@ -86,7 +86,7 @@ public class AuthenticationService {
 		String accessToken;
 		if (Encryptor.verifyPassword(password, user.getPassword()) && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED)) {
 			logger.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
-			accessToken = jwtService.generate(user.getId(), TokenConstants.Lifetime.ACCESS_TOKEN);
+			accessToken = jwtService.generate(user.getId());
 		}
 		else throw new UserCredentialsIsInvalidException();
 		
