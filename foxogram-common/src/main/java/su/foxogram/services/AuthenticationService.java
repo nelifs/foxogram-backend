@@ -38,18 +38,15 @@ public class AuthenticationService {
 		this.jwtService = jwtService;
 	}
 
-	public User getUser(String header) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header.substring(7));
+	public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+		return validate(header.substring(7), checkIfEmailVerified);
 	}
 
-	public User validate(String token) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
 		User user = userRepository.findByAccessToken(token);
 		if (user == null) throw new UserUnauthorizedException();
 
-		if (!user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED)) throw new UserEmailNotVerifiedException();
-
-//		Session session = sessionRepository.findByAccessToken(user.getAccessToken());
-//		if (session == null && validateSession) throw new UserAuthenticationNeededException();
+		if (!user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED) && !checkIfEmailVerified) throw new UserEmailNotVerifiedException();
 
 		return userRepository.findByAccessToken(token);
 	}
@@ -91,6 +88,7 @@ public class AuthenticationService {
 		if (Encryptor.verifyPassword(password, user.getPassword()) && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED))
 			logger.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
 		else throw new UserCredentialsIsInvalidException();
+		
 		return user;
 	}
 

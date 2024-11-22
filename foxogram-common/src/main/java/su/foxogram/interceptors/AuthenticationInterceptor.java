@@ -25,7 +25,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-        User user = authenticationService.getUser(request.getHeader(HttpHeaders.AUTHORIZATION));
+        boolean checkIfEmailVerified = request.getRequestURI().contains("email/verify");
+        User user = authenticationService.getUser(request.getHeader(HttpHeaders.AUTHORIZATION), checkIfEmailVerified);
         request.setAttribute("user", user);
         return true;
     }
