@@ -31,6 +31,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         boolean checkIfEmailVerified = request.getRequestURI().contains("email/verify");
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
+        if (accessToken == null) throw new UserUnauthorizedException();
+
         User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
 
         request.setAttribute("user", user);
