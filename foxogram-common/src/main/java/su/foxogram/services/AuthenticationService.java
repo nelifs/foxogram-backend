@@ -8,11 +8,9 @@ import su.foxogram.constants.UserConstants;
 import su.foxogram.models.*;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
-import su.foxogram.constants.TokenConstants;
 import su.foxogram.exceptions.*;
 import su.foxogram.repositories.CodeRepository;
 import su.foxogram.repositories.UserRepository;
-import su.foxogram.repositories.SessionRepository;
 import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
@@ -20,16 +18,14 @@ import su.foxogram.util.Encryptor;
 @Service
 public class AuthenticationService {
 	private final UserRepository userRepository;
-	private final SessionRepository sessionRepository;
 	private final CodeRepository codeRepository;
 	private final EmailService emailService;
 	private final JwtService jwtService;
 	final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, SessionRepository sessionRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
+	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
 		this.userRepository = userRepository;
-		this.sessionRepository = sessionRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
@@ -93,23 +89,19 @@ public class AuthenticationService {
 		return accessToken;
 	}
 
-	public void confirmUserDelete(User user, String pathCode, String accessToken) throws CodeIsInvalidException, UserUnauthorizedException {
+	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException, UserUnauthorizedException {
 		Code code = codeRepository.findByValue(pathCode);
-		String userId = jwtService.validate(accessToken).getId();
 
 		if (code == null) {
 			throw new CodeIsInvalidException();
 		}
 
 		long id = user.getId();
-		Session session = sessionRepository.findById(Long.parseLong(userId));
 
 		userRepository.delete(user);
 		logger.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
 		codeRepository.delete(code);
 		logger.info("CODE record deleted ({}, {}) successfully", id, user.getEmail());
-		sessionRepository.delete(session);
-		logger.info("SESSION record deleted ({}, {}) successfully", id, user.getEmail());
 	}
 
 	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException {

@@ -14,21 +14,18 @@ import su.foxogram.dtos.response.TokenDTO;
 import su.foxogram.models.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
-import su.foxogram.repositories.SessionRepository;
 import su.foxogram.services.AuthenticationService;
 
 @RestController
 @RequestMapping(value = APIConstants.AUTH, produces = "application/json")
 public class AuthenticationController {
 	private final AuthenticationService authenticationService;
-	private final SessionRepository sessionRepository;
 
 	final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
 	@Autowired
-	public AuthenticationController(AuthenticationService authenticationService, SessionRepository sessionRepository) {
+	public AuthenticationController(AuthenticationService authenticationService) {
 		this.authenticationService = authenticationService;
-		this.sessionRepository = sessionRepository;
 	}
 
 	@PostMapping("/signup")
@@ -63,21 +60,11 @@ public class AuthenticationController {
 		return new OkDTO(true);
 	}
 
-	@PostMapping("/logout")
-	public OkDTO logout(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, HttpServletRequest request) {
-		Session session = sessionRepository.findByAccessToken(accessToken);
-		logger.info("USER logout ({}, {}) request", user.getId(), user.getEmail());
-
-		sessionRepository.delete(session);
-
-		return new OkDTO(true);
-	}
-
 	@PostMapping("/delete/confirm/{code}")
 	public OkDTO deleteConfirm(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException, UserUnauthorizedException {
 		logger.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
-		authenticationService.confirmUserDelete(user, code, accessToken);
+		authenticationService.confirmUserDelete(user, code);
 
 
 		return new OkDTO(true);
