@@ -15,6 +15,7 @@
   - [https://github.foxogram.su](https://github.com/nelifs/foxogram-backend)
 
 <img src="src/main/resources/assets/backend_acknowledgements.png" alt="## Acknowledgements">
+
 We would like to thank the following people and organizations for their valuable input and support in the development of the backend:
 
 - **Java** for making it possible for this project to exist
@@ -23,6 +24,7 @@ We would like to thank the following people and organizations for their valuable
 Without your help, the **Foxogram Backend** project would not have been possible. We are grateful for your participation and support!
 
 <img src="src/main/resources/assets/backend_license.png" alt="## License">
+
 This project is licensed under the MIT license - see [LICENSE](LICENSE) for details.
 
 If you have any questions or problems with **Foxogram Backend**, please contact us at [Discord](https://discord.foxogram.su).
