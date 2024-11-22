@@ -1,6 +1,5 @@
 package su.foxogram.interceptors;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
@@ -14,8 +13,6 @@ import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.models.User;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.JwtService;
-
-import java.util.Date;
 
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {

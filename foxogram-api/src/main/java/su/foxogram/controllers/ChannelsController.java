@@ -10,7 +10,6 @@ import su.foxogram.models.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
 import su.foxogram.dtos.request.ChannelCreateDTO;
-import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.ChannelsService;
 
 @RestController

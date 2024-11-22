@@ -3,7 +3,6 @@ package su.foxogram.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.UserDTO;
-import su.foxogram.exceptions.UserEmailNotVerifiedException;
 import su.foxogram.models.User;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.UserUnauthorizedException;

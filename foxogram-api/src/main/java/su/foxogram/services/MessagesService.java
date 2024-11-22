@@ -57,7 +57,7 @@ public class MessagesService {
 		return message;
 	}
 
-	public Message addMessage(long channelId, User user, MessageDTO body) throws ChannelNotFoundException {
+	public void addMessage(long channelId, User user, MessageDTO body) throws ChannelNotFoundException {
 		Channel channel = channelRepository.findById(channelId);
 
 		if (channel == null) {
@@ -75,8 +75,7 @@ public class MessagesService {
 		logger.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", id, channelId);
 		logger.info("MESSAGE ({}) in CHANNEL ({}) posted successfully", id, channelId);
 
-		return message;
-	}
+    }
 
 	public void deleteMessage(long id, long channelId) throws MessageNotFoundException, ChannelNotFoundException {
 		Channel channel = channelRepository.findById(channelId);

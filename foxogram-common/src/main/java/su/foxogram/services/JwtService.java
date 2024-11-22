@@ -41,8 +41,7 @@ public class JwtService {
 
             return claimsJws.getBody();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new UserUnauthorizedException();
         }
     }
 
