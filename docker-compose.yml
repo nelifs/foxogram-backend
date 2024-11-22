@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      context: ./foxogram-api
+    restart: always
+    ports:
+      - '8080:8080'
+    networks:
+      - db_network
+
+networks:
+  db_network:
+    external: true
