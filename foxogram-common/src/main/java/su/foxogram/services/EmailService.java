@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import su.foxogram.configs.EmailConfig;
 import su.foxogram.models.Code;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.repositories.CodeRepository;
@@ -27,14 +28,14 @@ public class EmailService {
     private final CodeRepository codeRepository;
     private final ResourceLoader resourceLoader;
     private final JavaMailSender javaMailSender;
-
-    public String email = "noreply@foxogram.su"; // temp solution, fix asap
+    private final EmailConfig emailConfig;
 
     @Autowired
-    public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, CodeRepository codeRepository) {
+    public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, CodeRepository codeRepository, EmailConfig emailConfig) {
         this.javaMailSender = javaMailSender;
         this.resourceLoader = resourceLoader;
         this.codeRepository = codeRepository;
+        this.emailConfig = emailConfig;
     }
 
     @Async
@@ -45,7 +46,7 @@ public class EmailService {
 
         try {
             helper.setTo(to);
-            helper.setFrom(email);
+            helper.setFrom(emailConfig.getEmail());
             if (type.equals(EmailConstants.Type.DELETE.getValue())) {
                 helper.setSubject("Confirm Your Account Deletion");
                 HTMLContent = readHTML("delete").replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);
