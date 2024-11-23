@@ -29,6 +29,9 @@ public class ChannelsService {
         Channel channel = new Channel(id, name, type, ownerId);
         channelRepository.save(channel);
 
+        Member member = new Member(user.getId(), channel, user.getUsername(), true, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
+        memberRepository.save(member);
+
         return channel;
     }
 
