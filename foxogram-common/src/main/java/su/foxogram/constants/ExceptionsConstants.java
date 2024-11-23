@@ -12,7 +12,8 @@ public class ExceptionsConstants {
 		MEMBER_IN_CHANNEL_NOT_FOUND(401),
 		MEMBER_ALREADY_IN_CHANNEL(402),
 		MISSING_PERMISSIONS(403),
-		CODE_IS_INVALID(501);
+		CODE_IS_INVALID(501),
+		CODE_EXPIRED(502);
 
 		private final int code;
 

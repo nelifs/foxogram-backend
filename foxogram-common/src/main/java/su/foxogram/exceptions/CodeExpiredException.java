@@ -8,6 +8,6 @@ import su.foxogram.constants.ExceptionsConstants;
 public class CodeExpiredException extends BaseException {
 
 	public CodeExpiredException() {
-		super("Code has expired!", CodeExpiredException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsConstants.Codes.CODE_IS_INVALID.getValue());
+		super("Code has expired!", CodeExpiredException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsConstants.Codes.CODE_EXPIRED.getValue());
 	}
 }
