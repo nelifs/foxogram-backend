@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import su.foxogram.dtos.response.ExceptionDTO;
 import su.foxogram.exceptions.BaseException;
@@ -21,6 +23,13 @@ public class ExceptionController {
 	public ResponseEntity<ExceptionDTO> handleBaseException(BaseException exception) {
 		logger.error("CLIENT (USER) EXCEPTION ({}, {}, {}) occurred!\n", exception.getErrorCode(), exception.getStatus(), exception.getMessage());
 		return ResponseEntity.status(exception.getStatus()).body(new ExceptionDTO(false, exception.getErrorCode(), exception.getMessage()));
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ExceptionDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
+		String message = "Request body cannot be empty";
+		logger.error("SERVER REQUEST EXCEPTION ({}, {}, {}) occurred!\n", 999, HttpStatus.INTERNAL_SERVER_ERROR, message);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(false, 999, message));
 	}
 
 	@ExceptionHandler({ MethodArgumentNotValidException.class })
