@@ -44,7 +44,7 @@ public class ChannelsController {
 	}
 
 	@PostMapping("/{id}/join")
-	public MemberDTO joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
+	public MemberDTO joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, MemberAlreadyInChannelException {
 		logger.info("CHANNEL join ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 
@@ -54,7 +54,7 @@ public class ChannelsController {
 	}
 
 	@PostMapping("/{id}/leave")
-	public OkDTO leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
+	public OkDTO leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, MemberInChannelNotFoundException {
 		logger.info("CHANNEL leave ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 
@@ -67,7 +67,7 @@ public class ChannelsController {
 	public ChannelDTO editChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL edit ({}) request", id);
 
-		Channel channel =  channelsService.getChannel(id);
+		Channel channel = channelsService.getChannel(id);
 
 		return new ChannelDTO(channel);
 	}

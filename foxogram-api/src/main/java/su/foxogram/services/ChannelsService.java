@@ -2,6 +2,7 @@ package su.foxogram.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import su.foxogram.exceptions.MemberAlreadyInChannelException;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MemberInChannelNotFoundException;
@@ -64,13 +65,21 @@ public class ChannelsService {
         }
     }
 
-    public Member joinUser(Channel channel, User user) {
-        Member member = new Member(user.getId(), channel, user.getUsername(), false, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
+    public Member joinUser(Channel channel, User user) throws MemberAlreadyInChannelException {
+        Member member = memberRepository.findByChannelAndId(channel, user.getId());
+
+        if (member != null) throw new MemberAlreadyInChannelException();
+
+        member = new Member(user.getId(), channel, user.getUsername(), false, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
         return memberRepository.save(member);
     }
 
-    public void leaveUser(Channel channel, User user) {
+    public void leaveUser(Channel channel, User user) throws MemberInChannelNotFoundException {
         Member member = memberRepository.findByChannelAndId(channel, user.getId());
+
+        if (member == null) throw new MemberInChannelNotFoundException();
+
+        member = memberRepository.findByChannelAndId(channel, user.getId());
         memberRepository.delete(member);
     }
 }
