@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import su.foxogram.dtos.response.ChannelDTO;
+import su.foxogram.dtos.response.MemberDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.models.*;
 import su.foxogram.constants.APIConstants;
@@ -24,25 +26,31 @@ public class ChannelsController {
     }
 
 	@PostMapping("/create")
-	public Channel createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body, HttpServletRequest request) {
+	public ChannelDTO createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body, HttpServletRequest request) {
 		logger.info("CHANNEL create ({}, {}) request", body.getName(), body.getType());
 
-		return channelsService.createChannel(user, body.getType(), body.getName());
+		Channel channel = channelsService.createChannel(user, body.getType(), body.getName());
+
+		return new ChannelDTO(channel);
 	}
 
 	@GetMapping("/{id}")
-	public Channel getChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
+	public ChannelDTO getChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL info ({}) request", id);
 
-		return channelsService.getChannel(id);
+		Channel channel = channelsService.getChannel(id);
+
+		return new ChannelDTO(channel);
 	}
 
 	@PostMapping("/{id}/join")
-	public Member joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
+	public MemberDTO joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL join ({}) request", id);
 		Channel channel = channelsService.getChannel(id);
 
-		return channelsService.joinUser(channel, user);
+		Member member = channelsService.joinUser(channel, user);
+
+		return new MemberDTO(member);
 	}
 
 	@PostMapping("/{id}/leave")
@@ -51,14 +59,17 @@ public class ChannelsController {
 		Channel channel = channelsService.getChannel(id);
 
 		channelsService.leaveUser(channel, user);
+
 		return new OkDTO(true);
 	}
 
 	@PatchMapping("/{id}")
-	public Channel editChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
+	public ChannelDTO editChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
 		logger.info("CHANNEL edit ({}) request", id);
 
-		return channelsService.getChannel(id);
+		Channel channel =  channelsService.getChannel(id);
+
+		return new ChannelDTO(channel);
 	}
 
 	@DeleteMapping("/{id}")
