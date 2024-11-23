@@ -28,7 +28,8 @@ public class MessagesService {
     }
 
 	public List<Message> getMessages(long before, int limit, long channelId) throws MessageNotFoundException {
-		List<Message> messagesArray = messageRepository.findAllByChannelId(channelId);
+		Channel channel = channelRepository.findById(channelId);
+		List<Message> messagesArray = messageRepository.findAllByChannel(channel);
 
 		if (messagesArray.isEmpty()) {
 			throw new MessageNotFoundException();
@@ -46,7 +47,7 @@ public class MessagesService {
 			throw new ChannelNotFoundException();
 		}
 
-		Message message = messageRepository.findByChannelIdAndId(channelId, id);
+		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) {
 			throw new MessageNotFoundException();
@@ -70,7 +71,7 @@ public class MessagesService {
 		List<String> attachments = body.getAttachments();
 		String content = body.getContent();
 
-		Message message = new Message(id, channelId, content, authorId, timestamp, attachments);
+		Message message = new Message(id, channel, content, authorId, timestamp, attachments);
 		messageRepository.save(message);
 		logger.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", id, channelId);
 		logger.info("MESSAGE ({}) in CHANNEL ({}) posted successfully", id, channelId);
@@ -84,7 +85,7 @@ public class MessagesService {
 			throw new ChannelNotFoundException();
 		}
 
-		Message message = messageRepository.findByChannelIdAndId(channelId, id);
+		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) {
 			throw new MessageNotFoundException();
@@ -101,7 +102,7 @@ public class MessagesService {
 			throw new ChannelNotFoundException();
 		}
 
-		Message message = messageRepository.findByChannelIdAndId(channelId, id);
+		Message message = messageRepository.findByChannelAndId(channel, id);
 		String content = body.getContent();
 
 		if (message == null) {

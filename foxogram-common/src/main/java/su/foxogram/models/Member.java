@@ -1,8 +1,6 @@
 package su.foxogram.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +9,9 @@ import lombok.Setter;
 @Entity
 @Table(name = "members")
 public class Member extends BaseUser {
-    @Column()
-    public long channelId;
+    @ManyToOne
+    @JoinColumn(name = "channel", nullable = false)
+    private Channel channel;
 
     @Column()
     public boolean admin;
@@ -21,9 +20,9 @@ public class Member extends BaseUser {
 
     }
 
-    public Member(long id, long channelId, String username, boolean admin, String avatar, long createdAt, long flags, int type) {
+    public Member(long id, Channel channel, String username, boolean admin, String avatar, long createdAt, long flags, int type) {
         super(id, avatar, username, createdAt, flags, type);
-        this.channelId = channelId;
+        this.channel = channel;
         this.admin = admin;
         this.type = type;
     }

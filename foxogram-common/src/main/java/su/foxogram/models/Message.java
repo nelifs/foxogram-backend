@@ -14,8 +14,9 @@ public class Message {
     @Id
     public long id;
 
-    @Column()
-    public long channelId;
+    @ManyToOne
+    @JoinColumn(name = "channel", nullable = false)
+    private Channel channel;
 
     @Column()
     public String content;
@@ -35,9 +36,9 @@ public class Message {
 
     }
 
-    public Message(long id, long channelId, String content, long authorId, long timestamp, List<String> attachments) {
+    public Message(long id, Channel channel, String content, long authorId, long timestamp, List<String> attachments) {
         this.id = id;
-        this.channelId = channelId;
+        this.channel = channel;
         this.authorId = authorId;
         this.content = content;
         this.timestamp = timestamp;

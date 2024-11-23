@@ -43,7 +43,8 @@ public class ChannelsService {
     }
 
     public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
-        Member member = memberRepository.findByChannelIdAndId(channel.getId(), user.getId());
+        Member member = memberRepository.findByChannelAndId(channel, user.getId());
+
         if (member.isAdmin()) {
             channelRepository.delete(channel);
         } else {
@@ -52,7 +53,8 @@ public class ChannelsService {
     }
 
     public void getMemberInChannel(long id, long channelId) throws MemberInChannelNotFoundException {
-        Member member = memberRepository.findByChannelIdAndId(channelId, id);
+        Channel channel = channelRepository.findById(channelId);
+        Member member = memberRepository.findByChannelAndId(channel, id);
 
         if (member == null) {
             throw new MemberInChannelNotFoundException();
@@ -60,12 +62,12 @@ public class ChannelsService {
     }
 
     public Member joinUser(Channel channel, User user) {
-        Member member = new Member(user.getId(), channel.getId(), user.getUsername(), false, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
+        Member member = new Member(user.getId(), channel, user.getUsername(), false, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
         return memberRepository.save(member);
     }
 
     public void leaveUser(Channel channel, User user) {
-        Member member = memberRepository.findByChannelIdAndId(channel.getId(), user.getId());
+        Member member = memberRepository.findByChannelAndId(channel, user.getId());
         memberRepository.delete(member);
     }
 }
