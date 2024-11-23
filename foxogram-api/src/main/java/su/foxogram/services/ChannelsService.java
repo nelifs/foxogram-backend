@@ -3,6 +3,7 @@ package su.foxogram.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.ChannelsConstants;
+import su.foxogram.constants.MemberConstants;
 import su.foxogram.exceptions.MemberAlreadyInChannelException;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
@@ -31,7 +32,7 @@ public class ChannelsService {
         Channel channel = new Channel(id, name, type, ownerId);
         channelRepository.save(channel);
 
-        Member member = new Member(user.getId(), channel, user.getUsername(), true, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
+        Member member = new Member(user.getId(), channel, user.getUsername(), MemberConstants.Permissions.ADMIN.getBit(), user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
         memberRepository.save(member);
 
         return channel;
@@ -50,7 +51,7 @@ public class ChannelsService {
     public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
         Member member = memberRepository.findByChannelAndId(channel, user.getId());
 
-        if (member.isAdmin()) {
+        if (member.hasPermission(MemberConstants.Permissions.ADMIN)) {
             channelRepository.delete(channel);
         } else {
             throw new MissingPermissionsException();
@@ -71,7 +72,7 @@ public class ChannelsService {
 
         if (member != null) throw new MemberAlreadyInChannelException();
 
-        member = new Member(user.getId(), channel, user.getUsername(), false, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
+        member = new Member(user.getId(), channel, user.getUsername(), 0, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
         return memberRepository.save(member);
     }
 

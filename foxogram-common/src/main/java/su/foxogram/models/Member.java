@@ -3,6 +3,7 @@ package su.foxogram.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import su.foxogram.constants.MemberConstants;
 
 @Setter
 @Getter
@@ -14,16 +15,28 @@ public class Member extends BaseUser {
     private Channel channel;
 
     @Column()
-    public boolean admin;
+    public long permissions;
 
     public Member() {
 
     }
 
-    public Member(long id, Channel channel, String username, boolean admin, String avatar, long createdAt, long flags, int type) {
+    public Member(long id, Channel channel, String username, long permissions, String avatar, long createdAt, long flags, int type) {
         super(id, avatar, username, createdAt, flags, type);
         this.channel = channel;
-        this.admin = admin;
+        this.permissions = permissions;
         this.type = type;
+    }
+
+    public void addPermission(MemberConstants.Permissions permission) {
+        this.permissions |= permission.getBit();
+    }
+
+    public void removePermission(MemberConstants.Permissions permission) {
+        this.permissions &= ~permission.getBit();
+    }
+
+    public boolean hasPermission(MemberConstants.Permissions permission) {
+        return (this.permissions & permission.getBit()) != 0;
     }
 }

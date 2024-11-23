@@ -17,7 +17,7 @@ public class MemberDTO {
     private long flags;
     private long type;
     private long createdAt;
-    private boolean admin;
+    private long permissions;
 
     public MemberDTO(Member member) {
         this.id = member.getId();
@@ -26,7 +26,7 @@ public class MemberDTO {
         this.flags = member.getFlags();
         this.type = member.getType();
         this.createdAt = member.getCreatedAt();
-        this.admin = member.isAdmin();
+        this.permissions = member.getPermissions();
     }
 }
 
