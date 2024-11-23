@@ -2,6 +2,7 @@ package su.foxogram.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import su.foxogram.constants.ChannelsConstants;
 import su.foxogram.exceptions.MemberAlreadyInChannelException;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
@@ -23,7 +24,7 @@ public class ChannelsService {
         this.memberRepository = memberRepository;
     }
 
-    public Channel createChannel(User user, String type, String name) {
+    public Channel createChannel(User user, int type, String name) {
         long id = new Snowflake(1).nextId();
         long ownerId = user.getId();
 

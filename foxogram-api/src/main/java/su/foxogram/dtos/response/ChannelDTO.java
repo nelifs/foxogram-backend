@@ -18,7 +18,7 @@ import static java.util.Arrays.stream;
 public class ChannelDTO {
     private long id;
     private String name;
-    private String type;
+    private int type;
     private long ownerId;
     private List<MemberDTO> members;
 

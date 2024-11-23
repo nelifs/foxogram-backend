@@ -18,7 +18,7 @@ public class Channel {
     public String name;
 
     @Column()
-    public String type;
+    public int type;
 
     @Column()
     public long ownerId;
@@ -33,7 +33,7 @@ public class Channel {
 
     }
 
-    public Channel(long id, String name, String type, long ownerId) {
+    public Channel(long id, String name, int type, long ownerId) {
         this.id = id;
         this.name = name;
         this.type = type;
