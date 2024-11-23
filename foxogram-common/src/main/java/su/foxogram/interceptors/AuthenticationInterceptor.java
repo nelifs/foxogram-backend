@@ -32,6 +32,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (accessToken == null) throw new UserUnauthorizedException();
+        if (!accessToken.contains("Bearer")) throw new UserUnauthorizedException();
 
         User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
 

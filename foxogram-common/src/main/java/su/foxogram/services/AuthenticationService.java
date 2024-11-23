@@ -32,7 +32,7 @@ public class AuthenticationService {
 	}
 
 	public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header, checkIfEmailVerified);
+		return validate(header.substring(7), checkIfEmailVerified);
 	}
 
 	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -130,7 +130,7 @@ public class AuthenticationService {
 		} else {
 			user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
 			userRepository.save(user);
-			logger.info("USER record updated ({}, {}) SET emailverify to TRUE", user.getId(), user.getEmail());
+			logger.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
 			codeRepository.delete(code);
 			logger.info("CODE record deleted ({}, {}) successfully", user.getId(), user.getEmail());
 
