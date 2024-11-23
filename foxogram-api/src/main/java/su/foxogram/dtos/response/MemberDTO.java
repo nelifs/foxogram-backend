@@ -2,11 +2,7 @@ package su.foxogram.dtos.response;
 
 import lombok.Getter;
 import lombok.Setter;
-import su.foxogram.models.Channel;
 import su.foxogram.models.Member;
-import su.foxogram.models.Message;
-
-import java.util.List;
 
 @Getter
 @Setter

@@ -2,7 +2,6 @@ package su.foxogram.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import su.foxogram.constants.ChannelsConstants;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.exceptions.MemberAlreadyInChannelException;
 import su.foxogram.models.*;

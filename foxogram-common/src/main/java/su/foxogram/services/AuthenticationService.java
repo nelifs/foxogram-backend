@@ -89,7 +89,7 @@ public class AuthenticationService {
 		return accessToken;
 	}
 
-	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException, UserUnauthorizedException {
+	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
 		Code code = codeRepository.findByValue(pathCode);
 
 		if (code == null) {
