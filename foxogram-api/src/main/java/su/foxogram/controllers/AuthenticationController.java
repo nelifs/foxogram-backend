@@ -77,7 +77,6 @@ public class AuthenticationController {
 
 		authenticationService.requestUserDelete(user, password, accessToken);
 
-
 		return new OkDTO(true);
 	}
 }
