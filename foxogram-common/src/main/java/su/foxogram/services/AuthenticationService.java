@@ -80,7 +80,7 @@ public class AuthenticationService {
 		if (user == null) throw new UserCredentialsIsInvalidException();
 
 		String accessToken;
-		if (Encryptor.verifyPassword(password, user.getPassword()) && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED)) {
+		if (Encryptor.verifyPassword(password, user.getPassword())) {
 			logger.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
 			accessToken = jwtService.generate(user.getId());
 		}
