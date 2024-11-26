@@ -1,12 +1,12 @@
-name: Deploy Foxogram
+name: Deploy Foxogram to Dev
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dev" ]
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: dev
     steps:
       - uses: actions/checkout@v4
 
@@ -37,4 +37,4 @@ jobs:
         run: ./gradlew :foxogram-api:build
 
       - name: Run Foxogram API
-        run: docker compose up -d --build
+        run: docker-compose up -d --build
