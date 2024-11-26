@@ -30,8 +30,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
         boolean checkIfEmailVerified = request.getRequestURI().contains("email/verify") || request.getRequestURI().contains("users/@me");        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (accessToken == null) throw new UserUnauthorizedException();
-        if (!accessToken.contains("Bearer")) throw new UserUnauthorizedException();
+        if (accessToken == null || !accessToken.contains("Bearer")) throw new UserUnauthorizedException();
 
         User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
 
