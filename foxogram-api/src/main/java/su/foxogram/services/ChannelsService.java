@@ -1,5 +1,6 @@
 package su.foxogram.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
@@ -12,6 +13,7 @@ import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MemberRepository;
 import su.foxogram.structures.Snowflake;
 
+@Slf4j
 @Service
 public class ChannelsService {
 

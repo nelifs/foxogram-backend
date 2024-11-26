@@ -1,5 +1,6 @@
 package su.foxogram.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,12 @@ import su.foxogram.structures.Snowflake;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class MessagesService {
 
 	private final MessageRepository messageRepository;
 	private final ChannelRepository channelRepository;
-    final Logger logger = LoggerFactory.getLogger(MessagesService.class);
 
 	@Autowired
 	public MessagesService(MessageRepository messageRepository, ChannelRepository channelRepository) {
@@ -35,7 +36,7 @@ public class MessagesService {
 			throw new MessageNotFoundException();
 		}
 
-		logger.info("MESSAGES ({}, {}) in CHANNEL ({}) found successfully", limit, before, channelId);
+		log.info("MESSAGES ({}, {}) in CHANNEL ({}) found successfully", limit, before, channelId);
 
 		return messagesArray;
 	}
@@ -53,7 +54,7 @@ public class MessagesService {
 			throw new MessageNotFoundException();
 		}
 
-		logger.info("MESSAGE ({}) in CHANNEL ({}) found successfully", id, channelId);
+		log.info("MESSAGE ({}) in CHANNEL ({}) found successfully", id, channelId);
 
 		return message;
 	}
@@ -73,8 +74,8 @@ public class MessagesService {
 
 		Message message = new Message(id, channel, content, authorId, timestamp, attachments);
 		messageRepository.save(message);
-		logger.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", id, channelId);
-		logger.info("MESSAGE ({}) in CHANNEL ({}) posted successfully", id, channelId);
+		log.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", id, channelId);
+		log.info("MESSAGE ({}) in CHANNEL ({}) posted successfully", id, channelId);
 
     }
 
@@ -92,7 +93,7 @@ public class MessagesService {
 		}
 
 		messageRepository.delete(message);
-		logger.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channelId);
+		log.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channelId);
 	}
 
 	public Message editMessage(long id, long channelId, MessageDTO body) throws MessageNotFoundException, ChannelNotFoundException {
@@ -111,7 +112,7 @@ public class MessagesService {
 
 		message.setContent(content);
 		messageRepository.save(message);
-		logger.info("MESSAGE ({}) in CHANNEL ({}) patched successfully", id, channelId);
+		log.info("MESSAGE ({}) in CHANNEL ({}) patched successfully", id, channelId);
 
 		return message;
 	}
