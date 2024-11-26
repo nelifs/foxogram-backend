@@ -9,7 +9,7 @@ import su.foxogram.constants.ValidationConstants;
 @Setter
 @Getter
 public class UserDeleteDTO {
-	@NotNull
+	@NotNull(message = "Password" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
 	@Size(min = ValidationConstants.Lengths.MIN, max = ValidationConstants.Lengths.PASSWORD, message = ValidationConstants.Messages.PASSWORD_WRONG_LENGTH)
 	private String password;
 }

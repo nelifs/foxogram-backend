@@ -18,9 +18,9 @@ public class ValidationConstants {
         public static final String EMAIL_INCORRECT = "Incorrect email format";
         public static final String CHANNEL_NAME_WRONG_LENGTH = "Channel name must be between {min} and {max} characters long";
         public static final String CHANNEL_NAME_INCORRECT = "Incorrect channel format";
-        public static final String CHANNEL_TYPE_NOT_NULL = "Channel type must not be null";
         public static final String CHANNEL_TYPE_INCORRECT = "Channel type are incorrect";
         public static final String MESSAGE_WRONG_LENGTH = "Message length must be between {min} and {max} characters long";
+        public static final String MUST_NOT_BE_NULL = " must not be null";
     }
 
     public static class Regex {

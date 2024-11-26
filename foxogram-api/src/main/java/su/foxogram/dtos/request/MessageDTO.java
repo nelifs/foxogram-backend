@@ -11,8 +11,10 @@ import java.util.List;
 @Setter
 @Getter
 public class MessageDTO {
-	@NotNull
+	@NotNull(message = "Content" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
 	@Size(min = 1, max = ValidationConstants.Lengths.MESSAGE_CONTENT, message = ValidationConstants.Messages.MESSAGE_WRONG_LENGTH)
 	private String content;
+
+	@NotNull(message = "Attachments" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
 	private List<String> attachments;
 }

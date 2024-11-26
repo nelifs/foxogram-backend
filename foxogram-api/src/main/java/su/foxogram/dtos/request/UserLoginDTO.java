@@ -10,12 +10,12 @@ import su.foxogram.constants.ValidationConstants;
 @Setter
 @Getter
 public class UserLoginDTO {
-	@NotNull
+	@NotNull(message = "Email" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
 	@Size(min = ValidationConstants.Lengths.MIN, max = ValidationConstants.Lengths.EMAIL, message = ValidationConstants.Messages.EMAIL_WRONG_LENGTH)
 	@Pattern(regexp = ValidationConstants.Regex.EMAIL_REGEX, message = ValidationConstants.Messages.EMAIL_INCORRECT)
 	private String email;
 
-	@NotNull
+	@NotNull(message = "Password" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
 	@Size(min = ValidationConstants.Lengths.MIN, max = ValidationConstants.Lengths.PASSWORD, message = ValidationConstants.Messages.PASSWORD_WRONG_LENGTH)
 	private String password;
 }
