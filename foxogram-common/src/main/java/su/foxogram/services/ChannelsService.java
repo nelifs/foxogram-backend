@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
+import su.foxogram.dtos.response.MemberDTO;
 import su.foxogram.exceptions.MemberAlreadyInChannelException;
 import su.foxogram.models.*;
 import su.foxogram.exceptions.ChannelNotFoundException;
@@ -12,6 +13,9 @@ import su.foxogram.exceptions.MissingPermissionsException;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MemberRepository;
 import su.foxogram.structures.Snowflake;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -84,5 +88,15 @@ public class ChannelsService {
 
         member = memberRepository.findByChannelAndId(channel, user.getId());
         memberRepository.delete(member);
+    }
+
+    public List<MemberDTO> getMembers(Channel channel) {
+        return memberRepository.findAllByChannel(channel).stream()
+                .map(MemberDTO::new)
+                .toList();
+    }
+
+    public Member getMember(Channel channel, long id) {
+        return memberRepository.findByChannelAndId(channel, id);
     }
 }

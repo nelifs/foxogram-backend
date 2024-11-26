@@ -14,18 +14,12 @@ public class ChannelDTO {
     private String name;
     private int type;
     private long ownerId;
-    private List<MemberDTO> members;
 
     public ChannelDTO(Channel channel) {
         this.id = channel.getId();
         this.name = channel.getName();
         this.type = channel.getType();
         this.ownerId = channel.getOwnerId();
-        this.members = (channel.getMembers() != null)
-                ? channel.getMembers().stream()
-                .map(MemberDTO::new)
-                .collect(Collectors.toList())
-                : null;
     }
 }
 
