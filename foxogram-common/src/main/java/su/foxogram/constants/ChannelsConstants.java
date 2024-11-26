@@ -1,19 +1,18 @@
 package su.foxogram.constants;
 
+import lombok.Getter;
+
 public class ChannelsConstants {
+	@Getter
 	public enum Type {
-		GROUP("group"),
-		CHANNEL("channel"),
-		DM("dm");
+		DM(1),
+		GROUP(2),
+		CHANNEL(3);
 
-		private final String type;
+		private final int type;
 
-		Type(String type) {
+		Type(int type) {
 			this.type = type;
-		}
-
-		public String getValue() {
-			return type;
 		}
 	}
 }

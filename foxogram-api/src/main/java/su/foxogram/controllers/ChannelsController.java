@@ -1,10 +1,10 @@
 package su.foxogram.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import su.foxogram.dtos.response.ChannelDTO;
+import su.foxogram.dtos.response.MemberDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.models.*;
 import su.foxogram.constants.APIConstants;
@@ -12,62 +12,86 @@ import su.foxogram.exceptions.*;
 import su.foxogram.dtos.request.ChannelCreateDTO;
 import su.foxogram.services.ChannelsService;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping(value = APIConstants.CHANNELS, produces = "application/json")
 public class ChannelsController {
 
 	private final ChannelsService channelsService;
-	final Logger logger = LoggerFactory.getLogger(ChannelsController.class);
 
 	public ChannelsController(ChannelsService channelsService) {
 		this.channelsService = channelsService;
     }
 
 	@PostMapping("/create")
-	public Channel createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body, HttpServletRequest request) {
-		logger.info("CHANNEL create ({}, {}) request", body.getName(), body.getType());
+	public ChannelDTO createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body) {
+		log.info("CHANNEL create ({}, {}) request", body.getName(), body.getType());
 
-		return channelsService.createChannel(user, body.getType(), body.getName());
+		Channel channel = channelsService.createChannel(user, body.getType(), body.getName());
+
+		return new ChannelDTO(channel);
 	}
 
 	@GetMapping("/{id}")
-	public Channel getChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
-		logger.info("CHANNEL info ({}) request", id);
+	public ChannelDTO getChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel) {
+		log.info("CHANNEL info ({}) request", channel.getId());
 
-		return channelsService.getChannel(id);
+		return new ChannelDTO(channel);
 	}
 
 	@PostMapping("/{id}/join")
-	public Member joinChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
-		logger.info("CHANNEL join ({}) request", id);
-		Channel channel = channelsService.getChannel(id);
+	public MemberDTO joinChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable long id) throws MemberAlreadyInChannelException {
+		log.info("CHANNEL join ({}) request", channel.getId());
 
-		return channelsService.joinUser(channel, user);
+		Member member = channelsService.joinUser(channel, user);
+
+		return new MemberDTO(member);
 	}
 
 	@PostMapping("/{id}/leave")
-	public OkDTO leaveChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
-		logger.info("CHANNEL leave ({}) request", id);
-		Channel channel = channelsService.getChannel(id);
+	public OkDTO leaveChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel) throws MemberInChannelNotFoundException {
+		log.info("CHANNEL leave ({}) request", channel.getId());
 
 		channelsService.leaveUser(channel, user);
+
 		return new OkDTO(true);
 	}
 
 	@PatchMapping("/{id}")
-	public Channel editChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException {
-		logger.info("CHANNEL edit ({}) request", id);
+	public ChannelDTO editChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel) {
+		log.info("CHANNEL edit ({}) request", channel.getId());
 
-		return channelsService.getChannel(id);
+		// Channel channel = channelsService.editChannel(id);
+
+		return new ChannelDTO(channel);
 	}
 
 	@DeleteMapping("/{id}")
-	public OkDTO deleteChannel(@RequestAttribute(value = "user") User user, @PathVariable long id, HttpServletRequest request) throws ChannelNotFoundException, MissingPermissionsException {
-		logger.info("CHANNEL delete ({}) request", id);
-		Channel channel = channelsService.getChannel(id);
+	public OkDTO deleteChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel) throws MissingPermissionsException {
+		log.info("CHANNEL delete ({}) request", channel.getId());
 
 		channelsService.deleteChannel(channel, user);
 
 		return new OkDTO(true);
+	}
+
+	@GetMapping("/{id}/members")
+	public List<MemberDTO> getMembers(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel) {
+		log.info("CHANNEL get members ({}) request", channel.getId());
+
+		return channelsService.getMembers(channel);
+	}
+
+	@GetMapping("/{id}/members/{memberId}")
+	public MemberDTO getMember(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable long memberId) throws MemberInChannelNotFoundException {
+		log.info("CHANNEL get member ({}, {}) request", channel.getId(), memberId);
+
+		Member member = channelsService.getMember(channel, memberId);
+
+		if (member == null) throw new MemberInChannelNotFoundException();
+
+		return new MemberDTO(member);
 	}
 }

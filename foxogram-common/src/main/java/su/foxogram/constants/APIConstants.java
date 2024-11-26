@@ -8,8 +8,6 @@ public class APIConstants {
     public static final String AUTH = "/v1/auth";
     public static final String CHANNELS = "/v1/channels";
 
-    public static final String PROMETHEUS_BASE = "api.requests.";
-
     @Getter
     public enum RateLimit {
         CAPACITY(20),

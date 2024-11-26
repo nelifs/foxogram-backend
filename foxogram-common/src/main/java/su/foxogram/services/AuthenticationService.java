@@ -1,7 +1,6 @@
 package su.foxogram.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.UserConstants;
@@ -15,13 +14,13 @@ import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
 
+@Slf4j
 @Service
 public class AuthenticationService {
 	private final UserRepository userRepository;
 	private final CodeRepository codeRepository;
 	private final EmailService emailService;
 	private final JwtService jwtService;
-	final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
 	@Autowired
 	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
@@ -32,7 +31,7 @@ public class AuthenticationService {
 	}
 
 	public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header, checkIfEmailVerified);
+		return validate(header.substring(7), checkIfEmailVerified);
 	}
 
 	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -61,16 +60,16 @@ public class AuthenticationService {
 		User user = new User(id, avatar, username, email, password, createdAt, flags, type, deletion);
 
 		userRepository.save(user);
-		logger.info("USER record saved ({}, {}) successfully", username, email);
+		log.info("USER record saved ({}, {}) successfully", username, email);
 
 		String emailType = EmailConstants.Type.CONFIRM.getValue();
 		String digitCode = CodeGenerator.generateDigitCode();
 		long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.VERIFY.getValue();
 
 		emailService.sendEmail(email, id, emailType, username, digitCode, expiresAt, accessToken);
-		logger.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
+		log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
 
-		logger.info("USER created ({}, {}) successfully", username, email);
+		log.info("USER created ({}, {}) successfully", username, email);
 		return accessToken;
 	}
 
@@ -80,8 +79,8 @@ public class AuthenticationService {
 		if (user == null) throw new UserCredentialsIsInvalidException();
 
 		String accessToken;
-		if (Encryptor.verifyPassword(password, user.getPassword()) && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED)) {
-			logger.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
+		if (Encryptor.verifyPassword(password, user.getPassword())) {
+			log.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
 			accessToken = jwtService.generate(user.getId());
 		}
 		else throw new UserCredentialsIsInvalidException();
@@ -89,7 +88,7 @@ public class AuthenticationService {
 		return accessToken;
 	}
 
-	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException, UserUnauthorizedException {
+	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
 		Code code = codeRepository.findByValue(pathCode);
 
 		if (code == null) {
@@ -99,9 +98,9 @@ public class AuthenticationService {
 		long id = user.getId();
 
 		userRepository.delete(user);
-		logger.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
+		log.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
 		codeRepository.delete(code);
-		logger.info("CODE record deleted ({}, {}) successfully", id, user.getEmail());
+		log.info("CODE record deleted ({}, {}) successfully", id, user.getEmail());
 	}
 
 	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException {
@@ -115,8 +114,8 @@ public class AuthenticationService {
 			long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.DELETE.getValue();
 
 			emailService.sendEmail(email, id, type, username, code, expiresAt, accessToken);
-			logger.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, code, id, email);
-			logger.info("USER deletion requested ({}, {}) successfully", id, email);
+			log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, code, id, email);
+			log.info("USER deletion requested ({}, {}) successfully", id, email);
 		} else throw new UserCredentialsIsInvalidException();
 	}
 
@@ -130,11 +129,11 @@ public class AuthenticationService {
 		} else {
 			user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
 			userRepository.save(user);
-			logger.info("USER record updated ({}, {}) SET emailverify to TRUE", user.getId(), user.getEmail());
+			log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
 			codeRepository.delete(code);
-			logger.info("CODE record deleted ({}, {}) successfully", user.getId(), user.getEmail());
+			log.info("CODE record deleted ({}, {}) successfully", user.getId(), user.getEmail());
 
-			logger.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
+			log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
 		}
 	}
 }

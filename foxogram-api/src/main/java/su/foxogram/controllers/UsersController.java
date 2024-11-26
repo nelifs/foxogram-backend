@@ -1,6 +1,7 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.UserDTO;
 import su.foxogram.models.User;
@@ -10,6 +11,7 @@ import su.foxogram.services.UsersService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping(value = APIConstants.USERS, produces = "application/json")
 public class UsersController {
