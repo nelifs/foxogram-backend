@@ -15,7 +15,6 @@ import su.foxogram.repositories.MemberRepository;
 import su.foxogram.structures.Snowflake;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

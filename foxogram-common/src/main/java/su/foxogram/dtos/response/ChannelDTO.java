@@ -4,9 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import su.foxogram.models.Channel;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Getter
 @Setter
 public class ChannelDTO {
