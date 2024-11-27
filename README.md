@@ -1,6 +1,5 @@
 <img src="src/main/resources/assets/backend.png" alt="Backend Foxogram Floof.">
 <img src="src/main/resources/assets/backend_desc.png" alt="Server side of the Foxogram messenger developed in Java">
-<br><br><br> 
 <img src="src/main/resources/assets/backend_resources.png" alt="## Resources">
 
 - **Website** 
