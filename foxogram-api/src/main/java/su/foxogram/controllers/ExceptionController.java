@@ -17,9 +17,6 @@ import java.util.*;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionController {
-
-	final Logger logger = LoggerFactory.getLogger(ExceptionController.class);
-
 	@ExceptionHandler({ BaseException.class })
 	public ResponseEntity<ExceptionDTO> handleBaseException(BaseException exception) {
 		log.error("CLIENT (USER) EXCEPTION ({}, {}, {}) occurred!\n", exception.getErrorCode(), exception.getStatus(), exception.getMessage());

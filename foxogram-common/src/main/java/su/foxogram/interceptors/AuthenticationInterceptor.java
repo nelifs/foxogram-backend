@@ -20,12 +20,10 @@ import java.util.Set;
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
     final AuthenticationService authenticationService;
-    final JwtService jwtService;
 
     @Autowired
     public AuthenticationInterceptor(AuthenticationService authenticationService, JwtService jwtService) {
         this.authenticationService = authenticationService;
-        this.jwtService = jwtService;
     }
 
     @Override
