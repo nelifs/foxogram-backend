@@ -69,7 +69,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/delete")
-	public OkDTO delete(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException {
+	public OkDTO delete(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
 		String password = body.getPassword();
 		log.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 

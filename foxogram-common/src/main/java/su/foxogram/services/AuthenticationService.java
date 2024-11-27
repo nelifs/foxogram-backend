@@ -3,6 +3,7 @@ package su.foxogram.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import su.foxogram.configs.APIConfig;
 import su.foxogram.constants.UserConstants;
 import su.foxogram.models.*;
 import su.foxogram.constants.CodesConstants;
@@ -21,13 +22,15 @@ public class AuthenticationService {
 	private final CodeRepository codeRepository;
 	private final EmailService emailService;
 	private final JwtService jwtService;
+	private final APIConfig apiConfig;
 
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
+	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, APIConfig apiConfig) {
 		this.userRepository = userRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
+		this.apiConfig = apiConfig;
 	}
 
 	public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -53,7 +56,9 @@ public class AuthenticationService {
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
 		String accessToken = jwtService.generate(id);
-		long flags = 0;
+		long flags;
+		if (apiConfig.isDevelopment()) flags = UserConstants.Flags.EMAIL_VERIFIED.getBit();
+		else flags = 0;
 		int type = UserConstants.Type.USER.getType();
 		password = Encryptor.hashPassword(password);
 
@@ -62,12 +67,14 @@ public class AuthenticationService {
 		userRepository.save(user);
 		log.info("USER record saved ({}, {}) successfully", username, email);
 
-		String emailType = EmailConstants.Type.CONFIRM.getValue();
-		String digitCode = CodeGenerator.generateDigitCode();
-		long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.VERIFY.getValue();
+		if (!apiConfig.isDevelopment()) {
+			String emailType = EmailConstants.Type.CONFIRM.getValue();
+			String digitCode = CodeGenerator.generateDigitCode();
+			long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.VERIFY.getValue();
 
-		emailService.sendEmail(email, id, emailType, username, digitCode, expiresAt, accessToken);
-		log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
+			emailService.sendEmail(email, id, emailType, username, digitCode, expiresAt, accessToken);
+			log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
+		}
 
 		log.info("USER created ({}, {}) successfully", username, email);
 		return accessToken;
@@ -91,9 +98,7 @@ public class AuthenticationService {
 	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
 		Code code = codeRepository.findByValue(pathCode);
 
-		if (code == null) {
-			throw new CodeIsInvalidException();
-		}
+		if (code == null && !apiConfig.isDevelopment()) throw new CodeIsInvalidException();
 
 		long id = user.getId();
 
@@ -103,7 +108,7 @@ public class AuthenticationService {
 		log.info("CODE record deleted ({}, {}) successfully", id, user.getEmail());
 	}
 
-	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException {
+	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
 		if (Encryptor.verifyPassword(password, user.getPassword())) {
 
 			long id = user.getId();
@@ -113,9 +118,11 @@ public class AuthenticationService {
 			String code = CodeGenerator.generateDigitCode();
 			long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.DELETE.getValue();
 
-			emailService.sendEmail(email, id, type, username, code, expiresAt, accessToken);
-			log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, code, id, email);
-			log.info("USER deletion requested ({}, {}) successfully", id, email);
+			if (!apiConfig.isDevelopment()) {
+				emailService.sendEmail(email, id, type, username, code, expiresAt, accessToken);
+				log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, code, id, email);
+				log.info("USER deletion requested ({}, {}) successfully", id, email);
+			} else confirmUserDelete(user, "0");
 		} else throw new UserCredentialsIsInvalidException();
 	}
 
