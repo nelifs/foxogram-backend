@@ -14,6 +14,8 @@ import su.foxogram.models.User;
 import su.foxogram.services.AuthenticationService;
 import su.foxogram.services.JwtService;
 
+import java.util.Set;
+
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
@@ -28,7 +30,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-        boolean checkIfEmailVerified = request.getRequestURI().contains("email/verify") || request.getRequestURI().contains("users/@me");        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        Set<String> allowedPaths = Set.of("email/verify", "users/@me", "email/resend");
+        String requestURI = request.getRequestURI();
+
+        boolean checkIfEmailVerified = allowedPaths.stream().anyMatch(requestURI::contains);        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (accessToken == null || !accessToken.contains("Bearer")) throw new UserUnauthorizedException();
 

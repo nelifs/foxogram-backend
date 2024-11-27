@@ -77,4 +77,13 @@ public class AuthenticationController {
 
 		return new OkDTO(true);
 	}
+
+	@PostMapping("/email/resend")
+	public OkDTO resendEmail(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "accessToken") String accessToken, HttpServletRequest request) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
+		log.info("USER email verify resend requested ({}, {}) request", user.getId(), user.getEmail());
+
+		authenticationService.resendEmail(user, accessToken);
+
+		return new OkDTO(true);
+	}
 }

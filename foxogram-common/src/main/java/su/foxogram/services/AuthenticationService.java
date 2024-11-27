@@ -70,9 +70,10 @@ public class AuthenticationService {
 		if (!apiConfig.isDevelopment()) {
 			String emailType = EmailConstants.Type.CONFIRM.getValue();
 			String digitCode = CodeGenerator.generateDigitCode();
-			long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.VERIFY.getValue();
+			long issuedAt = System.currentTimeMillis();
+			long expiresAt = issuedAt + CodesConstants.Lifetime.VERIFY.getValue();
 
-			emailService.sendEmail(email, id, emailType, username, digitCode, expiresAt, accessToken);
+			emailService.sendEmail(email, id, emailType, username, digitCode, issuedAt, expiresAt, accessToken);
 			log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
 		}
 
@@ -116,10 +117,11 @@ public class AuthenticationService {
 			String email = user.getEmail();
 			String type = EmailConstants.Type.DELETE.getValue();
 			String code = CodeGenerator.generateDigitCode();
-			long expiresAt = System.currentTimeMillis() + CodesConstants.Lifetime.DELETE.getValue();
+			long issuedAt = System.currentTimeMillis();
+			long expiresAt = issuedAt + CodesConstants.Lifetime.DELETE.getValue();
 
 			if (!apiConfig.isDevelopment()) {
-				emailService.sendEmail(email, id, type, username, code, expiresAt, accessToken);
+				emailService.sendEmail(email, id, type, username, code, issuedAt, expiresAt, accessToken);
 				log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, code, id, email);
 				log.info("USER deletion requested ({}, {}) successfully", id, email);
 			} else confirmUserDelete(user, "0");
@@ -142,5 +144,16 @@ public class AuthenticationService {
 
 			log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
 		}
+	}
+
+	public void resendEmail(User user, String accessToken) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
+		Code code = codeRepository.findByUserId(user.getId());
+
+		if (code == null) throw new CodeIsInvalidException();
+
+		long issuedAt = code.getIssuedAt();
+		if (issuedAt <= (issuedAt + CodesConstants.Lifetime.RESEND.getValue())) throw new NeedToWaitBeforeResendException();
+
+		emailService.sendEmail(user.getEmail(), user.getId(), code.getType(), user.getUsername(), code.getValue(), System.currentTimeMillis(), code.getExpiresAt(), accessToken);
 	}
 }

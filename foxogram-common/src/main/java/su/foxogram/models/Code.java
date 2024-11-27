@@ -19,16 +19,20 @@ public class Code {
 	public String value;
 
 	@Column()
+	public long issuedAt;
+
+	@Column()
 	public long expiresAt;
 
 	public Code() {
 
 	}
 
-	public Code(long userId, String type, String value, long expiresAt) {
+	public Code(long userId, String type, String value, long issuedAt, long expiresAt) {
 		this.userId = userId;
 		this.type = type;
 		this.value = value;
+		this.issuedAt = issuedAt;
 		this.expiresAt = expiresAt;
 	}
 }

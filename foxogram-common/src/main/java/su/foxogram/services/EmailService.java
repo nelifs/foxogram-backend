@@ -36,7 +36,7 @@ public class EmailService {
     }
 
     @Async
-    public void sendEmail(String to, long id, String type, String username, String digitCode, long expiresAt, String token) {
+    public void sendEmail(String to, long id, String type, String username, String digitCode, long issuedAt, long expiresAt, String token) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
         String HTMLContent = null;
@@ -60,7 +60,7 @@ public class EmailService {
             e.printStackTrace();
         }
 
-        codeRepository.save(new Code(id, type, digitCode, expiresAt));
+        codeRepository.save(new Code(id, type, digitCode, issuedAt, expiresAt));
     }
 
     private String readHTML(String name) throws IOException {
