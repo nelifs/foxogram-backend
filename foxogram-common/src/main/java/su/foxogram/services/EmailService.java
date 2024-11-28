@@ -47,7 +47,7 @@ public class EmailService {
             helper.setFrom(emailConfig.getEmail());
 
             String subject = getSubjectByType(type);
-            String htmlContent = getEmailContentByType(type, username, digitCode, token);
+            String htmlContent = getEmailContentByType(username, digitCode, token);
 
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
@@ -73,14 +73,13 @@ public class EmailService {
         }
     }
 
-    private String getEmailContentByType(String type, String username, String digitCode, String token) throws IOException {
-        EmailConstants.Type emailType = EmailConstants.Type.valueOf(type.toUpperCase());
-        String templateName = emailType == EmailConstants.Type.DELETE ? "delete" : "confirm";
-        String htmlContent = readHTML(templateName);
+    private String getEmailContentByType(String username, String digitCode, String token) throws IOException {
+        String htmlContent = readHTML();
         return htmlContent.replace("{0}", username).replace("{1}", digitCode);//.replace("{2}", token);
     }
 
-    private String readHTML(String templateName) throws IOException {
+    private String readHTML() throws IOException {
+        String templateName = "email";
         Resource resource = resourceLoader.getResource("classpath:email/templates/" + templateName + ".html");
 
         if (!resource.exists()) {
