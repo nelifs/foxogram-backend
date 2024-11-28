@@ -114,7 +114,7 @@ public class AuthenticationService {
         return accessToken;
     }
 
-    private void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
+    public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
         if (!isCodeValid(pathCode))
             throw new CodeIsInvalidException();
 
