@@ -1,6 +1,7 @@
 package su.foxogram.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,44 +12,44 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import su.foxogram.dtos.response.ExceptionDTO;
 import su.foxogram.exceptions.BaseException;
 
-import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
 public class ExceptionController {
-	@ExceptionHandler({ BaseException.class })
-	public ResponseEntity<ExceptionDTO> handleBaseException(BaseException exception) {
-		log.error("CLIENT (USER) EXCEPTION ({}, {}, {}) occurred!\n", exception.getErrorCode(), exception.getStatus(), exception.getMessage());
-		return ResponseEntity.status(exception.getStatus()).body(new ExceptionDTO(false, exception.getErrorCode(), exception.getMessage()));
-	}
 
-	@ExceptionHandler(HttpMessageNotReadableException.class)
-	public ResponseEntity<ExceptionDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
-		String message = "Request body cannot be empty.";
-		log.error("SERVER REQUEST EXCEPTION ({}, {}, {}) occurred!\n", 999, HttpStatus.INTERNAL_SERVER_ERROR, message);
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(false, 999, message));
-	}
+    private ResponseEntity<ExceptionDTO> buildErrorResponse(int errorCode, String message, HttpStatus status) {
+        log.error("SERVER EXCEPTION ({}, {}, {}) occurred!\n", errorCode, status, message);
+        return ResponseEntity.status(status).body(new ExceptionDTO(false, errorCode, message));
+    }
 
-	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity<ExceptionDTO> handleDataIntegrityViolation(DataIntegrityViolationException exception) {
-		String message = "User with this username/email already exist.";
-		log.error("SERVER REQUEST EXCEPTION ({}, {}, {}) occurred!\n", 999, HttpStatus.INTERNAL_SERVER_ERROR, message);
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(false, 999, message));
-	}
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ExceptionDTO> handleBaseException(BaseException exception) {
+        log.error("CLIENT (USER) EXCEPTION ({}, {}, {}) occurred!\n", exception.getErrorCode(), exception.getStatus(), exception.getMessage());
+        return buildErrorResponse(exception.getErrorCode(), exception.getMessage(), exception.getStatus());
+    }
 
-	@ExceptionHandler({ MethodArgumentNotValidException.class })
-	public ResponseEntity<ExceptionDTO> handleValidationException(MethodArgumentNotValidException exception) {
-		List<String> messagesArray = new ArrayList<>();
-		exception.getBindingResult().getAllErrors().forEach((error) -> messagesArray.add(error.getDefaultMessage()));
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
+        return buildErrorResponse(999, "Request body cannot be empty.", HttpStatus.BAD_REQUEST);
+    }
 
-		String message = String.join(", ", messagesArray);
-		log.error("SERVER EXCEPTION ({}, {}, {}) occurred!\n", 999, HttpStatus.INTERNAL_SERVER_ERROR, message);
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(false, 1001, message));
-	}
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionDTO> handleDataIntegrityViolation(DataIntegrityViolationException exception) {
+        return buildErrorResponse(999, "User with this username/email already exist.", HttpStatus.BAD_REQUEST);
+    }
 
-	@ExceptionHandler({ Exception.class })
-	public ResponseEntity<ExceptionDTO> handleException(Exception exception) {
-		log.error("SERVER EXCEPTION ({}, {}, {}) occurred!\n", 999, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionDTO(false, 999, exception.getMessage()));
-	}
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionDTO> handleValidationException(MethodArgumentNotValidException exception) {
+        String message = exception.getBindingResult().getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        return buildErrorResponse(1001, message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionDTO> handleException(Exception exception) {
+        return buildErrorResponse(999, exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

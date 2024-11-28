@@ -63,20 +63,15 @@ public class EmailService {
     private String getSubjectByType(String type) {
         type = type.toUpperCase();
 
-        try {
-            return switch (EmailConstants.Type.valueOf(type)) {
-                case DELETE -> "Confirm Your Account Deletion";
-                case CONFIRM -> "Confirm Your Email Address";
-            };
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid email type: {}", type);
-            throw e;
-        }
+        return switch (EmailConstants.Type.valueOf(type)) {
+            case DELETE -> "Confirm Your Account Deletion";
+            case CONFIRM -> "Confirm Your Email Address";
+            default -> throw new IllegalArgumentException("Invalid email type: " + type);
+        };
     }
 
     private String getEmailContentByType(String username, String digitCode, String token) throws IOException {
-        String htmlContent = readHTML();
-        return htmlContent.replace("{0}", username).replace("{1}", digitCode);//.replace("{2}", token);
+        return readHTML().replace("{0}", username).replace("{1}", digitCode);//.replace("{2}", token);
     }
 
     private String readHTML() throws IOException {

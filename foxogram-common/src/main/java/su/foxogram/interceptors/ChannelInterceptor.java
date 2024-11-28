@@ -11,8 +11,9 @@ import org.springframework.web.servlet.ModelAndView;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.services.ChannelsService;
 
+import java.util.Collections;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Optional;
 
 @Component
 public class ChannelInterceptor implements HandlerInterceptor {
@@ -26,11 +27,31 @@ public class ChannelInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
-        Map<String, String> map = new TreeMap<>((Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
-        long id = Long.parseLong(map.get("id"));
+        Map<String, String> uriVariables = (Map<String, String>) getUriVariables(request);
 
-        request.setAttribute("channel", channelsService.getChannel(id));
+        long channelId = getChannelId(uriVariables).orElseThrow(ChannelNotFoundException::new);
+
+        request.setAttribute("channel", channelsService.getChannel(channelId));
+
         return true;
+    }
+
+    private Map<?, ?> getUriVariables(HttpServletRequest request) {
+        return Optional.ofNullable(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE))
+                .filter(Map.class::isInstance)
+                .map(Map.class::cast)
+                .orElseGet(Collections::emptyMap);
+    }
+
+    private Optional<Long> getChannelId(Map<String, String> uriVariables) {
+        String channelIdString = uriVariables.get("id");
+
+        try {
+            return Optional.ofNullable(channelIdString)
+                    .map(Long::parseLong);
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
