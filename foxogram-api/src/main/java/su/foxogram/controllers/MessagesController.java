@@ -28,46 +28,46 @@ public class MessagesController {
 	}
 
 	@GetMapping("/channel/{channelId}")
-	public MessagesDTO getMessages(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit, HttpServletRequest request) throws MessageNotFoundException {
-		log.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channelId, user.getId(), user.getEmail());
+	public MessagesDTO getMessages(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit, HttpServletRequest request) throws MessageNotFoundException {
+		log.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channel.getId(), user.getId(), user.getEmail());
 
-		List<Message> messagesArray = messagesService.getMessages(before, limit, channelId);
+		List<Message> messagesArray = messagesService.getMessages(before, limit, channel);
 
 		return new MessagesDTO(messagesArray);
 	}
 
 	@GetMapping("/channel/{channelId}/{id}")
-	public MessagesDTO getMessage(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, ChannelNotFoundException {
-		log.info("MESSAGE ({}) from CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
+	public MessagesDTO getMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable long id) throws MessageNotFoundException {
+		log.info("MESSAGE ({}) from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
-		List<Message> message = List.of(messagesService.getMessage(id, channelId));
+		List<Message> message = List.of(messagesService.getMessage(id, channel));
 
 		return new MessagesDTO(message);
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public OkDTO postMessage(@RequestAttribute(value = "user") User user, @Valid @RequestBody MessageDTO body, @PathVariable long channelId, HttpServletRequest request) throws ChannelNotFoundException {
-		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channelId, user.getId(), user.getEmail());
+	public OkDTO postMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body) {
+		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channel.getId(), user.getId(), user.getEmail());
 
-		messagesService.addMessage(channelId, user, body);
+		messagesService.addMessage(channel, user, body);
 
 		return new OkDTO(true);
 	}
 
 	@DeleteMapping("/channel/{channelId}/{id}")
-	public OkDTO deleteMessage(@RequestAttribute(value = "user") User user, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, ChannelNotFoundException {
-		log.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
+	public OkDTO deleteMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
+		log.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
-		messagesService.deleteMessage(id, channelId);
+		messagesService.deleteMessage(id, member, channel);
 
 		return new OkDTO(true);
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public MessagesDTO patchMessage(@RequestAttribute(value = "user") User user, @Valid @RequestBody MessageDTO body, @PathVariable long channelId, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, ChannelNotFoundException {
-		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channelId, user.getId(), user.getEmail());
+	public MessagesDTO patchMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, ChannelNotFoundException, MissingPermissionsException {
+		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
-		List<Message> message = List.of(messagesService.editMessage(channelId, id, body));
+		List<Message> message = List.of(messagesService.editMessage(id, channel, member, body));
 
 		return new MessagesDTO(message);
 	}
