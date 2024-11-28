@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import su.foxogram.exceptions.ChannelNotFoundException;
-import su.foxogram.exceptions.MemberInChannelNotFoundException;
 import su.foxogram.models.Channel;
 import su.foxogram.models.Member;
 import su.foxogram.models.User;

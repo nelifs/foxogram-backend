@@ -104,7 +104,7 @@ public class AuthenticationService {
     }
 
     private void validatePassword(User user, String password) throws UserCredentialsIsInvalidException {
-        if (!Encryptor.verifyPassword(password, user.getPassword()))
+        if (Encryptor.verifyPassword(password, user.getPassword()))
             throw new UserCredentialsIsInvalidException();
 
         log.info("PASSWORD VERIFIED FOR USER ({}, {})", user.getId(), user.getEmail());
@@ -146,7 +146,7 @@ public class AuthenticationService {
     }
 
     public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
-        if (!Encryptor.verifyPassword(password, user.getPassword()))
+        if (Encryptor.verifyPassword(password, user.getPassword()))
             throw new UserCredentialsIsInvalidException();
 
         if (apiConfig.isDevelopment())
@@ -155,7 +155,7 @@ public class AuthenticationService {
             sendDeleteRequestEmail(user, accessToken);
     }
 
-    private void sendDeleteRequestEmail(User user, String accessToken) throws CodeIsInvalidException {
+    private void sendDeleteRequestEmail(User user, String accessToken) {
         String emailType = EmailConstants.Type.DELETE.getValue();
         String code = CodeGenerator.generateDigitCode();
         long issuedAt = System.currentTimeMillis();

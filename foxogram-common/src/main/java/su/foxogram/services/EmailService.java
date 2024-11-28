@@ -67,7 +67,6 @@ public class EmailService {
             return switch (EmailConstants.Type.valueOf(type)) {
                 case DELETE -> "Confirm Your Account Deletion";
                 case CONFIRM -> "Confirm Your Email Address";
-                default -> throw new IllegalArgumentException("Invalid email type: " + type);
             };
         } catch (IllegalArgumentException e) {
             log.error("Invalid email type: {}", type);

@@ -27,7 +27,7 @@ public class ChannelInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
         Map<String, String> map = new TreeMap<>((Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
-        long id = Long.parseLong(map.get("id").toString());
+        long id = Long.parseLong(map.get("id"));
 
         request.setAttribute("channel", channelsService.getChannel(id));
         return true;
