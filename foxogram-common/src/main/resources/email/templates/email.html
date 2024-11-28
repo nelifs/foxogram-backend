@@ -10,18 +10,44 @@
 </head>
 <body>
 <div class="glow"></div>
-<div class="confirmation-box">
-    <h1>Hello, {0}!</h1>
-    <p>Your confirmation code:</p>
-    <div class="code">{1}</div>
-    <div class="description">Enter this code on the confirmation page to confirm this action.<br>Or <a href="#">click here</a> for automatic confirmation.</div>
-</div>
+<table cellpadding="0" cellspacing="0" border="0" style="width: 100%; height: 100%; background: #0a0a0a url('noiseEffect.png') no-repeat center; background-size: cover;">
+    <tr>
+        <td>
+            <table cellpadding="0" cellspacing="0" border="0" style="border: 1px solid rgba(96, 96, 96, 0.5); border-radius: 15px; background: rgba(6, 6, 6, 0.5); width: 545px;; height: 350px; padding: 90px 50px;">
+                <tr>
+                    <td>
+                        <h1 style="font: 400 30px 'Inter', sans-serif; color: rgba(236, 236, 236, 0.76); margin: 0px 0px -5px;">Hello, {0}!</h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p style="font: 700 40px 'Inter', sans-serif; color: #ececec; margin: 15px 0 20px;">Your confirmation code:</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p style="font: 900 65px 'Inter', sans-serif; color: #4a89ff; margin: 0;">{1}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p style="font: 400 20px 'Inter', sans-serif; color: rgba(236, 236, 236, 0.5); margin: 35px 0 0; width: 400px;">
+                            Enter this code on the registration page to confirm your mail.<br>
+                            Or <a href="https://foxogram.su/" style="font: 400 20px 'Inter', sans-serif; color: rgba(236, 236, 236, 0.5); font-weight: bold;">click here</a> for automatic confirmation.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
+</html>
+
 
 <style media="all" type="text/css">
-    body {
-        /*background: #0a0a0a url("noiseEffect.png");*/
-        background: #0A0A0A;
+    html, body {
+        background: #0a0a0a url("noiseEffect.png") !important;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -43,17 +69,6 @@
         filter: blur(90px);
     }
 
-    .confirmation-box {
-        position: relative;
-        z-index: 2;
-        border: 1px solid rgba(96, 96, 96, 0.5);
-        border-radius: 15px;
-        padding: 90px 50px;
-        width: 490px;
-        height: 350px;
-        background: rgba(6, 6, 6, 0.5);
-    }
-
     h1 {
         font: 400 30px "Inter", sans-serif;
         color: rgba(236, 236, 236, 0.76);
@@ -71,22 +86,4 @@
         color: rgba(236, 236, 236, 0.5);
         font-weight: bold;
     }
-
-    .code {
-        font: 900 65px "Inter", sans-serif;
-        color: #4a89ff;
-    }
-
-    .description {
-        font: 400 20px "Inter", sans-serif;
-        color: rgba(236, 236, 236, 0.5);
-        width: 400px;
-        margin-top: 35px;
-    }
-
-    .confirmation-box a:hover {
-        background: #0A0A0A;
-        color: #c1c1c1;
-    }
 </style>
-</html>
