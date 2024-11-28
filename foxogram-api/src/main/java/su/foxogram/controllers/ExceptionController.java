@@ -3,6 +3,7 @@ package su.foxogram.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -25,7 +26,14 @@ public class ExceptionController {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ExceptionDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
-		String message = "Request body cannot be empty";
+		String message = "Request body cannot be empty.";
+		log.error("SERVER REQUEST EXCEPTION ({}, {}, {}) occurred!\n", 999, HttpStatus.INTERNAL_SERVER_ERROR, message);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(false, 999, message));
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<ExceptionDTO> handleDataIntegrityViolation(DataIntegrityViolationException exception) {
+		String message = "User with this username/email already exist.";
 		log.error("SERVER REQUEST EXCEPTION ({}, {}, {}) occurred!\n", 999, HttpStatus.INTERNAL_SERVER_ERROR, message);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(false, 999, message));
 	}

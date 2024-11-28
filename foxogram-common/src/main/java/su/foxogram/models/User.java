@@ -13,7 +13,7 @@ import lombok.Setter;
 @Table(name = "users")
 public class User extends BaseUser {
 
-    @Column()
+    @Column(unique = true)
     private String email;
 
     @Column()

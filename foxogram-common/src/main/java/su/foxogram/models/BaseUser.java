@@ -12,7 +12,7 @@ public class BaseUser {
     @Id
     public long id;
 
-    @Column()
+    @Column(unique = true)
     public String username;
 
     @Column()

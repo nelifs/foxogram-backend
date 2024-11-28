@@ -2,6 +2,7 @@ package su.foxogram.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import su.foxogram.configs.APIConfig;
 import su.foxogram.constants.UserConstants;
@@ -49,12 +50,13 @@ public class AuthenticationService {
         return user;
     }
 
-    public String userSignUp(String username, String email, String password) throws UserWithThisEmailAlreadyExistException {
-        if (userRepository.findByEmail(email) != null)
-            throw new UserWithThisEmailAlreadyExistException();
-
+    public String userSignUp(String username, String email, String password) throws UserWithThisUsernameOrEmailAlreadyExistException {
         User user = createUser(username, email, password);
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new UserWithThisUsernameOrEmailAlreadyExistException();
+        }
         log.info("USER created ({}, {}) successfully", username, email);
 
         if (!apiConfig.isDevelopment())
