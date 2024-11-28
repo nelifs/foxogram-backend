@@ -4,12 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
+import su.foxogram.dtos.request.ChannelEditDTO;
 import su.foxogram.dtos.response.MemberDTO;
-import su.foxogram.exceptions.MemberAlreadyInChannelException;
+import su.foxogram.exceptions.*;
 import su.foxogram.models.*;
-import su.foxogram.exceptions.ChannelNotFoundException;
-import su.foxogram.exceptions.MemberInChannelNotFoundException;
-import su.foxogram.exceptions.MissingPermissionsException;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MemberRepository;
 import su.foxogram.structures.Snowflake;
@@ -52,6 +50,16 @@ public class ChannelsService {
         return channel;
     }
 
+    public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
+        if (!member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL)) throw new MissingPermissionsException();
+
+        if (body.getName() != null) channel.setName(body.getName());
+
+        channelRepository.save(channel);
+
+        return channel;
+    }
+
     public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
         Member member = memberRepository.findByChannelAndId(channel, user.getId());
 
@@ -59,15 +67,6 @@ public class ChannelsService {
             channelRepository.delete(channel);
         } else {
             throw new MissingPermissionsException();
-        }
-    }
-
-    public void getMemberInChannel(long id, long channelId) throws MemberInChannelNotFoundException {
-        Channel channel = channelRepository.findById(channelId);
-        Member member = memberRepository.findByChannelAndId(channel, id);
-
-        if (member == null) {
-            throw new MemberInChannelNotFoundException();
         }
     }
 
