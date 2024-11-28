@@ -34,11 +34,6 @@ public class ExceptionController {
         return buildErrorResponse(999, "Request body cannot be empty.", HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ExceptionDTO> handleDataIntegrityViolation(DataIntegrityViolationException exception) {
-        return buildErrorResponse(999, "User with this username/email already exist.", HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionDTO> handleValidationException(MethodArgumentNotValidException exception) {
         String message = exception.getBindingResult().getAllErrors().stream()
