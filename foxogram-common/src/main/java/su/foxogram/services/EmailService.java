@@ -61,6 +61,8 @@ public class EmailService {
     }
 
     private String getSubjectByType(String type) {
+        type = type.toUpperCase();
+
         try {
             return switch (EmailConstants.Type.valueOf(type)) {
                 case DELETE -> "Confirm Your Account Deletion";
