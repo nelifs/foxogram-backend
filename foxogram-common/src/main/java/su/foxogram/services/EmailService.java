@@ -55,7 +55,7 @@ public class EmailService {
             javaMailSender.send(mimeMessage);
 
             saveCode(id, type, digitCode, issuedAt, expiresAt);
-        } catch (MessagingException | IOException e) {
+        } catch (IllegalArgumentException | MessagingException | IOException e) {
             log.error("Error occurred while sending email to {}: {}", to, e.getMessage(), e);
         }
     }
@@ -77,7 +77,7 @@ public class EmailService {
         EmailConstants.Type emailType = EmailConstants.Type.valueOf(type.toUpperCase());
         String templateName = emailType == EmailConstants.Type.DELETE ? "delete" : "confirm";
         String htmlContent = readHTML(templateName);
-        return htmlContent.replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);
+        return htmlContent.replace("{0}", username).replace("{1}", digitCode);//.replace("{2}", token);
     }
 
     private String readHTML(String templateName) throws IOException {

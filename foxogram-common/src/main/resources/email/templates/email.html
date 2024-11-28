@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>Confirm Your Email Address</title>
+</head>
+<body>
+<div class="glow"></div>
+<div class="confirmation-box">
+    <h1>Hello, {0}!</h1>
+    <p>Your confirmation code:</p>
+    <div class="code">{1}</div>
+    <div class="description">Enter this code on the confirmation page to confirm this action.<br>Or <a href="#">click here</a> for automatic confirmation.</div>
+</div>
+</body>
+
+<style media="all" type="text/css">
+    body {
+        /*background: #0a0a0a url("noiseEffect.png");*/
+        background: #0A0A0A;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .glow {
+        position: absolute;
+        top: -200px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 707px;
+        height: 707px;
+        background: radial-gradient(circle, rgba(74, 137, 255, 0.25), rgba(10, 10, 10, 0));
+        z-index: 1;
+        pointer-events: none;
+        filter: blur(90px);
+    }
+
+    .confirmation-box {
+        position: relative;
+        z-index: 2;
+        border: 1px solid rgba(96, 96, 96, 0.5);
+        border-radius: 15px;
+        padding: 90px 50px;
+        width: 490px;
+        height: 350px;
+        background: rgba(6, 6, 6, 0.5);
+    }
+
+    h1 {
+        font: 400 30px "Inter", sans-serif;
+        color: rgba(236, 236, 236, 0.76);
+    }
+
+    p {
+        font: 700 40px "Inter", sans-serif;
+        color: #ececec;
+        margin-bottom: 20px;
+        margin-top: -15px;
+    }
+
+    a {
+        font: 400 20px "Inter", sans-serif;
+        color: rgba(236, 236, 236, 0.5);
+        font-weight: bold;
+    }
+
+    .code {
+        font: 900 65px "Inter", sans-serif;
+        color: #4a89ff;
+    }
+
+    .description {
+        font: 400 20px "Inter", sans-serif;
+        color: rgba(236, 236, 236, 0.5);
+        width: 400px;
+        margin-top: 35px;
+    }
+
+    .confirmation-box a:hover {
+        background: #0A0A0A;
+        color: #c1c1c1;
+    }
+</style>
+</html>
