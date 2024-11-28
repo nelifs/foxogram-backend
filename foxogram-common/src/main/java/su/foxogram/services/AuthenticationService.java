@@ -33,127 +33,175 @@ public class AuthenticationService {
 		this.apiConfig = apiConfig;
 	}
 
-	public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header.substring(7), checkIfEmailVerified);
-	}
+    public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+        return validate(header.substring(7), checkIfEmailVerified);
+    }
 
-	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		String userId = jwtService.validate(token).getId();
-		User user = userRepository.findById(Long.parseLong(userId));
+    public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+        String userId = jwtService.validate(token).getId();
 
-		if (user == null) throw new UserUnauthorizedException();
+        User user = userRepository.findById(Long.parseLong(userId));
 
-		if (!user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED) && !checkIfEmailVerified) throw new UserEmailNotVerifiedException();
+        if (user == null) throw new UserUnauthorizedException();
+        if (!user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED) && !checkIfEmailVerified)
+            throw new UserEmailNotVerifiedException();
 
-		return userRepository.findById(Long.parseLong(userId));
-	}
+        return user;
+    }
 
-	public String userSignUp(String username, String email, String password) throws UserWithThisEmailAlreadyExistException {
-		if (userRepository.findByEmail(email) != null) throw new UserWithThisEmailAlreadyExistException();
+    public String userSignUp(String username, String email, String password) throws UserWithThisEmailAlreadyExistException {
+        if (userRepository.findByEmail(email) != null)
+            throw new UserWithThisEmailAlreadyExistException();
 
-		long id = new Snowflake(1).nextId();
-		long createdAt = System.currentTimeMillis();
-		long deletion = 0;
-		String avatar = new Avatar("").getId();
-		String accessToken = jwtService.generate(id);
-		long flags;
-		if (apiConfig.isDevelopment()) flags = UserConstants.Flags.EMAIL_VERIFIED.getBit();
-		else flags = 0;
-		int type = UserConstants.Type.USER.getType();
-		password = Encryptor.hashPassword(password);
+        User user = createUser(username, email, password);
+        userRepository.save(user);
+        log.info("USER created ({}, {}) successfully", username, email);
 
-		User user = new User(id, avatar, username, email, password, createdAt, flags, type, deletion);
+        if (!apiConfig.isDevelopment())
+            sendConfirmationEmail(user);
 
-		userRepository.save(user);
-		log.info("USER record saved ({}, {}) successfully", username, email);
+        return jwtService.generate(user.getId());
+    }
 
-		if (!apiConfig.isDevelopment()) {
-			String emailType = EmailConstants.Type.CONFIRM.getValue();
-			String digitCode = CodeGenerator.generateDigitCode();
-			long issuedAt = System.currentTimeMillis();
-			long expiresAt = issuedAt + CodesConstants.Lifetime.VERIFY.getValue();
+    private User createUser(String username, String email, String password) {
+        long id = new Snowflake(1).nextId();
+        long createdAt = System.currentTimeMillis();
+        long deletion = 0;
+        String avatar = new Avatar("").getId();
+        long flags = apiConfig.isDevelopment() ? UserConstants.Flags.EMAIL_VERIFIED.getBit() : 0;
+        int type = UserConstants.Type.USER.getType();
 
-			emailService.sendEmail(email, id, emailType, username, digitCode, issuedAt, expiresAt, accessToken);
-			log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, digitCode, username, email);
-		}
+        return new User(id, avatar, username, email, Encryptor.hashPassword(password), createdAt, flags, type, deletion);
+    }
 
-		log.info("USER created ({}, {}) successfully", username, email);
-		return accessToken;
-	}
+    private void sendConfirmationEmail(User user) {
+        String emailType = EmailConstants.Type.CONFIRM.getValue();
+        String digitCode = CodeGenerator.generateDigitCode();
+        long issuedAt = System.currentTimeMillis();
+        long expiresAt = issuedAt + CodesConstants.Lifetime.VERIFY.getValue();
+        String accessToken = jwtService.generate(user.getId());
 
-	public String loginUser(String email, String password) throws UserCredentialsIsInvalidException {
-		User user = userRepository.findByEmail(email);
+        emailService.sendEmail(user.getEmail(), user.getId(), emailType, user.getUsername(), digitCode, issuedAt, expiresAt, accessToken);
 
-		if (user == null) throw new UserCredentialsIsInvalidException();
+        log.info("Sent EMAIL ({}, {}) to USER ({}, {})", emailType, digitCode, user.getUsername(), user.getEmail());
+    }
 
-		String accessToken;
-		if (Encryptor.verifyPassword(password, user.getPassword())) {
-			log.info("USER SIGNED IN ({}, {}) successfully", user.getId(), email);
-			accessToken = jwtService.generate(user.getId());
-		}
-		else throw new UserCredentialsIsInvalidException();
-		
-		return accessToken;
-	}
+    public String loginUser(String email, String password) throws UserCredentialsIsInvalidException {
+        User user = findUserByEmail(email);
+        validatePassword(user, password);
+        return generateAccessToken(user);
+    }
 
-	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
-		Code code = codeRepository.findByValue(pathCode);
+    private User findUserByEmail(String email) throws UserCredentialsIsInvalidException {
+        User user = userRepository.findByEmail(email);
 
-		if (code == null && !apiConfig.isDevelopment()) throw new CodeIsInvalidException();
+        if (user == null)
+            throw new UserCredentialsIsInvalidException();
 
-		long id = user.getId();
+        return user;
+    }
 
-		userRepository.delete(user);
-		log.info("USER record deleted ({}, {}) successfully", id, user.getEmail());
-		codeRepository.delete(code);
-		log.info("CODE record deleted ({}, {}) successfully", id, user.getEmail());
-	}
+    private void validatePassword(User user, String password) throws UserCredentialsIsInvalidException {
+        if (!Encryptor.verifyPassword(password, user.getPassword()))
+            throw new UserCredentialsIsInvalidException();
 
-	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
-		if (Encryptor.verifyPassword(password, user.getPassword())) {
+        log.info("PASSWORD VERIFIED FOR USER ({}, {})", user.getId(), user.getEmail());
+    }
 
-			long id = user.getId();
-			String username = user.getUsername();
-			String email = user.getEmail();
-			String type = EmailConstants.Type.DELETE.getValue();
-			String code = CodeGenerator.generateDigitCode();
-			long issuedAt = System.currentTimeMillis();
-			long expiresAt = issuedAt + CodesConstants.Lifetime.DELETE.getValue();
+    private String generateAccessToken(User user) {
+        String accessToken = jwtService.generate(user.getId());
+        log.info("USER SIGNED IN ({}, {}) successfully", user.getId(), user.getEmail());
+        return accessToken;
+    }
 
-			if (!apiConfig.isDevelopment()) {
-				emailService.sendEmail(email, id, type, username, code, issuedAt, expiresAt, accessToken);
-				log.info("Sent EMAIL ({}, {}) to USER ({}, {})", type, code, id, email);
-				log.info("USER deletion requested ({}, {}) successfully", id, email);
-			} else confirmUserDelete(user, "0");
-		} else throw new UserCredentialsIsInvalidException();
-	}
+    private void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
+        if (!isCodeValid(pathCode))
+            throw new CodeIsInvalidException();
 
-	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
-		Code code = codeRepository.findByValue(pathCode);
+        deleteUserAndCode(user, pathCode);
+    }
 
-		if (code == null) {
-			throw new CodeIsInvalidException();
-		} else if (code.expiresAt <= System.currentTimeMillis()) {
-			throw new CodeExpiredException();
-		} else {
-			user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
-			userRepository.save(user);
-			log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
-			codeRepository.delete(code);
-			log.info("CODE record deleted ({}, {}) successfully", user.getId(), user.getEmail());
+    private boolean isCodeValid(String pathCode) {
+        if (apiConfig.isDevelopment())
+            return true;
 
-			log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
-		}
-	}
+        Code code = codeRepository.findByValue(pathCode);
+        return code != null;
+    }
 
-	public void resendEmail(User user, String accessToken) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
-		Code code = codeRepository.findByUserId(user.getId());
+    private void deleteUserAndCode(User user, String pathCode) {
+        deleteUser(user);
 
-		if (code == null) throw new CodeIsInvalidException();
+        Code code = codeRepository.findByValue(pathCode);
 
-		long issuedAt = code.getIssuedAt();
-		if (issuedAt <= (issuedAt + CodesConstants.Lifetime.RESEND.getValue())) throw new NeedToWaitBeforeResendException();
+        if (code != null)
+            deleteVerificationCode(code);
+    }
 
-		emailService.sendEmail(user.getEmail(), user.getId(), code.getType(), user.getUsername(), code.getValue(), System.currentTimeMillis(), code.getExpiresAt(), accessToken);
-	}
+    private void deleteUser(User user) {
+        userRepository.delete(user);
+        log.info("USER record deleted ({}, {}) successfully", user.getId(), user.getEmail());
+    }
+
+    public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
+        if (!Encryptor.verifyPassword(password, user.getPassword()))
+            throw new UserCredentialsIsInvalidException();
+
+        if (apiConfig.isDevelopment())
+            confirmUserDelete(user, "0");
+        else
+            sendDeleteRequestEmail(user, accessToken);
+    }
+
+    private void sendDeleteRequestEmail(User user, String accessToken) throws CodeIsInvalidException {
+        String emailType = EmailConstants.Type.DELETE.getValue();
+        String code = CodeGenerator.generateDigitCode();
+        long issuedAt = System.currentTimeMillis();
+        long expiresAt = issuedAt + CodesConstants.Lifetime.DELETE.getValue();
+
+        emailService.sendEmail(user.getEmail(), user.getId(), emailType, user.getUsername(), code, issuedAt, expiresAt, accessToken);
+
+        log.info("Sent EMAIL ({}, {}) to USER ({}, {})", emailType, code, user.getId(), user.getEmail());
+        log.info("USER deletion requested ({}, {}) successfully", user.getId(), user.getEmail());
+    }
+
+    public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
+        Code code = validateCode(pathCode);
+
+        user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
+        userRepository.save(user);
+        log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
+        log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
+
+        deleteVerificationCode(code);
+    }
+
+    private Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
+        Code code = codeRepository.findByValue(pathCode);
+
+        if (code == null)
+            throw new CodeIsInvalidException();
+
+        if (code.expiresAt <= System.currentTimeMillis())
+            throw new CodeExpiredException();
+
+        return code;
+    }
+
+    private void deleteVerificationCode(Code code) {
+        codeRepository.delete(code);
+        log.info("CODE record deleted ({}, {}) successfully", code.getUserId(), code.getValue());
+    }
+
+    public void resendEmail(User user, String accessToken) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
+        Code code = codeRepository.findByUserId(user.getId());
+
+        if (code == null) throw new CodeIsInvalidException();
+
+        long issuedAt = code.getIssuedAt();
+        if (System.currentTimeMillis() - issuedAt < CodesConstants.Lifetime.RESEND.getValue())
+            throw new NeedToWaitBeforeResendException();
+
+        emailService.sendEmail(user.getEmail(), user.getId(), code.getType(), user.getUsername(), code.getValue(), System.currentTimeMillis(), code.getExpiresAt(), accessToken);
+    }
 }

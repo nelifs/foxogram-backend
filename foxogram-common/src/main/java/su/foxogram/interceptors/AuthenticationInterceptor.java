@@ -31,9 +31,11 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         Set<String> allowedPaths = Set.of("email/verify", "users/@me", "email/resend");
         String requestURI = request.getRequestURI();
 
-        boolean checkIfEmailVerified = allowedPaths.stream().anyMatch(requestURI::contains);        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        boolean checkIfEmailVerified = allowedPaths.stream().anyMatch(requestURI::contains);
+        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (accessToken == null || !accessToken.contains("Bearer")) throw new UserUnauthorizedException();
+        if (accessToken == null || !accessToken.startsWith("Bearer "))
+            throw new UserUnauthorizedException();
 
         User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
 

@@ -1,5 +1,6 @@
 package su.foxogram.services;
 
+import lombok.extern.slf4j.Slf4j;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,13 @@ import su.foxogram.configs.EmailConfig;
 import su.foxogram.models.Code;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.repositories.CodeRepository;
+import su.foxogram.util.Algorithm;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
+@Slf4j
 @Service
 public class EmailService {
 
@@ -38,37 +40,61 @@ public class EmailService {
     @Async
     public void sendEmail(String to, long id, String type, String username, String digitCode, long issuedAt, long expiresAt, String token) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-        String HTMLContent = null;
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 
         try {
             helper.setTo(to);
             helper.setFrom(emailConfig.getEmail());
-            if (type.equals(EmailConstants.Type.DELETE.getValue())) {
-                helper.setSubject("Confirm Your Account Deletion");
-                HTMLContent = readHTML("delete").replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);
-            } else if (type.equals(EmailConstants.Type.CONFIRM.getValue())) {
-                helper.setSubject("Confirm Your Email Address");
-                HTMLContent = readHTML("confirm").replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);
-            }
 
-            assert HTMLContent != null;
-            helper.setText(HTMLContent, true);
+            String subject = getSubjectByType(type);
+            String htmlContent = getEmailContentByType(type, username, digitCode, token);
+
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
 
             javaMailSender.send(mimeMessage);
-        } catch (MessagingException | IOException e) {
-            e.printStackTrace();
-        }
 
-        codeRepository.save(new Code(id, type, digitCode, issuedAt, expiresAt));
+            saveCode(id, type, digitCode, issuedAt, expiresAt);
+        } catch (MessagingException | IOException e) {
+            log.error("Error occurred while sending email to {}: {}", to, e.getMessage(), e);
+        }
     }
 
-    private String readHTML(String name) throws IOException {
-        Resource resource = resourceLoader.getResource("classpath:email/templates/" + name + ".html");
+    private String getSubjectByType(String type) {
+        try {
+            return switch (EmailConstants.Type.valueOf(type)) {
+                case DELETE -> "Confirm Your Account Deletion";
+                case CONFIRM -> "Confirm Your Email Address";
+                default -> throw new IllegalArgumentException("Invalid email type: " + type);
+            };
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid email type: {}", type);
+            throw e;
+        }
+    }
+
+    private String getEmailContentByType(String type, String username, String digitCode, String token) throws IOException {
+        EmailConstants.Type emailType = EmailConstants.Type.valueOf(type.toUpperCase());
+        String templateName = emailType == EmailConstants.Type.DELETE ? "delete" : "confirm";
+        String htmlContent = readHTML(templateName);
+        return htmlContent.replace("{0}", username).replace("{1}", digitCode).replace("{2}", token);
+    }
+
+    private String readHTML(String templateName) throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:email/templates/" + templateName + ".html");
+
+        if (!resource.exists()) {
+            log.error("Template not found: {}", templateName);
+            throw new IOException("Template file not found: " + templateName);
+        }
 
         try (InputStream inputStream = resource.getInputStream()) {
-            Scanner scanner = new Scanner(inputStream, StandardCharsets.UTF_8).useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
+            return Algorithm.inputStreamToString(inputStream, StandardCharsets.UTF_8);
         }
+    }
+
+    private void saveCode(long id, String type, String digitCode, long issuedAt, long expiresAt) {
+        Code code = new Code(id, type, digitCode, issuedAt, expiresAt);
+        codeRepository.save(code);
     }
 }
