@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.UserDTO;
+import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.models.User;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.UserUnauthorizedException;
@@ -29,7 +30,7 @@ public class UsersController {
 	}
 
 	@GetMapping("/{id}")
-	public UserDTO getUser(@RequestAttribute(value = "user") User user, @PathVariable String id, HttpServletRequest request) throws UserUnauthorizedException {
+	public UserDTO getUser(@RequestAttribute(value = "user") User user, @PathVariable String id, HttpServletRequest request) throws UserUnauthorizedException, UserNotFoundException {
 		user = usersService.getUser(id, user);
 
 		return new UserDTO(user);
