@@ -1,10 +1,13 @@
 package su.foxogram.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.UserDTO;
+import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.exceptions.UserNotFoundException;
+import su.foxogram.exceptions.UserWithThisUsernameOrEmailAlreadyExistException;
 import su.foxogram.models.User;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.UserUnauthorizedException;
@@ -37,8 +40,9 @@ public class UsersController {
 	}
 
 	@PatchMapping("/@me")
-	public User editUser(@RequestAttribute(value = "user") User user) {
+	public UserDTO editUser(@RequestAttribute(value = "user") User user, @Valid @RequestBody UserEditDTO body) throws UserWithThisUsernameOrEmailAlreadyExistException {
+		user = usersService.editUser(user, body);
 
-		return usersService.editUser(user);
+		return new UserDTO(user);
 	}
 }
