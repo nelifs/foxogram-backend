@@ -21,6 +21,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     final AuthenticationService authenticationService;
 
+    private static final Set<String> ALLOWED_PATHS = Set.of(
+            "email/verify",
+            "users/@me",
+            "email/resend"
+    );
+
     @Autowired
     public AuthenticationInterceptor(AuthenticationService authenticationService, JwtService jwtService) {
         this.authenticationService = authenticationService;
@@ -28,10 +34,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-        Set<String> allowedPaths = Set.of("email/verify", "users/@me", "email/resend");
         String requestURI = request.getRequestURI();
 
-        boolean checkIfEmailVerified = allowedPaths.stream().anyMatch(requestURI::contains);
+        boolean checkIfEmailVerified = ALLOWED_PATHS.stream().anyMatch(requestURI::contains);
+
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (accessToken == null || !accessToken.startsWith("Bearer "))
@@ -41,6 +47,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         request.setAttribute("user", user);
         request.setAttribute("accessToken", accessToken);
+
         return true;
     }
 
