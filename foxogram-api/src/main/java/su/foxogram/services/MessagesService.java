@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.exceptions.MissingPermissionsException;
 import su.foxogram.models.*;
-import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.exceptions.MessageNotFoundException;
 import su.foxogram.dtos.request.MessageDTO;
-import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MessageRepository;
 import su.foxogram.structures.Snowflake;
 
@@ -64,7 +62,7 @@ public class MessagesService {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
-		if (message.getAuthorId() != member.getId() || !member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES)) throw new MissingPermissionsException();
+		if (message.getAuthorId() != member.getId() || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES)) throw new MissingPermissionsException();
 
 		messageRepository.delete(message);
 		log.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channel.getId());

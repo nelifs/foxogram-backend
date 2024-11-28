@@ -20,13 +20,11 @@ import su.foxogram.util.CodeGenerator;
 public class UsersService {
 
 	private final UserRepository userRepository;
-	private final AuthenticationService authenticationService;
 	private final EmailService emailService;
 
 	@Autowired
-	public UsersService(UserRepository userRepository, AuthenticationService authenticationService, EmailService emailService) {
+	public UsersService(UserRepository userRepository, EmailService emailService) {
 		this.userRepository = userRepository;
-		this.authenticationService = authenticationService;
 		this.emailService = emailService;
 	}
 

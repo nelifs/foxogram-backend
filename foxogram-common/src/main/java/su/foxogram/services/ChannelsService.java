@@ -51,7 +51,7 @@ public class ChannelsService {
     }
 
     public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
-        if (!member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL)) throw new MissingPermissionsException();
+        if (member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL)) throw new MissingPermissionsException();
 
         if (body.getName() != null) channel.setName(body.getName());
 

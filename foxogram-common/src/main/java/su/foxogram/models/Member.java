@@ -52,9 +52,9 @@ public class Member extends BaseUser {
     public boolean hasAnyPermission(MemberConstants.Permissions... permissions) {
         for (MemberConstants.Permissions permission : permissions) {
             if ((this.permissions & permission.getBit()) != 0) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
