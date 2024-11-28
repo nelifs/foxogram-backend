@@ -8,6 +8,6 @@ import su.foxogram.constants.ExceptionsConstants;
 public class MissingPermissionsException extends BaseException {
 
 	public MissingPermissionsException() {
-		super("You don't have enough permissions to delete this channel", MissingPermissionsException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsConstants.Codes.MISSING_PERMISSIONS.getValue());
+		super("You don't have enough permissions to perform this action", MissingPermissionsException.class.getAnnotation(ResponseStatus.class).value(), ExceptionsConstants.Codes.MISSING_PERMISSIONS.getValue());
 	}
 }

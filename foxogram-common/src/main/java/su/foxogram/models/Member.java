@@ -39,4 +39,22 @@ public class Member extends BaseUser {
     public boolean hasPermission(MemberConstants.Permissions permission) {
         return (this.permissions & permission.getBit()) != 0;
     }
+
+    public boolean hasPermissions(MemberConstants.Permissions... permissions) {
+        for (MemberConstants.Permissions permission : permissions) {
+            if ((this.permissions & permission.getBit()) == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean hasAnyPermission(MemberConstants.Permissions... permissions) {
+        for (MemberConstants.Permissions permission : permissions) {
+            if ((this.permissions & permission.getBit()) != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

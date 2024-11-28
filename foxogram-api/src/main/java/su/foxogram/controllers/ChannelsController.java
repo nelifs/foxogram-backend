@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.ChannelDTO;
+import su.foxogram.dtos.request.ChannelEditDTO;
 import su.foxogram.dtos.response.MemberDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.models.*;
@@ -60,10 +61,10 @@ public class ChannelsController {
 	}
 
 	@PatchMapping("/{id}")
-	public ChannelDTO editChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel) {
+	public ChannelDTO editChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody ChannelEditDTO body) throws MissingPermissionsException {
 		log.info("CHANNEL edit ({}) request", channel.getId());
 
-		// Channel channel = channelsService.editChannel(id);
+		channel = channelsService.editChannel(member, channel, body);
 
 		return new ChannelDTO(channel);
 	}
