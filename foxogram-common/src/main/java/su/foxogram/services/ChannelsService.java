@@ -34,7 +34,7 @@ public class ChannelsService {
         Channel channel = new Channel(id, name, type, ownerId);
         channelRepository.save(channel);
 
-        Member member = new Member(user.getId(), channel, user.getUsername(), MemberConstants.Permissions.ADMIN.getBit(), user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
+        Member member = new Member(user.getId(), channel, user.getDisplayName(), user.getUsername(), MemberConstants.Permissions.ADMIN.getBit(), user.getAvatar(), user.getFlags(), user.getType());
         memberRepository.save(member);
 
         return channel;
@@ -75,7 +75,7 @@ public class ChannelsService {
 
         if (member != null) throw new MemberAlreadyInChannelException();
 
-        member = new Member(user.getId(), channel, user.getUsername(), 0, user.getAvatar(), user.getCreatedAt(), user.getFlags(), user.getType());
+        member = new Member(user.getId(), channel, user.getDisplayName(), user.getUsername(), 0, user.getAvatar(), user.getFlags(), user.getType());
         return memberRepository.save(member);
     }
 

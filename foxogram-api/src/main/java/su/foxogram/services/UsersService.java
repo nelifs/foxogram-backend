@@ -38,6 +38,7 @@ public class UsersService {
 	}
 
 	public User editUser(User user, UserEditDTO body) throws UserWithThisUsernameOrEmailAlreadyExistException {
+		if (body.getDisplayName() != null) user.setDisplayName(body.getDisplayName());
 		if (body.getAvatar() != null) user.setAvatar(body.getAvatar());
 
 		try {

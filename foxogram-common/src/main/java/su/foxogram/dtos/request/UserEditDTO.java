@@ -9,6 +9,10 @@ import su.foxogram.constants.ValidationConstants;
 @Getter
 @Setter
 public class UserEditDTO {
+    @Size(min = ValidationConstants.Lengths.MIN, max = ValidationConstants.Lengths.USERNAME, message = ValidationConstants.Messages.DISPLAY_NAME_WRONG_LENGTH)
+    @Pattern(regexp = ValidationConstants.Regex.USERNAME_REGEX, message = ValidationConstants.Messages.DISPLAY_NAME_INCORRECT)
+    private String displayName;
+
     @Size(min = ValidationConstants.Lengths.MIN, max = ValidationConstants.Lengths.USERNAME, message = ValidationConstants.Messages.USERNAME_WRONG_LENGTH)
     @Pattern(regexp = ValidationConstants.Regex.USERNAME_REGEX, message = ValidationConstants.Messages.USERNAME_INCORRECT)
     private String username;

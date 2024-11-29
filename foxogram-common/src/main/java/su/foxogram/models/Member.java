@@ -21,8 +21,8 @@ public class Member extends BaseUser {
 
     }
 
-    public Member(long id, Channel channel, String username, long permissions, String avatar, long flags, int type) {
-        super(id, avatar, username, flags, type);
+    public Member(long id, Channel channel, String displayName, String username, long permissions, String avatar, long flags, int type) {
+        super(id, avatar, displayName, username, flags, type);
         this.channel = channel;
         this.permissions = permissions;
         this.type = type;

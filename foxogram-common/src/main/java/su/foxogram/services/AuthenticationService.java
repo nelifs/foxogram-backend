@@ -72,7 +72,7 @@ public class AuthenticationService {
         long flags = apiConfig.isDevelopment() ? UserConstants.Flags.EMAIL_VERIFIED.getBit() : 0;
         int type = UserConstants.Type.USER.getType();
 
-        return new User(id, avatar, username, email, Encryptor.hashPassword(password), flags, type, deletion);
+        return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion);
     }
 
     private void sendConfirmationEmail(User user) {

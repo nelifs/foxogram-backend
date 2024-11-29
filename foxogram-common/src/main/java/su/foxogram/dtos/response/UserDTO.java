@@ -9,6 +9,7 @@ import su.foxogram.models.User;
 public class UserDTO {
     private long id;
     private String avatar;
+    private String displayName;
     private String username;
     private String email;
     private long flags;
@@ -17,6 +18,7 @@ public class UserDTO {
     public UserDTO(User user) {
         this.id = user.getId();
         this.avatar = user.getAvatar();
+        this.displayName = user.getDisplayName();
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.flags = user.getFlags();

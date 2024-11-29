@@ -12,6 +12,8 @@ public class ValidationConstants {
 
     public static class Messages {
         public static final String PASSWORD_WRONG_LENGTH = "Password must be between {min} and {max} characters long";
+        public static final String DISPLAY_NAME_WRONG_LENGTH = "Display name must be between {min} and {max} characters long";
+        public static final String DISPLAY_NAME_INCORRECT = "Incorrect display name format";
         public static final String USERNAME_WRONG_LENGTH = "Username must be between {min} and {max} characters long";
         public static final String USERNAME_INCORRECT = "Incorrect username format";
         public static final String EMAIL_WRONG_LENGTH = "Email must be between {min} and {max} characters long";

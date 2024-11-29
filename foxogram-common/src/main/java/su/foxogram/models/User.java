@@ -25,8 +25,8 @@ public class User extends BaseUser {
     public User() {
     }
 
-    public User(long id, String avatar, String username, String email, String password, long flags, int type, long deletion) {
-        super(id, avatar, username, flags, type);
+    public User(long id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion) {
+        super(id, avatar, displayName, username, flags, type);
         this.id = id;
         this.avatar = avatar;
         this.username = username;

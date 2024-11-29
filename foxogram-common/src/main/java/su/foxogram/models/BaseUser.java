@@ -13,6 +13,9 @@ public class BaseUser {
     @Id
     public long id;
 
+    @Column()
+    public String displayName;
+
     @Column(unique = true)
     public String username;
 
@@ -29,9 +32,10 @@ public class BaseUser {
 
     }
 
-    public BaseUser(long id, String avatar, String username, long flags, int type) {
+    public BaseUser(long id, String avatar, String displayName, String username, long flags, int type) {
         this.id = id;
         this.avatar = avatar;
+        this.displayName = displayName;
         this.username = username;
         this.flags = flags;
         this.type = type;
