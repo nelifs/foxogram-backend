@@ -3,6 +3,7 @@ package su.foxogram.dtos.response;
 import lombok.Getter;
 import lombok.Setter;
 import su.foxogram.models.Member;
+import su.foxogram.models.User;
 
 @Getter
 @Setter
@@ -15,11 +16,13 @@ public class MemberDTO {
     private long permissions;
 
     public MemberDTO(Member member) {
+        User user = member.getUser();
+
         this.id = member.getId();
-        this.avatar = member.getAvatar();
-        this.username = member.getUsername();
-        this.flags = member.getFlags();
-        this.type = member.getType();
+        this.avatar = user.getAvatar();
+        this.username = user.getUsername();
+        this.flags = user.getFlags();
+        this.type = user.getType();
         this.permissions = member.getPermissions();
     }
 }
