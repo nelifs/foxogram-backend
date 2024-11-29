@@ -7,7 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "codes")
+@Table(name = "codes", indexes = {
+		@Index(name = "idx_code_user_id", columnList = "userId", unique = true),
+		@Index(name = "idx_code_value", columnList = "value", unique = true)
+})
 public class Code {
 	@Id()
 	public long userId;
@@ -15,7 +18,7 @@ public class Code {
 	@Column()
 	public String type;
 
-	@Column()
+	@Column(unique = true)
 	public String value;
 
 	@Column()

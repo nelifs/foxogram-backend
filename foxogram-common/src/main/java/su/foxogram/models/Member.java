@@ -8,7 +8,9 @@ import su.foxogram.constants.MemberConstants;
 @Setter
 @Getter
 @Entity
-@Table(name = "members")
+@Table(name = "members", indexes = {
+        @Index(name = "idx_member_user_channel_id", columnList = "id, channel")
+})
 public class Member {
     @Id
     private long id;
@@ -28,8 +30,8 @@ public class Member {
 
     }
 
-    public Member(long id, User user, Channel channel, long permissions) {
-        this.id = id;
+    public Member(User user, Channel channel, long permissions) {
+        this.id = user.getId();
         this.user = user;
         this.channel = channel;
         this.permissions = permissions;

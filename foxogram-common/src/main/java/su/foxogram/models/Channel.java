@@ -9,7 +9,10 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "channels")
+@Table(name = "channels", indexes = {
+        @Index(name = "idx_channel_id", columnList = "id", unique = true),
+        @Index(name = "idx_channel_name", columnList = "name", unique = true)
+})
 public class Channel {
     @Id
     public long id;

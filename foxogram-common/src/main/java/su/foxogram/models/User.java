@@ -1,9 +1,6 @@
 package su.foxogram.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import su.foxogram.constants.UserConstants;
@@ -12,7 +9,11 @@ import su.foxogram.constants.UserConstants;
 @Setter
 @Getter
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_user_id", columnList = "id", unique = true),
+        @Index(name = "idx_user_username", columnList = "username", unique = true),
+        @Index(name = "idx_user_email", columnList = "email", unique = true)
+})
 public class User {
     @Id
     public long id;
