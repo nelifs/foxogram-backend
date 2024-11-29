@@ -9,7 +9,14 @@ import su.foxogram.constants.MemberConstants;
 @Getter
 @Entity
 @Table(name = "members")
-public class Member extends BaseUser {
+public class Member {
+    @Id
+    private long id;
+
+    @ManyToOne
+    @JoinColumn(name = "id", nullable = false)
+    private User user;
+
     @ManyToOne
     @JoinColumn(name = "channel", nullable = false)
     private Channel channel;
@@ -21,11 +28,11 @@ public class Member extends BaseUser {
 
     }
 
-    public Member(long id, Channel channel, String displayName, String username, long permissions, String avatar, long flags, int type) {
-        super(id, avatar, displayName, username, flags, type);
+    public Member(long id, User user, Channel channel, long permissions) {
+        this.id = id;
+        this.user = user;
         this.channel = channel;
         this.permissions = permissions;
-        this.type = type;
     }
 
     public void addPermission(MemberConstants.Permissions permission) {
