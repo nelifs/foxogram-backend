@@ -15,6 +15,7 @@ public class Member {
     @Id
     private long id;
 
+    @MapsId
     @ManyToOne
     @JoinColumn(name = "id", nullable = false)
     private User user;
