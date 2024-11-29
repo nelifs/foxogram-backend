@@ -7,7 +7,6 @@ public class Encryptor {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-
     public static boolean verifyPassword(String password, String hashedPassword) {
         try {
             return !BCrypt.checkpw(password, hashedPassword);

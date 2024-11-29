@@ -13,8 +13,6 @@ import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.services.UsersService;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping(value = APIConstants.USERS, produces = "application/json")
