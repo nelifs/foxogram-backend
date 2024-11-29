@@ -12,7 +12,6 @@ public class MemberDTO {
     private String username;
     private long flags;
     private long type;
-    private long createdAt;
     private long permissions;
 
     public MemberDTO(Member member) {
@@ -21,7 +20,6 @@ public class MemberDTO {
         this.username = member.getUsername();
         this.flags = member.getFlags();
         this.type = member.getType();
-        this.createdAt = member.getCreatedAt();
         this.permissions = member.getPermissions();
     }
 }

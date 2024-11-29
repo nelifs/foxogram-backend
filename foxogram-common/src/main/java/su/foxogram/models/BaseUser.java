@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import su.foxogram.constants.UserConstants;
+import su.foxogram.structures.Snowflake;
 
 @Getter
 @Setter
@@ -24,18 +25,14 @@ public class BaseUser {
     @Column()
     public int type;
 
-    @Column()
-    public long createdAt;
-
     public BaseUser() {
 
     }
 
-    public BaseUser(long id, String avatar, String username, long createdAt, long flags, int type) {
+    public BaseUser(long id, String avatar, String username, long flags, int type) {
         this.id = id;
         this.avatar = avatar;
         this.username = username;
-        this.createdAt = createdAt;
         this.flags = flags;
         this.type = type;
     }

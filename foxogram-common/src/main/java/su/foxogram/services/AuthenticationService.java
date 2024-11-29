@@ -67,13 +67,12 @@ public class AuthenticationService {
 
     private User createUser(String username, String email, String password) {
         long id = new Snowflake(1).nextId();
-        long createdAt = System.currentTimeMillis();
         long deletion = 0;
         String avatar = new Avatar("").getId();
         long flags = apiConfig.isDevelopment() ? UserConstants.Flags.EMAIL_VERIFIED.getBit() : 0;
         int type = UserConstants.Type.USER.getType();
 
-        return new User(id, avatar, username, email, Encryptor.hashPassword(password), createdAt, flags, type, deletion);
+        return new User(id, avatar, username, email, Encryptor.hashPassword(password), flags, type, deletion);
     }
 
     private void sendConfirmationEmail(User user) {

@@ -13,7 +13,6 @@ public class UserDTO {
     private String email;
     private long flags;
     private long type;
-    private long createdAt;
 
     public UserDTO(User user) {
         this.id = user.getId();
@@ -22,6 +21,5 @@ public class UserDTO {
         this.email = user.getEmail();
         this.flags = user.getFlags();
         this.type = user.getType();
-        this.createdAt = user.getCreatedAt();
     }
 }

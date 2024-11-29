@@ -25,8 +25,8 @@ public class User extends BaseUser {
     public User() {
     }
 
-    public User(long id, String avatar, String username, String email, String password, long createdAt, long flags, int type, long deletion) {
-        super(id, avatar, username, createdAt, flags, type);
+    public User(long id, String avatar, String username, String email, String password, long flags, int type, long deletion) {
+        super(id, avatar, username, flags, type);
         this.id = id;
         this.avatar = avatar;
         this.username = username;
@@ -34,7 +34,6 @@ public class User extends BaseUser {
         this.password = password;
         this.flags = flags;
         this.type = type;
-        this.createdAt = createdAt;
         this.deletion = deletion;
     }
 }
