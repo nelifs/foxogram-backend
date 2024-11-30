@@ -39,4 +39,4 @@ jobs:
         run: ./gradlew :foxogram-api:build
 
       - name: Run Foxogram API
-        run: docker compose -f docker-compose-${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'dev' }}.yml up -d --build
+        run: docker compose -f docker-compose-${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'dev' }}.yml up -d --build --remove-orphans

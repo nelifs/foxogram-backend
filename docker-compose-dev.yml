@@ -1,5 +1,6 @@
 services:
-  api:
+  api-dev:
+    container_name: foxogram-api-dev
     build:
       context: ./foxogram-api
     restart: always
