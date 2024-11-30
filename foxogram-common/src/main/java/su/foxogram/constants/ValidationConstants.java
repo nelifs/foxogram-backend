@@ -4,7 +4,8 @@ public class ValidationConstants {
     public static class Lengths {
         public static final int MIN = 4;
         public static final int PASSWORD = 128;
-        public static final int USERNAME = 32;
+		public static final int DISPLAY_NAME = 32;
+		public static final int USERNAME = 32;
         public static final int EMAIL = 64;
         public static final int CHANNEL_NAME = 16;
         public static final int MESSAGE_CONTENT = 5000;
