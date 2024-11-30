@@ -3,17 +3,14 @@ services:
     build:
       context: ./foxogram-api
     restart: always
-    ports:
-      - '8080:8080'
     networks:
       - db_network
       - traefik
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.api.rule=Host(`api.foxogram.su`)
-      - traefik.http.routers.api.tls=true
-      - traefik.http.routers.api.tls.certresolver=letsencrypt
-      - traefik.http.routers.foxogram-web.certresolver=letsencrypt
+      traefik.enable: true
+      traefik.http.routers.foxogram-api.rule: Host(`api.foxogram.su`)
+      traefik.http.routers.foxogram-api.tls.certresolver: letsencrypt
+      traefik.http.services.foxogram-api.loadbalancer.server.port: 8080
 
 networks:
   db_network:
