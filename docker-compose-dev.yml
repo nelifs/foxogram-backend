@@ -1,3 +1,4 @@
+name: foxogram-app-dev
 services:
   api-dev:
     container_name: foxogram-api-dev
