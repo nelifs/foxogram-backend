@@ -44,7 +44,7 @@ public class AuthenticationService {
         User user = userRepository.findById(Long.parseLong(userId));
 
         if (user == null) throw new UserUnauthorizedException();
-        if (!user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED) && !checkIfEmailVerified)
+        if (!user.hasFlag(UserConstants.Flags.AWAITING_CONFIRMATION) && !checkIfEmailVerified)
             throw new UserEmailNotVerifiedException();
 
         return user;
@@ -69,17 +69,17 @@ public class AuthenticationService {
         long id = new Snowflake(1).nextId();
         long deletion = 0;
         String avatar = new Avatar("").getId();
-        long flags = apiConfig.isDevelopment() ? UserConstants.Flags.EMAIL_VERIFIED.getBit() : 0;
+        long flags = apiConfig.isDevelopment() ? 0 : UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
         int type = UserConstants.Type.USER.getType();
 
         return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion);
     }
 
     private void sendConfirmationEmail(User user) {
-        String emailType = EmailConstants.Type.CONFIRM.getValue();
+        String emailType = EmailConstants.Type.EMAIL_VERIFY.getValue();
         String digitCode = CodeGenerator.generateDigitCode();
         long issuedAt = System.currentTimeMillis();
-        long expiresAt = issuedAt + CodesConstants.Lifetime.VERIFY.getValue();
+        long expiresAt = issuedAt + CodesConstants.Lifetime.BASE.getValue();
         String accessToken = jwtService.generate(user.getId());
 
         emailService.sendEmail(user.getEmail(), user.getId(), emailType, user.getUsername(), digitCode, issuedAt, expiresAt, accessToken);
@@ -155,10 +155,10 @@ public class AuthenticationService {
     }
 
     private void sendDeleteRequestEmail(User user, String accessToken) {
-        String emailType = EmailConstants.Type.DELETE.getValue();
+        String emailType = EmailConstants.Type.ACCOUNT_DELETE.getValue();
         String code = CodeGenerator.generateDigitCode();
         long issuedAt = System.currentTimeMillis();
-        long expiresAt = issuedAt + CodesConstants.Lifetime.DELETE.getValue();
+        long expiresAt = issuedAt + CodesConstants.Lifetime.BASE.getValue();
 
         emailService.sendEmail(user.getEmail(), user.getId(), emailType, user.getUsername(), code, issuedAt, expiresAt, accessToken);
 
@@ -169,7 +169,7 @@ public class AuthenticationService {
     public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
         Code code = validateCode(pathCode);
 
-        user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
+        user.removeFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
         userRepository.save(user);
         log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
         log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());

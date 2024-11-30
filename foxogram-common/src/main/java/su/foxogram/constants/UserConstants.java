@@ -5,7 +5,7 @@ import lombok.Getter;
 public class UserConstants {
     @Getter
     public enum Flags {
-        EMAIL_VERIFIED(1),
+		AWAITING_CONFIRMATION(1),
         MFA_ENABLED(1 << 1),
         DISABLED(1 << 2);
 
@@ -14,7 +14,6 @@ public class UserConstants {
         Flags(long bit) {
             this.bit = bit;
         }
-
     }
 
     @Getter
