@@ -18,3 +18,5 @@ services:
 networks:
   db_network:
     external: true
+  traefik:
+    external: true
