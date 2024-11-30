@@ -7,6 +7,7 @@ services:
       - '8080:8080'
     networks:
       - db_network
+      - traefik
     labels:
       - traefik.enable=true
       - traefik.http.routers.api.rule=Host(`api.foxogram.su`)
