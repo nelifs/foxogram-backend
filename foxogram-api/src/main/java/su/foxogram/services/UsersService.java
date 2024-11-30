@@ -44,6 +44,7 @@ public class UsersService {
 		try {
 			if (body.getUsername() != null) user.setUsername(body.getUsername());
 			if (body.getEmail() != null) changeEmail(user, body);
+			if (body.getPassword() != null) changePassword(user, body);
 		} catch (DataIntegrityViolationException e) {
 			throw new UserWithThisUsernameOrEmailAlreadyExistException();
 		}
@@ -55,16 +56,23 @@ public class UsersService {
 
 	private void changeEmail(User user, UserEditDTO body) {
 		user.setEmail(body.getEmail());
-		user.removeFlag(UserConstants.Flags.EMAIL_VERIFIED);
+		user.addFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
 
-		sendEmail(user);
+		sendEmail(user, EmailConstants.Type.EMAIL_VERIFY);
 	}
 
-	private void sendEmail(User user) {
-		String emailType = EmailConstants.Type.CONFIRM.getValue();
+	private void changePassword(User user, UserEditDTO body) {
+		user.setPassword(body.getPassword());
+		user.addFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
+
+		sendEmail(user, EmailConstants.Type.RESET_PASSWORD);
+	}
+
+	private void sendEmail(User user, EmailConstants.Type type) {
+		String emailType = type.getValue();
 		String code = CodeGenerator.generateDigitCode();
 		long issuedAt = System.currentTimeMillis();
-		long expiresAt = issuedAt + CodesConstants.Lifetime.DELETE.getValue();
+		long expiresAt = issuedAt + CodesConstants.Lifetime.BASE.getValue();
 
 		emailService.sendEmail(user.getEmail(), user.getId(), emailType, user.getUsername(), code, issuedAt, expiresAt, null);
 	}
