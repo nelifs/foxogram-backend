@@ -1,13 +1,13 @@
-name: Deploy Foxogram to Dev
+name: Deploy Foxogram
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
-    runs-on: dev
-    environment: development
+    runs-on: cloud
+    environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'dev' && 'development' || 'development' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,7 +24,7 @@ jobs:
           smtp.email=${{ secrets.SMTP_EMAIL }}\n
           jwt.secret=${{ secrets.JWT_SECRET }}\n
           api.version=1\n
-          api.env=dev" >> foxogram-common/src/main/resources/application.properties
+          api.env=${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'dev' }}" >> foxogram-common/src/main/resources/application.properties
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -39,4 +39,4 @@ jobs:
         run: ./gradlew :foxogram-api:build
 
       - name: Run Foxogram API
-        run: docker-compose up -d --build
+        run: docker compose -f docker-compose-${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'dev' }}.yml up -d --build
