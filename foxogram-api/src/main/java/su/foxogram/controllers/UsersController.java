@@ -24,9 +24,14 @@ public class UsersController {
 		this.usersService = usersService;
 	}
 
-	@GetMapping("/{id}")
-	public UserDTO getUser(@RequestAttribute(value = "user") User user, @PathVariable String id, HttpServletRequest request) throws UserUnauthorizedException, UserNotFoundException {
-		user = usersService.getUser(id, user);
+	@GetMapping("/@me")
+	public UserDTO getYourself(@RequestAttribute(value = "user") User user) {
+		return new UserDTO(user);
+	}
+
+	@GetMapping("/{key}")
+	public UserDTO getUser(@PathVariable String key) throws UserNotFoundException {
+		User user = usersService.getUser(key);
 
 		return new UserDTO(user);
 	}
