@@ -49,7 +49,7 @@ public class User {
         this.id = id;
         this.avatar = avatar;
         this.displayName = displayName;
-        this.username = username;
+        this.username = username.toLowerCase();
         this.email = email;
         this.password = password;
         this.flags = flags;
