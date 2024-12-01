@@ -13,7 +13,12 @@ import su.foxogram.exceptions.UserWithThisUsernameOrEmailAlreadyExistException;
 import su.foxogram.models.User;
 import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.repositories.UserRepository;
+import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
+
+import java.util.Arrays;
+
+import static su.foxogram.structures.Snowflake.DEFAULT_CUSTOM_EPOCH;
 
 @Slf4j
 @Service
@@ -28,9 +33,9 @@ public class UsersService {
 		this.emailService = emailService;
 	}
 
-	public User getUser(String id, User user) throws UserUnauthorizedException, UserNotFoundException {
-		if (!id.equals("@me")) user = userRepository.findById(Long.parseLong(id));
-		else if (user == null) throw new UserUnauthorizedException();
+	public User getUser(String key) throws UserNotFoundException {
+		User user = userRepository.findByUsername(key);
+		if (user == null) user = userRepository.findById(Long.parseLong(key));
 
 		if (user == null) throw new UserNotFoundException();
 
