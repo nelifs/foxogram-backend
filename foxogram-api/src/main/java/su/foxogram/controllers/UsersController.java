@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.dtos.response.UserDTO;
 import su.foxogram.dtos.request.UserEditDTO;
+import su.foxogram.dtos.response.UserMeDTO;
 import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.exceptions.UserWithThisUsernameOrEmailAlreadyExistException;
 import su.foxogram.models.User;
@@ -25,8 +26,8 @@ public class UsersController {
 	}
 
 	@GetMapping("/@me")
-	public UserDTO getYourself(@RequestAttribute(value = "user") User user) {
-		return new UserDTO(user);
+	public UserMeDTO getYourself(@RequestAttribute(value = "user") User user) {
+		return new UserMeDTO(user);
 	}
 
 	@GetMapping("/{key}")
