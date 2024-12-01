@@ -11,7 +11,6 @@ public class UserDTO {
     private String avatar;
     private String displayName;
     private String username;
-    private String email;
     private long flags;
     private long type;
 
@@ -20,7 +19,6 @@ public class UserDTO {
         this.avatar = user.getAvatar();
         this.displayName = user.getDisplayName();
         this.username = user.getUsername();
-        this.email = user.getEmail();
         this.flags = user.getFlags();
         this.type = user.getType();
     }
