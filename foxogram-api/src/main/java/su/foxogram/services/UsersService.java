@@ -11,14 +11,8 @@ import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.exceptions.UserWithThisUsernameOrEmailAlreadyExistException;
 import su.foxogram.models.User;
-import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.repositories.UserRepository;
-import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
-
-import java.util.Arrays;
-
-import static su.foxogram.structures.Snowflake.DEFAULT_CUSTOM_EPOCH;
 
 @Slf4j
 @Service

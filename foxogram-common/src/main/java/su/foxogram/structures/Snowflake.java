@@ -14,10 +14,10 @@ public class Snowflake {
     private static final long maxSequence = (1L << SEQUENCE_BITS) - 1;
 
     // Epoch since foxogram launch
-    private static final long DEFAULT_CUSTOM_EPOCH = 1698406020000L;
+    public static final long DEFAULT_CUSTOM_EPOCH = 1698406020000L;
 
     private final long nodeId;
-    private final long customEpoch;
+    private static long customEpoch = 0;
 
     private volatile long lastTimestamp = -1L;
     private volatile long sequence = 0L;
@@ -28,7 +28,7 @@ public class Snowflake {
             throw new IllegalArgumentException(String.format("NodeId must be between %d and %d", 0, maxNodeId));
         }
         this.nodeId = nodeId;
-        this.customEpoch = customEpoch;
+        Snowflake.customEpoch = customEpoch;
     }
 
     // Create Snowflake with a nodeId
@@ -39,7 +39,7 @@ public class Snowflake {
     // Let Snowflake generate a nodeId
     public Snowflake() {
         this.nodeId = createNodeId();
-        this.customEpoch = DEFAULT_CUSTOM_EPOCH;
+        customEpoch = DEFAULT_CUSTOM_EPOCH;
     }
 
     public synchronized long nextId() {
@@ -103,7 +103,7 @@ public class Snowflake {
         return nodeId;
     }
 
-    public long[] parse(long id) {
+    public static long[] parse(long id) {
         long maskNodeId = ((1L << NODE_ID_BITS) - 1) << SEQUENCE_BITS;
         long maskSequence = (1L << SEQUENCE_BITS) - 1;
 

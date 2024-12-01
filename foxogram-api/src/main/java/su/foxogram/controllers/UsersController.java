@@ -1,6 +1,5 @@
 package su.foxogram.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,6 @@ import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.exceptions.UserWithThisUsernameOrEmailAlreadyExistException;
 import su.foxogram.models.User;
 import su.foxogram.constants.APIConstants;
-import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.services.UsersService;
 
 @Slf4j
