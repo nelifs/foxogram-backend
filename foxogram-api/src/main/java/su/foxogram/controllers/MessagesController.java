@@ -46,7 +46,7 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public OkDTO postMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body) {
+	public OkDTO createMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body) {
 		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channel.getId(), user.getId(), user.getEmail());
 
 		messagesService.addMessage(channel, user, body);
@@ -64,7 +64,7 @@ public class MessagesController {
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public MessagesDTO patchMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
+	public MessagesDTO editMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> message = List.of(messagesService.editMessage(id, channel, member, body));
