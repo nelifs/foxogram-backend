@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
-import su.foxogram.exceptions.MissingPermissionsException;
-import su.foxogram.models.*;
-import su.foxogram.exceptions.MessageNotFoundException;
 import su.foxogram.dtos.request.MessageDTO;
+import su.foxogram.exceptions.MessageNotFoundException;
+import su.foxogram.exceptions.MissingPermissionsException;
+import su.foxogram.models.Channel;
+import su.foxogram.models.Member;
+import su.foxogram.models.Message;
+import su.foxogram.models.User;
 import su.foxogram.repositories.MessageRepository;
 import su.foxogram.structures.Snowflake;
 
@@ -22,7 +25,7 @@ public class MessagesService {
 	@Autowired
 	public MessagesService(MessageRepository messageRepository) {
 		this.messageRepository = messageRepository;
-    }
+	}
 
 	public List<Message> getMessages(long before, int limit, Channel channel) throws MessageNotFoundException {
 		List<Message> messagesArray = messageRepository.findAllByChannel(channel);
@@ -56,13 +59,14 @@ public class MessagesService {
 		messageRepository.save(message);
 		log.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", id, channel.getId());
 		log.info("MESSAGE ({}) in CHANNEL ({}) posted successfully", id, channel.getId());
-    }
+	}
 
 	public void deleteMessage(long id, Member member, Channel channel) throws MessageNotFoundException, MissingPermissionsException {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
-		if (message.getAuthorId() != member.getId() || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES)) throw new MissingPermissionsException();
+		if (message.getAuthorId() != member.getId() || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
+			throw new MissingPermissionsException();
 
 		messageRepository.delete(message);
 		log.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channel.getId());

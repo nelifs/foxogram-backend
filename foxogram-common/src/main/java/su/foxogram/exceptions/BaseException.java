@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 public abstract class BaseException extends Exception {
 
 	@Getter
-    public int errorCode;
+	public int errorCode;
+
 	@Getter
-    public HttpStatus status;
+	public HttpStatus status;
+
 	public String message;
 
 	public BaseException(String message, HttpStatus status, int errorCode) {
@@ -19,7 +21,7 @@ public abstract class BaseException extends Exception {
 		this.errorCode = errorCode;
 	}
 
-    @Override
+	@Override
 	public String getMessage() {
 		return message;
 	}

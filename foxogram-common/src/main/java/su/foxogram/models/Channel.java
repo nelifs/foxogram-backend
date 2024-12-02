@@ -10,36 +10,36 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "channels", indexes = {
-        @Index(name = "idx_channel_id", columnList = "id", unique = true),
-        @Index(name = "idx_channel_name", columnList = "name", unique = true)
+		@Index(name = "idx_channel_id", columnList = "id", unique = true),
+		@Index(name = "idx_channel_name", columnList = "name", unique = true)
 })
 public class Channel {
-    @Id
-    public long id;
+	@Id
+	public long id;
 
-    @Column()
-    public String name;
+	@Column()
+	public String name;
 
-    @Column()
-    public int type;
+	@Column()
+	public int type;
 
-    @Column()
-    public long ownerId;
+	@Column()
+	public long ownerId;
 
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Member> members;
+	@OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Member> members;
 
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Message> messages;
+	@OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Message> messages;
 
-    public Channel() {
+	public Channel() {
 
-    }
+	}
 
-    public Channel(long id, String name, int type, long ownerId) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.ownerId = ownerId;
-    }
+	public Channel(long id, String name, int type, long ownerId) {
+		this.id = id;
+		this.name = name;
+		this.type = type;
+		this.ownerId = ownerId;
+	}
 }

@@ -19,46 +19,47 @@ import java.util.Objects;
 @Controller
 public class ReadyController implements WebSocketHandler {
 
-    final AuthenticationService authenticationService;
+	final AuthenticationService authenticationService;
 
-    final Logger logger = LoggerFactory.getLogger(ReadyController.class);
-    final ObjectMapper mapper = new ObjectMapper();
+	final Logger logger = LoggerFactory.getLogger(ReadyController.class);
 
-    @Autowired
-    public ReadyController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
+	final ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        logger.info("Session CREATED with ID {} and with URI {}", session.getId(), session.getUri());
-    }
+	@Autowired
+	public ReadyController(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
+	}
 
-    @Override
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        Map<String, List<String>> headers = session.getHandshakeHeaders();
-        User user = authenticationService.getUser(Objects.requireNonNull(headers.get(HttpHeaders.AUTHORIZATION)).toString());
+	@Override
+	public void afterConnectionEstablished(WebSocketSession session) {
+		logger.info("Session CREATED with ID {} and with URI {}", session.getId(), session.getUri());
+	}
 
-        if (user == null) throw new UserUnauthorizedException();
+	@Override
+	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+		Map<String, List<String>> headers = session.getHandshakeHeaders();
+		User user = authenticationService.getUser(Objects.requireNonNull(headers.get(HttpHeaders.AUTHORIZATION)).toString());
 
-        ReadyPayload payload = mapper.readValue((String) message.getPayload(), ReadyPayload.class);
-        logger.info("got READY event with CODE {} and NAME {}", payload.getCode(), payload.getName());
-        session.sendMessage(new TextMessage("ok :)"));
-    }
+		if (user == null) throw new UserUnauthorizedException();
 
-    @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        logger.error("There's an ERROR with transporting, SESSION ID {} and URI {}", session.getId(), session.getUri());
-        throw new Exception(exception);
-    }
+		ReadyPayload payload = mapper.readValue((String) message.getPayload(), ReadyPayload.class);
+		logger.info("got READY event with CODE {} and NAME {}", payload.getCode(), payload.getName());
+		session.sendMessage(new TextMessage("ok :)"));
+	}
 
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
-        logger.info("Session DESTROYED with STATUS {} ({}) and with ID {} and with URI {}", closeStatus.getReason(), closeStatus.getCode(), session.getId(), session.getUri());
-    }
+	@Override
+	public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+		logger.error("There's an ERROR with transporting, SESSION ID {} and URI {}", session.getId(), session.getUri());
+		throw new Exception(exception);
+	}
 
-    @Override
-    public boolean supportsPartialMessages() {
-        return false;
-    }
+	@Override
+	public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
+		logger.info("Session DESTROYED with STATUS {} ({}) and with ID {} and with URI {}", closeStatus.getReason(), closeStatus.getCode(), session.getId(), session.getUri());
+	}
+
+	@Override
+	public boolean supportsPartialMessages() {
+		return false;
+	}
 }

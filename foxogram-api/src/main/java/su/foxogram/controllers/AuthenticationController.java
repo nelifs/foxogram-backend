@@ -5,14 +5,14 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import su.foxogram.constants.APIConstants;
 import su.foxogram.dtos.request.UserDeleteDTO;
 import su.foxogram.dtos.request.UserLoginDTO;
 import su.foxogram.dtos.request.UserSignUpDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.dtos.response.TokenDTO;
-import su.foxogram.models.*;
-import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
+import su.foxogram.models.User;
 import su.foxogram.services.AuthenticationService;
 
 import java.security.NoSuchAlgorithmException;
@@ -65,7 +65,6 @@ public class AuthenticationController {
 		log.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.confirmUserDelete(user, code);
-
 
 		return new OkDTO(true);
 	}

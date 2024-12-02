@@ -6,118 +6,122 @@ import java.time.Instant;
 import java.util.Enumeration;
 
 public class Snowflake {
-    private static final int EPOCH_BITS = 41;
-    private static final int NODE_ID_BITS = 10;
-    private static final int SEQUENCE_BITS = 12;
+	// Epoch since foxogram launch
+	public static final long DEFAULT_CUSTOM_EPOCH = 1698406020000L;
 
-    private static final long maxNodeId = (1L << NODE_ID_BITS) - 1;
-    private static final long maxSequence = (1L << SEQUENCE_BITS) - 1;
+	private static final int EPOCH_BITS = 41;
 
-    // Epoch since foxogram launch
-    public static final long DEFAULT_CUSTOM_EPOCH = 1698406020000L;
+	private static final int NODE_ID_BITS = 10;
 
-    private final long nodeId;
-    private static long customEpoch = 0;
+	private static final int SEQUENCE_BITS = 12;
 
-    private volatile long lastTimestamp = -1L;
-    private volatile long sequence = 0L;
+	private static final long maxNodeId = (1L << NODE_ID_BITS) - 1;
 
-    // Create Snowflake with a nodeId and custom epoch
-    public Snowflake(long nodeId, long customEpoch) {
-        if(nodeId < 0 || nodeId > maxNodeId) {
-            throw new IllegalArgumentException(String.format("NodeId must be between %d and %d", 0, maxNodeId));
-        }
-        this.nodeId = nodeId;
-        Snowflake.customEpoch = customEpoch;
-    }
+	private static final long maxSequence = (1L << SEQUENCE_BITS) - 1;
 
-    // Create Snowflake with a nodeId
-    public Snowflake(long nodeId) {
-        this(nodeId, DEFAULT_CUSTOM_EPOCH);
-    }
+	private static long customEpoch = 0;
 
-    // Let Snowflake generate a nodeId
-    public Snowflake() {
-        this.nodeId = createNodeId();
-        customEpoch = DEFAULT_CUSTOM_EPOCH;
-    }
+	private final long nodeId;
 
-    public synchronized long nextId() {
-        long currentTimestamp = timestamp();
+	private volatile long lastTimestamp = -1L;
 
-        if(currentTimestamp < lastTimestamp) {
-            throw new IllegalStateException("Invalid System Clock!");
-        }
+	private volatile long sequence = 0L;
 
-        if (currentTimestamp == lastTimestamp) {
-            sequence = (sequence + 1) & maxSequence;
-            if(sequence == 0) {
-                // Sequence Exhausted, wait till next millisecond.
-                currentTimestamp = waitNextMillis(currentTimestamp);
-            }
-        } else {
-            // reset sequence to start with zero for the next millisecond
-            sequence = 0;
-        }
+	// Create Snowflake with a nodeId and custom epoch
+	public Snowflake(long nodeId, long customEpoch) {
+		if (nodeId < 0 || nodeId > maxNodeId) {
+			throw new IllegalArgumentException(String.format("NodeId must be between %d and %d", 0, maxNodeId));
+		}
+		this.nodeId = nodeId;
+		Snowflake.customEpoch = customEpoch;
+	}
 
-        lastTimestamp = currentTimestamp;
+	// Create Snowflake with a nodeId
+	public Snowflake(long nodeId) {
+		this(nodeId, DEFAULT_CUSTOM_EPOCH);
+	}
 
-        return currentTimestamp << (NODE_ID_BITS + SEQUENCE_BITS)
-                | (nodeId << SEQUENCE_BITS)
-                | sequence;
-    }
+	// Let Snowflake generate a nodeId
+	public Snowflake() {
+		this.nodeId = createNodeId();
+		customEpoch = DEFAULT_CUSTOM_EPOCH;
+	}
 
+	public static long[] parse(long id) {
+		long maskNodeId = ((1L << NODE_ID_BITS) - 1) << SEQUENCE_BITS;
+		long maskSequence = (1L << SEQUENCE_BITS) - 1;
 
-    // Get current timestamp in milliseconds, adjust for the custom epoch.
-    private long timestamp() {
-        return Instant.now().toEpochMilli() - customEpoch;
-    }
+		long timestamp = (id >> (NODE_ID_BITS + SEQUENCE_BITS)) + customEpoch;
+		long nodeId = (id & maskNodeId) >> SEQUENCE_BITS;
+		long sequence = id & maskSequence;
 
-    // Block and wait till next millisecond
-    private long waitNextMillis(long currentTimestamp) {
-        while (currentTimestamp == lastTimestamp) {
-            currentTimestamp = timestamp();
-        }
-        return currentTimestamp;
-    }
+		return new long[]{timestamp, nodeId, sequence};
+	}
 
-    private long createNodeId() {
-        long nodeId;
-        try {
-            StringBuilder sb = new StringBuilder();
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while (networkInterfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = networkInterfaces.nextElement();
-                byte[] mac = networkInterface.getHardwareAddress();
-                if (mac != null) {
-                    for(byte macPort: mac) {
-                        sb.append(String.format("%02X", macPort));
-                    }
-                }
-            }
-            nodeId = sb.toString().hashCode();
-        } catch (Exception ex) {
-            nodeId = (new SecureRandom().nextInt());
-        }
-        nodeId = nodeId & maxNodeId;
-        return nodeId;
-    }
+	public synchronized long nextId() {
+		long currentTimestamp = timestamp();
 
-    public static long[] parse(long id) {
-        long maskNodeId = ((1L << NODE_ID_BITS) - 1) << SEQUENCE_BITS;
-        long maskSequence = (1L << SEQUENCE_BITS) - 1;
+		if (currentTimestamp < lastTimestamp) {
+			throw new IllegalStateException("Invalid System Clock!");
+		}
 
-        long timestamp = (id >> (NODE_ID_BITS + SEQUENCE_BITS)) + customEpoch;
-        long nodeId = (id & maskNodeId) >> SEQUENCE_BITS;
-        long sequence = id & maskSequence;
+		if (currentTimestamp == lastTimestamp) {
+			sequence = (sequence + 1) & maxSequence;
+			if (sequence == 0) {
+				// Sequence Exhausted, wait till next millisecond.
+				currentTimestamp = waitNextMillis(currentTimestamp);
+			}
+		} else {
+			// reset sequence to start with zero for the next millisecond
+			sequence = 0;
+		}
 
-        return new long[]{timestamp, nodeId, sequence};
-    }
+		lastTimestamp = currentTimestamp;
 
-    @Override
-    public String toString() {
-        return "Snowflake Settings [EPOCH_BITS=" + EPOCH_BITS + ", NODE_ID_BITS=" + NODE_ID_BITS
-                + ", SEQUENCE_BITS=" + SEQUENCE_BITS + ", CUSTOM_EPOCH=" + customEpoch
-                + ", NodeId=" + nodeId + "]";
-    }
+		return currentTimestamp << (NODE_ID_BITS + SEQUENCE_BITS)
+				| (nodeId << SEQUENCE_BITS)
+				| sequence;
+	}
+
+	// Get current timestamp in milliseconds, adjust for the custom epoch.
+	private long timestamp() {
+		return Instant.now().toEpochMilli() - customEpoch;
+	}
+
+	// Block and wait till next millisecond
+	private long waitNextMillis(long currentTimestamp) {
+		while (currentTimestamp == lastTimestamp) {
+			currentTimestamp = timestamp();
+		}
+		return currentTimestamp;
+	}
+
+	private long createNodeId() {
+		long nodeId;
+		try {
+			StringBuilder sb = new StringBuilder();
+			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (networkInterfaces.hasMoreElements()) {
+				NetworkInterface networkInterface = networkInterfaces.nextElement();
+				byte[] mac = networkInterface.getHardwareAddress();
+				if (mac != null) {
+					for (byte macPort : mac) {
+						sb.append(String.format("%02X", macPort));
+					}
+				}
+			}
+			nodeId = sb.toString().hashCode();
+		} catch (Exception ex) {
+			nodeId = (new SecureRandom().nextInt());
+		}
+		nodeId = nodeId & maxNodeId;
+		return nodeId;
+	}
+
+	@Override
+	public String toString() {
+		return "Snowflake Settings [EPOCH_BITS=" + EPOCH_BITS + ", NODE_ID_BITS=" + NODE_ID_BITS
+				+ ", SEQUENCE_BITS=" + SEQUENCE_BITS + ", CUSTOM_EPOCH=" + customEpoch
+				+ ", NodeId=" + nodeId + "]";
+	}
 }

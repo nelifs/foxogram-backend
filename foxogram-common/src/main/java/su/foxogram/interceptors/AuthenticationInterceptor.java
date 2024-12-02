@@ -19,45 +19,45 @@ import java.util.Set;
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
-    final AuthenticationService authenticationService;
+	private static final Set<String> ALLOWED_PATHS = Set.of(
+			"email/verify",
+			"users/@me",
+			"email/resend"
+	);
 
-    private static final Set<String> ALLOWED_PATHS = Set.of(
-            "email/verify",
-            "users/@me",
-            "email/resend"
-    );
+	final AuthenticationService authenticationService;
 
-    @Autowired
-    public AuthenticationInterceptor(AuthenticationService authenticationService, JwtService jwtService) {
-        this.authenticationService = authenticationService;
-    }
+	@Autowired
+	public AuthenticationInterceptor(AuthenticationService authenticationService, JwtService jwtService) {
+		this.authenticationService = authenticationService;
+	}
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-        String requestURI = request.getRequestURI();
+	@Override
+	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+		String requestURI = request.getRequestURI();
 
-        boolean checkIfEmailVerified = ALLOWED_PATHS.stream().anyMatch(requestURI::contains);
+		boolean checkIfEmailVerified = ALLOWED_PATHS.stream().anyMatch(requestURI::contains);
 
-        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (accessToken == null || !accessToken.startsWith("Bearer "))
-            throw new UserUnauthorizedException();
+		if (accessToken == null || !accessToken.startsWith("Bearer "))
+			throw new UserUnauthorizedException();
 
-        User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
+		User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
 
-        request.setAttribute("user", user);
-        request.setAttribute("accessToken", accessToken);
+		request.setAttribute("user", user);
+		request.setAttribute("accessToken", accessToken);
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
+	@Override
+	public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
 
-    }
+	}
 
-    @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
+	@Override
+	public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
 
-    }
+	}
 }

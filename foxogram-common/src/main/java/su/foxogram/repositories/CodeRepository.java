@@ -11,22 +11,16 @@ import java.util.List;
 public interface CodeRepository extends CrudRepository<Code, Long> {
 	Code findByUserId(long userId);
 
-	
 	List<Code> findAllByUserId(long userId);
 
-	
 	List<Code> findAllBy();
 
-	
 	Code findByValue(String value);
 
-	
 	List<Code> findAllByValue(String value);
 
-	
 	Code findByType(String type);
 
-	
 	List<Code> findAllByType(String type);
 
 	@Override

@@ -7,19 +7,24 @@ import su.foxogram.models.User;
 @Getter
 @Setter
 public class UserDTO {
-    private long id;
-    private String avatar;
-    private String displayName;
-    private String username;
-    private long flags;
-    private long type;
+	private long id;
 
-    public UserDTO(User user) {
-        this.id = user.getId();
-        this.avatar = user.getAvatar();
-        this.displayName = user.getDisplayName();
-        this.username = user.getUsername();
-        this.flags = user.getFlags();
-        this.type = user.getType();
-    }
+	private String avatar;
+
+	private String displayName;
+
+	private String username;
+
+	private long flags;
+
+	private long type;
+
+	public UserDTO(User user) {
+		this.id = user.getId();
+		this.avatar = user.getAvatar();
+		this.displayName = user.getDisplayName();
+		this.username = user.getUsername();
+		this.flags = user.getFlags();
+		this.type = user.getType();
+	}
 }

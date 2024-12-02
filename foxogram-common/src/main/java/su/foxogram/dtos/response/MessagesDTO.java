@@ -9,9 +9,9 @@ import java.util.List;
 @Getter
 @Setter
 public class MessagesDTO {
-    private List<Message> messages;
+	private List<Message> messages;
 
-    public MessagesDTO(List<Message> messages) {
-        this.messages = messages;
-    }
+	public MessagesDTO(List<Message> messages) {
+		this.messages = messages;
+	}
 }

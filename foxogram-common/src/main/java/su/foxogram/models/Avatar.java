@@ -6,9 +6,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Avatar {
-    public String id;
+	public String id;
 
-    public Avatar(String id) {
-        this.id = id;
-    }
+	public Avatar(String id) {
+		this.id = id;
+	}
 }

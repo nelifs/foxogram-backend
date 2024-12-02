@@ -11,11 +11,12 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Setter
 public class APIConfig {
-    private String version;
-    private String env;
+	private String version;
 
-    @Bean
-    public boolean isDevelopment() {
-        return env.equals("dev");
-    }
+	private String env;
+
+	@Bean
+	public boolean isDevelopment() {
+		return env.equals("dev");
+	}
 }

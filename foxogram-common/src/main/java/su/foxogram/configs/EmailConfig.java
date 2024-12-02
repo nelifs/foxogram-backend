@@ -17,9 +17,13 @@ import java.util.Properties;
 public class EmailConfig {
 
 	private String host;
+
 	private String port;
+
 	private String email;
+
 	private String username;
+
 	private String password;
 
 	@Bean

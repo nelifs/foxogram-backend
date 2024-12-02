@@ -18,49 +18,49 @@ import java.util.Optional;
 @Component
 public class ChannelInterceptor implements HandlerInterceptor {
 
-    private final ChannelsService channelsService;
+	private final ChannelsService channelsService;
 
-    @Autowired
-    public ChannelInterceptor(ChannelsService channelsService) {
-        this.channelsService = channelsService;
-    }
+	@Autowired
+	public ChannelInterceptor(ChannelsService channelsService) {
+		this.channelsService = channelsService;
+	}
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
-        Map<String, String> uriVariables = (Map<String, String>) getUriVariables(request);
+	@Override
+	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
+		Map<String, String> uriVariables = (Map<String, String>) getUriVariables(request);
 
-        long channelId = getChannelId(uriVariables).orElseThrow(ChannelNotFoundException::new);
+		long channelId = getChannelId(uriVariables).orElseThrow(ChannelNotFoundException::new);
 
-        request.setAttribute("channel", channelsService.getChannel(channelId));
+		request.setAttribute("channel", channelsService.getChannel(channelId));
 
-        return true;
-    }
+		return true;
+	}
 
-    private Map<?, ?> getUriVariables(HttpServletRequest request) {
-        return Optional.ofNullable(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE))
-                .filter(Map.class::isInstance)
-                .map(Map.class::cast)
-                .orElseGet(Collections::emptyMap);
-    }
+	private Map<?, ?> getUriVariables(HttpServletRequest request) {
+		return Optional.ofNullable(request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE))
+				.filter(Map.class::isInstance)
+				.map(Map.class::cast)
+				.orElseGet(Collections::emptyMap);
+	}
 
-    private Optional<Long> getChannelId(Map<String, String> uriVariables) {
-        String channelIdString = uriVariables.get("id");
+	private Optional<Long> getChannelId(Map<String, String> uriVariables) {
+		String channelIdString = uriVariables.get("id");
 
-        try {
-            return Optional.ofNullable(channelIdString)
-                    .map(Long::parseLong);
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
+		try {
+			return Optional.ofNullable(channelIdString)
+					.map(Long::parseLong);
+		} catch (NumberFormatException e) {
+			return Optional.empty();
+		}
+	}
 
-    @Override
-    public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
+	@Override
+	public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
 
-    }
+	}
 
-    @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
+	@Override
+	public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
 
-    }
+	}
 }

@@ -3,14 +3,18 @@ package su.foxogram.controllers;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import su.foxogram.dtos.response.ChannelDTO;
+import su.foxogram.constants.APIConstants;
+import su.foxogram.dtos.request.ChannelCreateDTO;
 import su.foxogram.dtos.request.ChannelEditDTO;
+import su.foxogram.dtos.response.ChannelDTO;
 import su.foxogram.dtos.response.MemberDTO;
 import su.foxogram.dtos.response.OkDTO;
-import su.foxogram.models.*;
-import su.foxogram.constants.APIConstants;
-import su.foxogram.exceptions.*;
-import su.foxogram.dtos.request.ChannelCreateDTO;
+import su.foxogram.exceptions.MemberAlreadyInChannelException;
+import su.foxogram.exceptions.MemberInChannelNotFoundException;
+import su.foxogram.exceptions.MissingPermissionsException;
+import su.foxogram.models.Channel;
+import su.foxogram.models.Member;
+import su.foxogram.models.User;
 import su.foxogram.services.ChannelsService;
 
 import java.util.List;
@@ -24,7 +28,7 @@ public class ChannelsController {
 
 	public ChannelsController(ChannelsService channelsService) {
 		this.channelsService = channelsService;
-    }
+	}
 
 	@PostMapping("/")
 	public ChannelDTO createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body) {

@@ -17,33 +17,33 @@ import su.foxogram.services.ChannelsService;
 @Component
 public class MemberInterceptor implements HandlerInterceptor {
 
-    private final ChannelsService channelsService;
+	private final ChannelsService channelsService;
 
-    @Autowired
-    public MemberInterceptor(MemberRepository memberRepository, ChannelsService channelsService) {
-        this.channelsService = channelsService;
-    }
+	@Autowired
+	public MemberInterceptor(MemberRepository memberRepository, ChannelsService channelsService) {
+		this.channelsService = channelsService;
+	}
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
-        User user = (User) request.getAttribute("user");
-        Channel channel = (Channel) request.getAttribute("channel");
+	@Override
+	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
+		User user = (User) request.getAttribute("user");
+		Channel channel = (Channel) request.getAttribute("channel");
 
-        Member member = channelsService.getMember(channel, user.getId());
+		Member member = channelsService.getMember(channel, user.getId());
 
-        if (member == null) throw new ChannelNotFoundException();
+		if (member == null) throw new ChannelNotFoundException();
 
-        request.setAttribute("member", member);
-        return true;
-    }
+		request.setAttribute("member", member);
+		return true;
+	}
 
-    @Override
-    public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
+	@Override
+	public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
 
-    }
+	}
 
-    @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
+	@Override
+	public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
 
-    }
+	}
 }

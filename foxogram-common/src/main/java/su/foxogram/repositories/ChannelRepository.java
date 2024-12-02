@@ -11,10 +11,8 @@ import java.util.List;
 public interface ChannelRepository extends CrudRepository<Channel, Long> {
 	Channel findById(long id);
 
-	
 	Channel findByName(String name);
 
-	
 	List<Channel> findAllByName(String name);
 
 	@Override

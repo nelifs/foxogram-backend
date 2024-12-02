@@ -31,7 +31,7 @@ public class Totp {
 
 		try {
 			serverOTP = totp.generateOneTimePasswordString(key, now);
-		} catch(InvalidKeyException e) {
+		} catch (InvalidKeyException e) {
 			throw new TOTPKeyIsInvalidException();
 		}
 

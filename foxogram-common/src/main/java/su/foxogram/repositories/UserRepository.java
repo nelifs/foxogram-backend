@@ -10,15 +10,15 @@ import java.util.List;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 	User findById(long id);
-	
+
 	List<User> findAllById(long id);
-	
+
 	List<User> findAllBy();
 
 	User findByEmail(String email);
 
 	User findByUsername(String username);
-	
+
 	List<User> findAllByEmail(String email);
 
 	@Override

@@ -32,7 +32,7 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     implementation 'org.aspectj:aspectjrt:1.9.7'
     implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
-	implementation 'com.eatthepath:java-otp:0.4.0'
+    implementation 'com.eatthepath:java-otp:0.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-mail'

@@ -18,31 +18,34 @@ import su.foxogram.services.JwtService;
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
-    final AuthenticationService authenticationService;
-    private final JwtService jwtService;
-    private final ChannelsService channelsService;
-    private final MemberRepository memberRepository;
+	final AuthenticationService authenticationService;
 
-    @Autowired
-    public WebConfig(AuthenticationService authenticationService, JwtService jwtService, ChannelsService channelsService, MemberRepository memberRepository) {
-        this.authenticationService = authenticationService;
-        this.jwtService = jwtService;
-        this.channelsService = channelsService;
-        this.memberRepository = memberRepository;
-    }
+	private final JwtService jwtService;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("*")
-                .allowedHeaders("*");
-    }
+	private final ChannelsService channelsService;
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticationInterceptor(authenticationService, jwtService)).excludePathPatterns("/v1/auth/signup", "/v1/auth/login");
-        registry.addInterceptor(new ChannelInterceptor(channelsService)).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
-        registry.addInterceptor(new MemberInterceptor(memberRepository, channelsService)).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
-    }
+	private final MemberRepository memberRepository;
+
+	@Autowired
+	public WebConfig(AuthenticationService authenticationService, JwtService jwtService, ChannelsService channelsService, MemberRepository memberRepository) {
+		this.authenticationService = authenticationService;
+		this.jwtService = jwtService;
+		this.channelsService = channelsService;
+		this.memberRepository = memberRepository;
+	}
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+				.allowedOrigins("*")
+				.allowedMethods("*")
+				.allowedHeaders("*");
+	}
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new AuthenticationInterceptor(authenticationService, jwtService)).excludePathPatterns("/v1/auth/signup", "/v1/auth/login");
+		registry.addInterceptor(new ChannelInterceptor(channelsService)).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
+		registry.addInterceptor(new MemberInterceptor(memberRepository, channelsService)).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
+	}
 }

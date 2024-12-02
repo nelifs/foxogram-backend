@@ -12,24 +12,24 @@ import su.foxogram.services.AuthenticationService;
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    AuthenticationService authenticationService;
+	AuthenticationService authenticationService;
 
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(rootHandler(), "/");
-    }
+	@Override
+	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+		registry.addHandler(rootHandler(), "/");
+	}
 
-    private WebSocketHandler rootHandler() {
-        return new ReadyController(authenticationService);
-    }
+	private WebSocketHandler rootHandler() {
+		return new ReadyController(authenticationService);
+	}
 
-    @Bean
-    public ServletServerContainerFactoryBean createWebSocketContainer() {
-        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
-        container.setMaxTextMessageBufferSize(8192);
-        container.setMaxBinaryMessageBufferSize(8192);
-        return container;
-    }
+	@Bean
+	public ServletServerContainerFactoryBean createWebSocketContainer() {
+		ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+		container.setMaxTextMessageBufferSize(8192);
+		container.setMaxBinaryMessageBufferSize(8192);
+		return container;
+	}
 
 //    @Bean
 //    public DefaultHandshakeHandler handshakeHandler() {

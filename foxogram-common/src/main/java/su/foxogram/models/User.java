@@ -5,39 +5,38 @@ import lombok.Getter;
 import lombok.Setter;
 import su.foxogram.constants.UserConstants;
 
-
 @Setter
 @Getter
 @Entity
 @Table(name = "users", indexes = {
-        @Index(name = "idx_user_id", columnList = "id", unique = true),
-        @Index(name = "idx_user_username", columnList = "username", unique = true),
-        @Index(name = "idx_user_email", columnList = "email", unique = true)
+		@Index(name = "idx_user_id", columnList = "id", unique = true),
+		@Index(name = "idx_user_username", columnList = "username", unique = true),
+		@Index(name = "idx_user_email", columnList = "email", unique = true)
 })
 public class User {
-    @Id
-    public long id;
+	@Id
+	public long id;
 
-    @Column()
-    public String displayName;
+	@Column()
+	public String displayName;
 
-    @Column(unique = true)
-    public String username;
+	@Column(unique = true)
+	public String username;
 
-    @Column()
-    public String avatar;
+	@Column()
+	public String avatar;
 
-    @Column(unique = true)
-    private String email;
+	@Column()
+	public long flags;
 
-    @Column()
-    private String password;
+	@Column()
+	public int type;
 
-    @Column()
-    public long flags;
+	@Column(unique = true)
+	private String email;
 
-    @Column()
-    public int type;
+	@Column()
+	private String password;
 
 	@Column()
 	private long deletion;
@@ -45,31 +44,31 @@ public class User {
 	@Column()
 	private String key;
 
-    public User() {
-    }
+	public User() {
+	}
 
-    public User(long id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion, String key) {
-        this.id = id;
-        this.avatar = avatar;
-        this.displayName = displayName;
-        this.username = username.toLowerCase();
-        this.email = email;
-        this.password = password;
-        this.flags = flags;
-        this.type = type;
-        this.deletion = deletion;
+	public User(long id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion, String key) {
+		this.id = id;
+		this.avatar = avatar;
+		this.displayName = displayName;
+		this.username = username.toLowerCase();
+		this.email = email;
+		this.password = password;
+		this.flags = flags;
+		this.type = type;
+		this.deletion = deletion;
 		this.key = key;
-    }
+	}
 
-    public void addFlag(UserConstants.Flags flag) {
-        this.flags |= flag.getBit();
-    }
+	public void addFlag(UserConstants.Flags flag) {
+		this.flags |= flag.getBit();
+	}
 
-    public void removeFlag(UserConstants.Flags flag) {
-        this.flags &= ~flag.getBit();
-    }
+	public void removeFlag(UserConstants.Flags flag) {
+		this.flags &= ~flag.getBit();
+	}
 
-    public boolean hasFlag(UserConstants.Flags flag) {
-        return (this.flags & flag.getBit()) != 0;
-    }
+	public boolean hasFlag(UserConstants.Flags flag) {
+		return (this.flags & flag.getBit()) != 0;
+	}
 }

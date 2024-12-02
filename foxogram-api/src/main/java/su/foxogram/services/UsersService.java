@@ -8,8 +8,8 @@ import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserEditDTO;
-import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.exceptions.UserCredentialsDuplicateException;
+import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.models.User;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
@@ -19,6 +19,7 @@ import su.foxogram.util.CodeGenerator;
 public class UsersService {
 
 	private final UserRepository userRepository;
+
 	private final EmailService emailService;
 
 	@Autowired

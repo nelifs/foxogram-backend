@@ -6,8 +6,13 @@ import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.dtos.request.ChannelEditDTO;
 import su.foxogram.dtos.response.MemberDTO;
-import su.foxogram.exceptions.*;
-import su.foxogram.models.*;
+import su.foxogram.exceptions.ChannelNotFoundException;
+import su.foxogram.exceptions.MemberAlreadyInChannelException;
+import su.foxogram.exceptions.MemberInChannelNotFoundException;
+import su.foxogram.exceptions.MissingPermissionsException;
+import su.foxogram.models.Channel;
+import su.foxogram.models.Member;
+import su.foxogram.models.User;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MemberRepository;
 import su.foxogram.structures.Snowflake;
@@ -18,83 +23,85 @@ import java.util.List;
 @Service
 public class ChannelsService {
 
-    private final ChannelRepository channelRepository;
-    private final MemberRepository memberRepository;
+	private final ChannelRepository channelRepository;
 
-    @Autowired
-    public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, AuthenticationService authenticationService) {
-        this.channelRepository = channelRepository;
-        this.memberRepository = memberRepository;
-    }
+	private final MemberRepository memberRepository;
 
-    public Channel createChannel(User user, int type, String name) {
-        long id = new Snowflake(1).nextId();
-        long ownerId = user.getId();
+	@Autowired
+	public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, AuthenticationService authenticationService) {
+		this.channelRepository = channelRepository;
+		this.memberRepository = memberRepository;
+	}
 
-        Channel channel = new Channel(id, name, type, ownerId);
-        channelRepository.save(channel);
+	public Channel createChannel(User user, int type, String name) {
+		long id = new Snowflake(1).nextId();
+		long ownerId = user.getId();
 
-        Member member = new Member(user, channel, MemberConstants.Permissions.ADMIN.getBit());
-        memberRepository.save(member);
+		Channel channel = new Channel(id, name, type, ownerId);
+		channelRepository.save(channel);
 
-        return channel;
-    }
+		Member member = new Member(user, channel, MemberConstants.Permissions.ADMIN.getBit());
+		memberRepository.save(member);
 
-    public Channel getChannel(long id) throws ChannelNotFoundException {
-        Channel channel = channelRepository.findById(id);
+		return channel;
+	}
 
-        if (channel == null) {
-            throw new ChannelNotFoundException();
-        }
+	public Channel getChannel(long id) throws ChannelNotFoundException {
+		Channel channel = channelRepository.findById(id);
 
-        return channel;
-    }
+		if (channel == null) {
+			throw new ChannelNotFoundException();
+		}
 
-    public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
-        if (member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL)) throw new MissingPermissionsException();
+		return channel;
+	}
 
-        if (body.getName() != null) channel.setName(body.getName());
+	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
+		if (member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL))
+			throw new MissingPermissionsException();
 
-        channelRepository.save(channel);
+		if (body.getName() != null) channel.setName(body.getName());
 
-        return channel;
-    }
+		channelRepository.save(channel);
 
-    public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
-        Member member = memberRepository.findByChannelAndId(channel, user.getId());
+		return channel;
+	}
 
-        if (member.hasPermission(MemberConstants.Permissions.ADMIN)) {
-            channelRepository.delete(channel);
-        } else {
-            throw new MissingPermissionsException();
-        }
-    }
+	public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
+		Member member = memberRepository.findByChannelAndId(channel, user.getId());
 
-    public Member joinUser(Channel channel, User user) throws MemberAlreadyInChannelException {
-        Member member = memberRepository.findByChannelAndId(channel, user.getId());
+		if (member.hasPermission(MemberConstants.Permissions.ADMIN)) {
+			channelRepository.delete(channel);
+		} else {
+			throw new MissingPermissionsException();
+		}
+	}
 
-        if (member != null) throw new MemberAlreadyInChannelException();
+	public Member joinUser(Channel channel, User user) throws MemberAlreadyInChannelException {
+		Member member = memberRepository.findByChannelAndId(channel, user.getId());
 
-        member = new Member(user, channel, 0);
-        return memberRepository.save(member);
-    }
+		if (member != null) throw new MemberAlreadyInChannelException();
 
-    public void leaveUser(Channel channel, User user) throws MemberInChannelNotFoundException {
-        Member member = memberRepository.findByChannelAndId(channel, user.getId());
+		member = new Member(user, channel, 0);
+		return memberRepository.save(member);
+	}
 
-        if (member == null) throw new MemberInChannelNotFoundException();
+	public void leaveUser(Channel channel, User user) throws MemberInChannelNotFoundException {
+		Member member = memberRepository.findByChannelAndId(channel, user.getId());
 
-        member = memberRepository.findByChannelAndId(channel, user.getId());
-        memberRepository.delete(member);
-    }
+		if (member == null) throw new MemberInChannelNotFoundException();
 
-    public List<MemberDTO> getMembers(Channel channel) {
-        return memberRepository.findAllByChannel(channel).stream()
-                .map(MemberDTO::new)
-                .toList();
-    }
+		member = memberRepository.findByChannelAndId(channel, user.getId());
+		memberRepository.delete(member);
+	}
 
-    public Member getMember(Channel channel, long id) {
-        return memberRepository.findByChannelAndId(channel, id);
-    }
+	public List<MemberDTO> getMembers(Channel channel) {
+		return memberRepository.findAllByChannel(channel).stream()
+				.map(MemberDTO::new)
+				.toList();
+	}
+
+	public Member getMember(Channel channel, long id) {
+		return memberRepository.findByChannelAndId(channel, id);
+	}
 }

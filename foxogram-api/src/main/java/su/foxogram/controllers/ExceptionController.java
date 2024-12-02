@@ -17,33 +17,33 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ExceptionController {
 
-    private ResponseEntity<ExceptionDTO> buildErrorResponse(int errorCode, String message, HttpStatus status) {
-        log.error("SERVER EXCEPTION ({}, {}, {}) occurred!\n", errorCode, status, message);
-        return ResponseEntity.status(status).body(new ExceptionDTO(false, errorCode, message));
-    }
+	private ResponseEntity<ExceptionDTO> buildErrorResponse(int errorCode, String message, HttpStatus status) {
+		log.error("SERVER EXCEPTION ({}, {}, {}) occurred!\n", errorCode, status, message);
+		return ResponseEntity.status(status).body(new ExceptionDTO(false, errorCode, message));
+	}
 
-    @ExceptionHandler(BaseException.class)
-    public ResponseEntity<ExceptionDTO> handleBaseException(BaseException exception) {
-        log.error("CLIENT (USER) EXCEPTION ({}, {}, {}) occurred!\n", exception.getErrorCode(), exception.getStatus(), exception.getMessage());
-        return buildErrorResponse(exception.getErrorCode(), exception.getMessage(), exception.getStatus());
-    }
+	@ExceptionHandler(BaseException.class)
+	public ResponseEntity<ExceptionDTO> handleBaseException(BaseException exception) {
+		log.error("CLIENT (USER) EXCEPTION ({}, {}, {}) occurred!\n", exception.getErrorCode(), exception.getStatus(), exception.getMessage());
+		return buildErrorResponse(exception.getErrorCode(), exception.getMessage(), exception.getStatus());
+	}
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ExceptionDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
-        return buildErrorResponse(999, "Request body cannot be empty.", HttpStatus.BAD_REQUEST);
-    }
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ExceptionDTO> handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
+		return buildErrorResponse(999, "Request body cannot be empty.", HttpStatus.BAD_REQUEST);
+	}
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionDTO> handleValidationException(MethodArgumentNotValidException exception) {
-        String message = exception.getBindingResult().getAllErrors().stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining(", "));
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ExceptionDTO> handleValidationException(MethodArgumentNotValidException exception) {
+		String message = exception.getBindingResult().getAllErrors().stream()
+				.map(DefaultMessageSourceResolvable::getDefaultMessage)
+				.collect(Collectors.joining(", "));
 
-        return buildErrorResponse(1001, message, HttpStatus.BAD_REQUEST);
-    }
+		return buildErrorResponse(1001, message, HttpStatus.BAD_REQUEST);
+	}
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionDTO> handleException(Exception exception) {
-        return buildErrorResponse(999, exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ExceptionDTO> handleException(Exception exception) {
+		return buildErrorResponse(999, exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
