@@ -39,13 +39,16 @@ public class User {
     @Column()
     public int type;
 
-    @Column()
-    private long deletion;
+	@Column()
+	private long deletion;
+
+	@Column()
+	private String key;
 
     public User() {
     }
 
-    public User(long id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion) {
+    public User(long id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion, String key) {
         this.id = id;
         this.avatar = avatar;
         this.displayName = displayName;
@@ -55,6 +58,7 @@ public class User {
         this.flags = flags;
         this.type = type;
         this.deletion = deletion;
+		this.key = key;
     }
 
     public void addFlag(UserConstants.Flags flag) {

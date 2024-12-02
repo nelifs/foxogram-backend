@@ -15,6 +15,8 @@ import su.foxogram.constants.APIConstants;
 import su.foxogram.exceptions.*;
 import su.foxogram.services.AuthenticationService;
 
+import java.security.NoSuchAlgorithmException;
+
 @Slf4j
 @RestController
 @RequestMapping(value = APIConstants.AUTH, produces = "application/json")
@@ -27,7 +29,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signup")
-	public TokenDTO signup(@Valid @RequestBody UserSignUpDTO body) throws UserCredentialsDuplicateException {
+	public TokenDTO signup(@Valid @RequestBody UserSignUpDTO body) throws UserCredentialsDuplicateException, NoSuchAlgorithmException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();

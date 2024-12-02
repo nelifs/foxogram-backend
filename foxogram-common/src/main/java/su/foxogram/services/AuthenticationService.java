@@ -15,6 +15,9 @@ import su.foxogram.repositories.UserRepository;
 import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
+import su.foxogram.util.Totp;
+
+import java.security.NoSuchAlgorithmException;
 
 @Slf4j
 @Service
@@ -50,7 +53,7 @@ public class AuthenticationService {
         return user;
     }
 
-    public String userSignUp(String username, String email, String password) throws UserCredentialsDuplicateException {
+    public String userSignUp(String username, String email, String password) throws UserCredentialsDuplicateException, NoSuchAlgorithmException {
         User user = createUser(username, email, password);
         try {
             userRepository.save(user);
@@ -65,14 +68,15 @@ public class AuthenticationService {
         return jwtService.generate(user.getId());
     }
 
-    private User createUser(String username, String email, String password) {
+    private User createUser(String username, String email, String password) throws NoSuchAlgorithmException {
         long id = new Snowflake(1).nextId();
         long deletion = 0;
         String avatar = new Avatar("").getId();
         long flags = apiConfig.isDevelopment() ? 0 : UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
         int type = UserConstants.Type.USER.getType();
+		String key = String.valueOf(Totp.generateKey());
 
-        return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion);
+        return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion, key);
     }
 
     private void sendConfirmationEmail(User user) {
