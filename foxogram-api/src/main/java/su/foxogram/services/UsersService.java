@@ -9,7 +9,7 @@ import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.exceptions.UserNotFoundException;
-import su.foxogram.exceptions.UserWithThisUsernameOrEmailAlreadyExistException;
+import su.foxogram.exceptions.UserCredentialsDuplicateException;
 import su.foxogram.models.User;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
@@ -36,7 +36,7 @@ public class UsersService {
 		return user;
 	}
 
-	public User editUser(User user, UserEditDTO body) throws UserWithThisUsernameOrEmailAlreadyExistException {
+	public User editUser(User user, UserEditDTO body) throws UserCredentialsDuplicateException {
 		if (body.getDisplayName() != null) user.setDisplayName(body.getDisplayName());
 		if (body.getAvatar() != null) user.setAvatar(body.getAvatar());
 
@@ -45,7 +45,7 @@ public class UsersService {
 			if (body.getEmail() != null) changeEmail(user, body);
 			if (body.getPassword() != null) changePassword(user, body);
 		} catch (DataIntegrityViolationException e) {
-			throw new UserWithThisUsernameOrEmailAlreadyExistException();
+			throw new UserCredentialsDuplicateException();
 		}
 
 		userRepository.save(user);

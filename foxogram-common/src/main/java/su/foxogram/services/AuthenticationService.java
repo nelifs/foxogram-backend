@@ -50,12 +50,12 @@ public class AuthenticationService {
         return user;
     }
 
-    public String userSignUp(String username, String email, String password) throws UserWithThisUsernameOrEmailAlreadyExistException {
+    public String userSignUp(String username, String email, String password) throws UserCredentialsDuplicateException {
         User user = createUser(username, email, password);
         try {
             userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
-            throw new UserWithThisUsernameOrEmailAlreadyExistException();
+            throw new UserCredentialsDuplicateException();
         }
         log.info("USER created ({}, {}) successfully", username, email);
 
@@ -103,7 +103,7 @@ public class AuthenticationService {
     }
 
     private void validatePassword(User user, String password) throws UserCredentialsIsInvalidException {
-        if (Encryptor.verifyPassword(password, user.getPassword()))
+        if (!Encryptor.verifyPassword(password, user.getPassword()))
             throw new UserCredentialsIsInvalidException();
 
         log.info("PASSWORD VERIFIED FOR USER ({}, {})", user.getId(), user.getEmail());
@@ -145,7 +145,7 @@ public class AuthenticationService {
     }
 
     public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
-        if (Encryptor.verifyPassword(password, user.getPassword()))
+        if (!Encryptor.verifyPassword(password, user.getPassword()))
             throw new UserCredentialsIsInvalidException();
 
         if (apiConfig.isDevelopment())

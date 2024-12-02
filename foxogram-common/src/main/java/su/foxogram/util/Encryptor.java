@@ -9,7 +9,7 @@ public class Encryptor {
 
     public static boolean verifyPassword(String password, String hashedPassword) {
         try {
-            return !BCrypt.checkpw(password, hashedPassword);
+            return BCrypt.checkpw(password, hashedPassword);
         } catch(Exception error) {
             error.printStackTrace();
             return true;

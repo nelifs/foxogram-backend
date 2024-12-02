@@ -7,7 +7,7 @@ import su.foxogram.dtos.response.UserDTO;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.dtos.response.UserMeDTO;
 import su.foxogram.exceptions.UserNotFoundException;
-import su.foxogram.exceptions.UserWithThisUsernameOrEmailAlreadyExistException;
+import su.foxogram.exceptions.UserCredentialsDuplicateException;
 import su.foxogram.models.User;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.services.UsersService;
@@ -36,7 +36,7 @@ public class UsersController {
 	}
 
 	@PatchMapping("/@me")
-	public UserDTO editUser(@RequestAttribute(value = "user") User user, @Valid @RequestBody UserEditDTO body) throws UserWithThisUsernameOrEmailAlreadyExistException {
+	public UserDTO editUser(@RequestAttribute(value = "user") User user, @Valid @RequestBody UserEditDTO body) throws UserCredentialsDuplicateException {
 		user = usersService.editUser(user, body);
 
 		return new UserDTO(user);

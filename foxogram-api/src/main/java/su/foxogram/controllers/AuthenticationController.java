@@ -27,7 +27,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/signup")
-	public TokenDTO signup(@Valid @RequestBody UserSignUpDTO body) throws UserWithThisUsernameOrEmailAlreadyExistException {
+	public TokenDTO signup(@Valid @RequestBody UserSignUpDTO body) throws UserCredentialsDuplicateException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
