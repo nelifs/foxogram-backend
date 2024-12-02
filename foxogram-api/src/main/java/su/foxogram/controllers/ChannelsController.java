@@ -26,7 +26,7 @@ public class ChannelsController {
 		this.channelsService = channelsService;
     }
 
-	@PostMapping("/create")
+	@PostMapping("/")
 	public ChannelDTO createChannel(@RequestAttribute(value = "user") User user, @Valid @RequestBody ChannelCreateDTO body) {
 		log.info("CHANNEL create ({}, {}) request", body.getName(), body.getType());
 
