@@ -25,16 +25,16 @@ public class UsersController {
 	}
 
 	@GetMapping("/{id}")
-	public UserDTO getUser(@RequestAttribute(value = "user") User user, @PathVariable String id, HttpServletRequest request) throws UserUnauthorizedException, UserNotFoundException {
-		user = usersService.getUser(id, user);
+	public UserDTO getUser(@RequestAttribute(value = "user") User authenticatedUser, @PathVariable String userId, HttpServletRequest request) throws UserUnauthorizedException, UserNotFoundException {
+		User requestedUser = usersService.getUser(userId, authenticatedUser);
 
-		return new UserDTO(user);
+		return new UserDTO(requestedUser);
 	}
 
 	@PatchMapping("/@me")
-	public UserDTO editUser(@RequestAttribute(value = "user") User user, @Valid @RequestBody UserEditDTO body) throws UserWithThisUsernameOrEmailAlreadyExistException {
-		user = usersService.editUser(user, body);
+	public UserDTO editUser(@RequestAttribute(value = "user") User authenticatedUser, @Valid @RequestBody UserEditDTO requestBody) throws UserWithThisUsernameOrEmailAlreadyExistException {
+		User updatedUser = usersService.editUser(authenticatedUser, requestBody);
 
-		return new UserDTO(user);
+		return new UserDTO(updatedUser);
 	}
 }
