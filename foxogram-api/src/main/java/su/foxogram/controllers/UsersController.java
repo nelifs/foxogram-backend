@@ -24,21 +24,21 @@ public class UsersController {
 	}
 
 	@GetMapping("/@me")
-	public UserMeDTO getYourself(@RequestAttribute(value = "user") User user) {
-		return new UserMeDTO(user);
+	public UserMeDTO getYourself(@RequestAttribute(value = "user") User authenticatedUser) {
+		return new UserMeDTO(authenticatedUser);
 	}
 
-	@GetMapping("/{key}")
-	public UserDTO getUser(@PathVariable String key) throws UserNotFoundException {
-		User user = usersService.getUser(key);
+	@GetMapping("/{userKey}")
+	public UserDTO getUser(@PathVariable String userKey) throws UserNotFoundException {
+		User fetchedUser = usersService.getUser(userKey);
 
-		return new UserDTO(user);
+		return new UserDTO(fetchedUser);
 	}
 
 	@PatchMapping("/@me")
-	public UserDTO editUser(@RequestAttribute(value = "user") User user, @Valid @RequestBody UserEditDTO body) throws UserCredentialsDuplicateException {
-		user = usersService.editUser(user, body);
+	public UserDTO editUser(@RequestAttribute(value = "user") User authenticatedUser, @Valid @RequestBody UserEditDTO userEditRequest) throws UserCredentialsDuplicateException {
+		authenticatedUser = usersService.editUser(authenticatedUser, userEditRequest);
 
-		return new UserDTO(user);
+		return new UserDTO(authenticatedUser);
 	}
 }
