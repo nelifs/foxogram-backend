@@ -1,140 +1,159 @@
-    <!doctype html>
-    <html lang="en">
-    <head>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-        <title>Email Code</title>
-        <style>
-            body {
-                background-color: #0a0a0a;
-                font-family: 'Inter', sans-serif;
-                margin: 0;
-                padding: 0;
-                color: #ececec;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                background-image: url('noiseEffect.svg');
-                background-size: cover;
-                background-repeat: no-repeat;
-                position: relative;
-                overflow: hidden;
-            }
-            body::before {
-                content: '';
-                position: absolute;
-                top: -200px;
-                left: 50%;
-                transform: translateX(-50%);
-                border-radius: 100%;
-                width: 200%;
-                height: 500px;
-                background: radial-gradient(circle, rgba(74, 137, 255, 0.25), rgba(10, 10, 10, 0));
-                filter: blur(90px);
-                z-index: 1;
-                pointer-events: none;
-            }
+<!doctype html>
+<html lang="en">
+<head>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Email Code</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #ececec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('noiseEffect.svg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 100%;
+            width: 200%;
+            height: 500px;
+            background: radial-gradient(circle, rgba(74, 137, 255, 0.25), rgba(10, 10, 10, 0));
+            filter: blur(90px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .email-container {
+            max-width: 600px;
+            width: 90%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .email-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+            font: 800 40px 'Inter', sans-serif;
+            color: #ffffff;
+            bottom: 120%;
+        }
+
+        .email-logo img {
+            height: 60px;
+        }
+
+        .email-title {
+            font: 400 30px 'Inter', sans-serif;
+            color: rgba(236, 236, 236, 0.76);
+            margin: 80px 0 -40px;
+        }
+
+        .email-code {
+            font: 900 65px 'Inter', sans-serif;
+            color: #4a89ff;
+            margin: 20px 0;
+            word-break: break-word;
+        }
+
+        .email-text-confirm {
+            font: 700 40px 'Inter', sans-serif;
+            margin: 40px 0px -5px 0px;
+        }
+
+        .email-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: rgba(236, 236, 236, 0.5);
+            word-break: break-word;
+        }
+
+        .email-link {
+            color: #4a89ff;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .email-footer {
+            font-size: 14px;
+            color: rgba(236, 236, 236, 0.5);
+            margin-top: 30px;
+            word-break: break-word;
+            width: 75%;
+        }
+
+        .email-footer-suspension {
+            margin-top: 10px;
+            display: block;
+        }
+
+        @media only screen and (max-width: 400px) {
             .email-container {
-                max-width: 600px;
-                width: 90%;
-                margin: 0 auto;
-                position: relative;
-                z-index: 2;
+                padding: 0 20px;
             }
-            .email-logo {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                position: absolute;
-                font: 800 40px 'Inter', sans-serif;
-                color: #ffffff;
-                bottom: 120%;
-            }
+
             .email-logo img {
-                height: 60px;
+                height: 30px;
             }
+
             .email-title {
-                font: 400 30px 'Inter', sans-serif;
-                color: rgba(236, 236, 236, 0.76);
-                margin: 80px 0 -40px;
+                font-size: 24px;
+                margin: 0px 0 10px;
             }
+
             .email-code {
-                font: 900 65px 'Inter', sans-serif;
-                color: #4a89ff;
-                margin: 20px 0;
-                word-break: break-word;
+                font-size: 36px;
             }
-            .email-text-confirm {
-                font: 700 40px 'Inter', sans-serif;
-                margin: 40px 0px -5px 0px;
-            }
+
             .email-text {
-                font-size: 18px;
-                line-height: 1.6;
-                color: rgba(236, 236, 236, 0.5);
-                word-break: break-word;
+                font-size: 16px;
             }
-            .email-link {
-                color: #4a89ff;
-                font-weight: 700;
-                word-break: break-word;
-            }
+
             .email-footer {
-                font-size: 14px;
-                color: rgba(236, 236, 236, 0.5);
-                margin-top: 30px;
-                word-break: break-word;
-                width: 75%;
+                font-size: 12px;
             }
-            .email-footer-suspension {
-                margin-top: 10px;
-                display: block;
-            }
-            @media only screen and (max-width: 400px) {
-                .email-container {
-                    padding: 0 20px;
-                }
-                .email-logo img {
-                    height: 30px;
-                }
-                .email-title {
-                    font-size: 24px;
-                    margin: 0px 0 10px;
-                }
-                .email-code {
-                    font-size: 36px;
-                }
-                .email-text {
-                    font-size: 16px;
-                }
-                .email-footer {
-                    font-size: 12px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-    <div class="email-container">
-        <div class="email-logo">
-            <img src="/logo.svg" alt="Foxogram Logo">
-            <span>Foxogram</span>
-        </div>
-        <h1 class="email-title">Hello, {0}!</h1>
-        <p class="email-text-confirm">Your confirmation code:</p>
-        <p class="email-code">{1}</p>
-        <p class="email-text">
-            Enter this code on the registration page to confirm your mail.<br>
-            Or <a href="https://app.dev.foxogram.su/auth/email/verify/{1}" class="email-link">click here</a> for automatic confirmation.
-        </p>
-        <p class="email-footer">
-            You received this message because your e-mail address was used to register at <a href="https://foxogram.su" class="email-link">foxogram.su</a>.
-            <br>
-            <span class="email-footer-suspension">If you did not do it - ignore this message.</span>
-        </p>
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="email-logo">
+        <img src="/logo.svg" alt="Foxogram Logo">
+        <span>Foxogram</span>
     </div>
-    </body>
-    </html>
+    <h1 class="email-title">Hello, {0}!</h1>
+    <p class="email-text-confirm">Your confirmation code:</p>
+    <p class="email-code">{1}</p>
+    <p class="email-text">
+        Enter this code on the registration page to confirm your mail.<br>
+        Or <a href="https://app.dev.foxogram.su/auth/email/verify/{1}" class="email-link">click here</a> for automatic
+        confirmation.
+    </p>
+    <p class="email-footer">
+        You received this message because your e-mail address was used to register at <a href="https://foxogram.su"
+                                                                                         class="email-link">foxogram.su</a>.
+        <br>
+        <span class="email-footer-suspension">If you did not do it - ignore this message.</span>
+    </p>
+</div>
+</body>
+</html>
