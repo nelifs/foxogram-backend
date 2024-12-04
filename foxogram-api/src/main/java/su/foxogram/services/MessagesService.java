@@ -65,7 +65,7 @@ public class MessagesService {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getId(), member.getId()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
+		if (!Objects.equals(message.getAuthor().getUserId(), member.getUserId()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
 			throw new MissingPermissionsException();
 
 		messageRepository.delete(message);
@@ -77,7 +77,8 @@ public class MessagesService {
 		String content = body.getContent();
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getId(), member.getId())) throw new MissingPermissionsException();
+		if (!Objects.equals(message.getAuthor().getUserId(), member.getUserId()))
+			throw new MissingPermissionsException();
 
 		message.setContent(content);
 		messageRepository.save(message);

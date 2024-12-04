@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface MemberRepository extends CrudRepository<Member, String> {
-	@Query(value = "SELECT m FROM Member m WHERE m.channel = :ch AND m.id = :id")
+	@Query(value = "SELECT m FROM Member m WHERE m.channel = :ch AND m.user.id = :id")
 	Member findByChannelAndId(@Param("ch") Channel channel, @Param("id") String id);
 
 	List<Member> findAllByChannel(Channel channel);

@@ -9,7 +9,7 @@ import su.foxogram.constants.MemberConstants;
 @Getter
 @Entity
 @Table(name = "members", indexes = {
-		@Index(name = "idx_member_user_channel_id", columnList = "id, channel")
+		@Index(name = "idx_member_user_channel_id", columnList = "user_id, channel")
 })
 public class Member {
 	@Column()
@@ -17,7 +17,7 @@ public class Member {
 
 	@MapsId
 	@ManyToOne
-	@JoinColumn(name = "id", nullable = false)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@ManyToOne
@@ -25,18 +25,18 @@ public class Member {
 	private Channel channel;
 
 	@Id
-	private String id;
+	private String userId;
 
 	public Member() {
 
 	}
 
-	public Member(String id) {
-		this.id = id;
+	public Member(String userId) {
+		this.userId = userId;
 	}
 
 	public Member(User user, Channel channel, long permissions) {
-		this.id = user.getId();
+		this.userId = user.getId();
 		this.user = user;
 		this.channel = channel;
 		this.permissions = permissions;
