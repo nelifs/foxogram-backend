@@ -53,7 +53,7 @@ public class AuthenticationService {
 		User user = userRepository.findById(Long.parseLong(userId));
 
 		if (user == null) throw new UserUnauthorizedException();
-		if (!user.hasFlag(UserConstants.Flags.AWAITING_CONFIRMATION) && !checkIfEmailVerified)
+		if (user.hasFlag(UserConstants.Flags.AWAITING_CONFIRMATION) && !checkIfEmailVerified)
 			throw new UserEmailNotVerifiedException();
 
 		return user;
