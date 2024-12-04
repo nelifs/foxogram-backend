@@ -16,13 +16,13 @@ import java.util.List;
 })
 public class Message {
 	@Id
-	public long id;
+	public String id;
 
 	@Column()
 	public String content;
 
 	@Column()
-	public long authorId;
+	public String authorId;
 
 	@Column()
 	public long timestamp;
@@ -40,7 +40,7 @@ public class Message {
 
 	}
 
-	public Message(long id, Channel channel, String content, long authorId, long timestamp, List<String> attachments) {
+	public Message(String id, Channel channel, String content, String authorId, long timestamp, List<String> attachments) {
 		this.id = id;
 		this.channel = channel;
 		this.authorId = authorId;

@@ -15,9 +15,6 @@ public class Member {
 	@Column()
 	public long permissions;
 
-	@Id
-	private long id;
-
 	@MapsId
 	@ManyToOne
 	@JoinColumn(name = "id", nullable = false)
@@ -26,6 +23,9 @@ public class Member {
 	@ManyToOne
 	@JoinColumn(name = "channel", nullable = false)
 	private Channel channel;
+
+	@Id
+	private String id;
 
 	public Member() {
 

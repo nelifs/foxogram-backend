@@ -15,7 +15,7 @@ import su.foxogram.constants.UserConstants;
 })
 public class User {
 	@Id
-	public long id;
+	public String id;
 
 	@Column()
 	public String displayName;
@@ -47,7 +47,7 @@ public class User {
 	public User() {
 	}
 
-	public User(long id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion, String key) {
+	public User(String id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion, String key) {
 		this.id = id;
 		this.avatar = avatar;
 		this.displayName = displayName;

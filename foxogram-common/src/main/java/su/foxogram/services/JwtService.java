@@ -21,12 +21,12 @@ public class JwtService {
 		this.jwtConfig = jwtConfig;
 	}
 
-	public String generate(long id) {
+	public String generate(String id) {
 		long now = System.currentTimeMillis();
 		Date expirationDate = new Date(now + TokenConstants.LIFETIME);
 
 		return Jwts.builder()
-				.setId(String.valueOf(id))
+				.setId(id)
 				.setExpiration(expirationDate)
 				.signWith(getSigningKey())
 				.compact();

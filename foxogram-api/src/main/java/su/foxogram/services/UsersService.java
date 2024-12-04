@@ -30,9 +30,7 @@ public class UsersService {
 
 	public User getUser(String key) throws UserNotFoundException {
 		User user = userRepository.findByUsername(key);
-		if (user == null) user = userRepository.findById(Long.parseLong(key));
-
-		if (user == null) throw new UserNotFoundException();
+		if (user == null) user = userRepository.findById(key).orElseThrow(UserNotFoundException::new);
 
 		return user;
 	}

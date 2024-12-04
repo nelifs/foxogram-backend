@@ -34,8 +34,8 @@ public class ChannelsService {
 	}
 
 	public Channel createChannel(User user, int type, String name) {
-		long id = new Snowflake(1).nextId();
-		long ownerId = user.getId();
+		String id = Snowflake.create();
+		String ownerId = user.getId();
 
 		Channel channel = new Channel(id, name, type, ownerId);
 		channelRepository.save(channel);
@@ -46,14 +46,8 @@ public class ChannelsService {
 		return channel;
 	}
 
-	public Channel getChannel(long id) throws ChannelNotFoundException {
-		Channel channel = channelRepository.findById(id);
-
-		if (channel == null) {
-			throw new ChannelNotFoundException();
-		}
-
-		return channel;
+	public Channel getChannel(String id) throws ChannelNotFoundException {
+		return channelRepository.findById(id).orElseThrow(ChannelNotFoundException::new);
 	}
 
 	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
@@ -101,7 +95,7 @@ public class ChannelsService {
 				.toList();
 	}
 
-	public Member getMember(Channel channel, long id) {
+	public Member getMember(Channel channel, String id) {
 		return memberRepository.findByChannelAndId(channel, id);
 	}
 }

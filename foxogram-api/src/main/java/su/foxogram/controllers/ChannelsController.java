@@ -90,7 +90,7 @@ public class ChannelsController {
 	}
 
 	@GetMapping("/{id}/members/{memberId}")
-	public MemberDTO getMember(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable long memberId) throws MemberInChannelNotFoundException {
+	public MemberDTO getMember(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable String memberId) throws MemberInChannelNotFoundException {
 		log.info("CHANNEL get member ({}, {}) request", channel.getId(), memberId);
 
 		Member member = channelsService.getMember(channel, memberId);

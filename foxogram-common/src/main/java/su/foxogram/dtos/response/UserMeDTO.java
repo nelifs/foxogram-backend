@@ -7,7 +7,7 @@ import su.foxogram.models.User;
 @Getter
 @Setter
 public class UserMeDTO {
-	private long id;
+	private String id;
 
 	private String avatar;
 

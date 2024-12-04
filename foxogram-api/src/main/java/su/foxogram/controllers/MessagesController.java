@@ -41,7 +41,7 @@ public class MessagesController {
 	}
 
 	@GetMapping("/channel/{channelId}/{id}")
-	public MessagesDTO getMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable long id) throws MessageNotFoundException {
+	public MessagesDTO getMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable String id) throws MessageNotFoundException {
 		log.info("MESSAGE ({}) from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> message = List.of(messagesService.getMessage(id, channel));
@@ -59,7 +59,7 @@ public class MessagesController {
 	}
 
 	@DeleteMapping("/channel/{channelId}/{id}")
-	public OkDTO deleteMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
+	public OkDTO deleteMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		messagesService.deleteMessage(id, member, channel);
@@ -68,7 +68,7 @@ public class MessagesController {
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public MessagesDTO editMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body, @PathVariable long id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
+	public MessagesDTO editMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> message = List.of(messagesService.editMessage(id, channel, member, body));

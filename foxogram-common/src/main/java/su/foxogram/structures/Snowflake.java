@@ -1,21 +1,14 @@
 package su.foxogram.structures;
 
-import java.net.NetworkInterface;
-import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Enumeration;
 
 public class Snowflake {
 	// Epoch since foxogram launch
 	public static final long DEFAULT_CUSTOM_EPOCH = 1698406020000L;
 
-	private static final int EPOCH_BITS = 41;
-
 	private static final int NODE_ID_BITS = 10;
 
 	private static final int SEQUENCE_BITS = 12;
-
-	private static final long maxNodeId = (1L << NODE_ID_BITS) - 1;
 
 	private static final long maxSequence = (1L << SEQUENCE_BITS) - 1;
 
@@ -28,23 +21,9 @@ public class Snowflake {
 	private volatile long sequence = 0L;
 
 	// Create Snowflake with a nodeId and custom epoch
-	public Snowflake(long nodeId, long customEpoch) {
-		if (nodeId < 0 || nodeId > maxNodeId) {
-			throw new IllegalArgumentException(String.format("NodeId must be between %d and %d", 0, maxNodeId));
-		}
-		this.nodeId = nodeId;
-		Snowflake.customEpoch = customEpoch;
-	}
-
-	// Create Snowflake with a nodeId
-	public Snowflake(long nodeId) {
-		this(nodeId, DEFAULT_CUSTOM_EPOCH);
-	}
-
-	// Let Snowflake generate a nodeId
 	public Snowflake() {
-		this.nodeId = createNodeId();
-		customEpoch = DEFAULT_CUSTOM_EPOCH;
+		this.nodeId = 1;
+		Snowflake.customEpoch = DEFAULT_CUSTOM_EPOCH;
 	}
 
 	public static long[] parse(long id) {
@@ -96,32 +75,7 @@ public class Snowflake {
 		return currentTimestamp;
 	}
 
-	private long createNodeId() {
-		long nodeId;
-		try {
-			StringBuilder sb = new StringBuilder();
-			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-			while (networkInterfaces.hasMoreElements()) {
-				NetworkInterface networkInterface = networkInterfaces.nextElement();
-				byte[] mac = networkInterface.getHardwareAddress();
-				if (mac != null) {
-					for (byte macPort : mac) {
-						sb.append(String.format("%02X", macPort));
-					}
-				}
-			}
-			nodeId = sb.toString().hashCode();
-		} catch (Exception ex) {
-			nodeId = (new SecureRandom().nextInt());
-		}
-		nodeId = nodeId & maxNodeId;
-		return nodeId;
-	}
-
-	@Override
-	public String toString() {
-		return "Snowflake Settings [EPOCH_BITS=" + EPOCH_BITS + ", NODE_ID_BITS=" + NODE_ID_BITS
-				+ ", SEQUENCE_BITS=" + SEQUENCE_BITS + ", CUSTOM_EPOCH=" + customEpoch
-				+ ", NodeId=" + nodeId + "]";
+	public static String create() {
+		return String.valueOf(new Snowflake().nextId());
 	}
 }

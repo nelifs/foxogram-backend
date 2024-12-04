@@ -7,12 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 import su.foxogram.exceptions.UserEmailNotVerifiedException;
 import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.models.User;
 import su.foxogram.services.AuthenticationService;
-import su.foxogram.services.JwtService;
 
 import java.util.Set;
 
@@ -28,7 +26,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 	final AuthenticationService authenticationService;
 
 	@Autowired
-	public AuthenticationInterceptor(AuthenticationService authenticationService, JwtService jwtService) {
+	public AuthenticationInterceptor(AuthenticationService authenticationService) {
 		this.authenticationService = authenticationService;
 	}
 
@@ -49,15 +47,5 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		request.setAttribute("accessToken", accessToken);
 
 		return true;
-	}
-
-	@Override
-	public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
-
-	}
-
-	@Override
-	public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
-
 	}
 }

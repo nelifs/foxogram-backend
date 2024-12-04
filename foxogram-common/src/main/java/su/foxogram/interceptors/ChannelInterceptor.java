@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.ModelAndView;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.services.ChannelsService;
 
@@ -26,10 +25,10 @@ public class ChannelInterceptor implements HandlerInterceptor {
 	}
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
+	public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
 		Map<String, String> uriVariables = (Map<String, String>) getUriVariables(request);
 
-		long channelId = getChannelId(uriVariables).orElseThrow(ChannelNotFoundException::new);
+		String channelId = getChannelId(uriVariables).orElseThrow(ChannelNotFoundException::new);
 
 		request.setAttribute("channel", channelsService.getChannel(channelId));
 
@@ -43,24 +42,13 @@ public class ChannelInterceptor implements HandlerInterceptor {
 				.orElseGet(Collections::emptyMap);
 	}
 
-	private Optional<Long> getChannelId(Map<String, String> uriVariables) {
+	private Optional<String> getChannelId(Map<String, String> uriVariables) {
 		String channelIdString = uriVariables.get("id");
 
 		try {
-			return Optional.ofNullable(channelIdString)
-					.map(Long::parseLong);
+			return Optional.ofNullable(channelIdString);
 		} catch (NumberFormatException e) {
 			return Optional.empty();
 		}
-	}
-
-	@Override
-	public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) {
-
-	}
-
-	@Override
-	public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
-
 	}
 }

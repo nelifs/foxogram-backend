@@ -9,29 +9,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import su.foxogram.interceptors.AuthenticationInterceptor;
 import su.foxogram.interceptors.ChannelInterceptor;
 import su.foxogram.interceptors.MemberInterceptor;
-import su.foxogram.repositories.MemberRepository;
-import su.foxogram.services.AuthenticationService;
-import su.foxogram.services.ChannelsService;
-import su.foxogram.services.JwtService;
 
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
+	private final AuthenticationInterceptor authenticationInterceptor;
 
-	final AuthenticationService authenticationService;
+	private final ChannelInterceptor channelInterceptor;
 
-	private final JwtService jwtService;
-
-	private final ChannelsService channelsService;
-
-	private final MemberRepository memberRepository;
+	private final MemberInterceptor memberInterceptor;
 
 	@Autowired
-	public WebConfig(AuthenticationService authenticationService, JwtService jwtService, ChannelsService channelsService, MemberRepository memberRepository) {
-		this.authenticationService = authenticationService;
-		this.jwtService = jwtService;
-		this.channelsService = channelsService;
-		this.memberRepository = memberRepository;
+	public WebConfig(AuthenticationInterceptor authenticationInterceptor, ChannelInterceptor channelInterceptor, MemberInterceptor memberInterceptor) {
+		this.authenticationInterceptor = authenticationInterceptor;
+		this.channelInterceptor = channelInterceptor;
+		this.memberInterceptor = memberInterceptor;
 	}
 
 	@Override
@@ -44,8 +36,8 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new AuthenticationInterceptor(authenticationService, jwtService)).excludePathPatterns("/v1/auth/signup", "/v1/auth/login");
-		registry.addInterceptor(new ChannelInterceptor(channelsService)).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
-		registry.addInterceptor(new MemberInterceptor(memberRepository, channelsService)).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
+		registry.addInterceptor(authenticationInterceptor).excludePathPatterns("/v1/auth/signup", "/v1/auth/login");
+		registry.addInterceptor(channelInterceptor).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
+		registry.addInterceptor(memberInterceptor).excludePathPatterns("/v1/auth/**", "/v1/users/**", "/v1/channels/create");
 	}
 }

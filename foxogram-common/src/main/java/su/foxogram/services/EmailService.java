@@ -41,7 +41,7 @@ public class EmailService {
 	}
 
 	@Async
-	public void sendEmail(String to, long id, String type, String username, String digitCode, long issuedAt, long expiresAt, String token) {
+	public void sendEmail(String to, String id, String type, String username, String digitCode, long issuedAt, long expiresAt, String token) {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 
@@ -70,7 +70,6 @@ public class EmailService {
 			case ACCOUNT_DELETE -> "Confirm Your Account Deletion";
 			case EMAIL_VERIFY -> "Confirm Your Email Address";
 			case RESET_PASSWORD -> "Confirm Password Change";
-			default -> throw new IllegalArgumentException("Invalid email type: " + type);
 		};
 	}
 
@@ -92,7 +91,7 @@ public class EmailService {
 		}
 	}
 
-	private void saveCode(long id, String type, String digitCode, long issuedAt, long expiresAt) {
+	private void saveCode(String id, String type, String digitCode, long issuedAt, long expiresAt) {
 		Code code = new Code(id, type, digitCode, issuedAt, expiresAt);
 		codeRepository.save(code);
 	}

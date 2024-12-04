@@ -20,6 +20,7 @@ import su.foxogram.util.Encryptor;
 import su.foxogram.util.Totp;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -50,9 +51,8 @@ public class AuthenticationService {
 	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
 		String userId = jwtService.validate(token).getId();
 
-		User user = userRepository.findById(Long.parseLong(userId));
+		User user = userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
 
-		if (user == null) throw new UserUnauthorizedException();
 		if (user.hasFlag(UserConstants.Flags.AWAITING_CONFIRMATION) && !checkIfEmailVerified)
 			throw new UserEmailNotVerifiedException();
 
@@ -75,12 +75,12 @@ public class AuthenticationService {
 	}
 
 	private User createUser(String username, String email, String password) throws NoSuchAlgorithmException {
-		long id = new Snowflake(1).nextId();
+		String id = Snowflake.create();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
 		long flags = apiConfig.isDevelopment() ? 0 : UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
 		int type = UserConstants.Type.USER.getType();
-		String key = String.valueOf(Totp.generateKey());
+		String key = Base64.getEncoder().encodeToString(Totp.generateKey().getEncoded());
 
 		return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion, key);
 	}
