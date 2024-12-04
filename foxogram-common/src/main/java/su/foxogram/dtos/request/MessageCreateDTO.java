@@ -10,7 +10,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class MessageDTO {
+public class MessageCreateDTO {
 	@NotNull(message = "Content" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
 	@Size(min = 1, max = ValidationConstants.Lengths.MESSAGE_CONTENT, message = ValidationConstants.Messages.MESSAGE_WRONG_LENGTH)
 	private String content;

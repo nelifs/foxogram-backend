@@ -21,8 +21,9 @@ public class Message {
 	@Column()
 	public String content;
 
-	@Column()
-	public String authorId;
+	@OneToOne
+	@JoinColumn(name = "author", nullable = false)
+	public Member author;
 
 	@Column()
 	public long timestamp;
@@ -37,16 +38,14 @@ public class Message {
 	private Channel channel;
 
 	public Message() {
-
 	}
 
 	public Message(String id, Channel channel, String content, String authorId, long timestamp, List<String> attachments) {
 		this.id = id;
 		this.channel = channel;
-		this.authorId = authorId;
+		this.author = new Member(authorId);
 		this.content = content;
 		this.timestamp = timestamp;
 		this.attachments = attachments;
 	}
-
 }

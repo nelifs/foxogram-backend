@@ -9,9 +9,11 @@ import java.util.List;
 @Getter
 @Setter
 public class MessagesDTO {
-	private List<Message> messages;
+	private List<MessageDTO> messages;
 
 	public MessagesDTO(List<Message> messages) {
-		this.messages = messages;
+		for (Message message : messages) {
+			this.messages.add(new MessageDTO(message.getId(), message.getContent(), message.getAuthor().getId(), message.getChannel().getId(), message.getAttachments()));
+		}
 	}
 }

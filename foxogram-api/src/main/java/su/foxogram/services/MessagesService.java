@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
-import su.foxogram.dtos.request.MessageDTO;
+import su.foxogram.dtos.request.MessageCreateDTO;
 import su.foxogram.exceptions.MessageNotFoundException;
 import su.foxogram.exceptions.MissingPermissionsException;
 import su.foxogram.models.Channel;
@@ -48,7 +48,7 @@ public class MessagesService {
 		return message;
 	}
 
-	public void addMessage(Channel channel, User user, MessageDTO body) {
+	public void addMessage(Channel channel, User user, MessageCreateDTO body) {
 		String id = Snowflake.create();
 		String authorId = user.getId();
 		long timestamp = System.currentTimeMillis();
@@ -65,19 +65,19 @@ public class MessagesService {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthorId(), member.getId()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
+		if (!Objects.equals(message.getAuthor().getId(), member.getId()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
 			throw new MissingPermissionsException();
 
 		messageRepository.delete(message);
 		log.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channel.getId());
 	}
 
-	public Message editMessage(String id, Channel channel, Member member, MessageDTO body) throws MessageNotFoundException, MissingPermissionsException {
+	public Message editMessage(String id, Channel channel, Member member, MessageCreateDTO body) throws MessageNotFoundException, MissingPermissionsException {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 		String content = body.getContent();
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthorId(), member.getId())) throw new MissingPermissionsException();
+		if (!Objects.equals(message.getAuthor().getId(), member.getId())) throw new MissingPermissionsException();
 
 		message.setContent(content);
 		messageRepository.save(message);

@@ -33,7 +33,6 @@ public class Channel {
 	private List<Message> messages;
 
 	public Channel() {
-
 	}
 
 	public Channel(String id, String name, int type, String ownerId) {

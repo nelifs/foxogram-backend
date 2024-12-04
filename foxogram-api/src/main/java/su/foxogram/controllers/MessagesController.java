@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
-import su.foxogram.dtos.request.MessageDTO;
+import su.foxogram.dtos.request.MessageCreateDTO;
 import su.foxogram.dtos.response.MessagesDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.exceptions.MessageNotFoundException;
@@ -50,7 +50,7 @@ public class MessagesController {
 	}
 
 	@PostMapping("/channel/{channelId}")
-	public OkDTO createMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body) {
+	public OkDTO createMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageCreateDTO body) {
 		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channel.getId(), user.getId(), user.getEmail());
 
 		messagesService.addMessage(channel, user, body);
@@ -68,7 +68,7 @@ public class MessagesController {
 	}
 
 	@PatchMapping("/channel/{channelId}/{id}")
-	public MessagesDTO editMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageDTO body, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
+	public MessagesDTO editMessage(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "member") Member member, @RequestAttribute(value = "channel") Channel channel, @Valid @RequestBody MessageCreateDTO body, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> message = List.of(messagesService.editMessage(id, channel, member, body));

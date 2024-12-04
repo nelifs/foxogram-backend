@@ -22,4 +22,3 @@ public class ChannelDTO {
 		this.ownerId = channel.getOwnerId();
 	}
 }
-

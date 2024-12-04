@@ -20,7 +20,7 @@ public class User {
 	@Column()
 	public String displayName;
 
-	@Column(unique = true)
+	@Column()
 	public String username;
 
 	@Column()
@@ -32,7 +32,7 @@ public class User {
 	@Column()
 	public int type;
 
-	@Column(unique = true)
+	@Column()
 	private String email;
 
 	@Column()

@@ -31,6 +31,10 @@ public class Member {
 
 	}
 
+	public Member(String id) {
+		this.id = id;
+	}
+
 	public Member(User user, Channel channel, long permissions) {
 		this.id = user.getId();
 		this.user = user;

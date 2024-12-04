@@ -18,7 +18,7 @@ public class Code {
 	@Column()
 	public String type;
 
-	@Column(unique = true)
+	@Column()
 	public String value;
 
 	@Column()
@@ -28,7 +28,6 @@ public class Code {
 	public long expiresAt;
 
 	public Code() {
-
 	}
 
 	public Code(String userId, String type, String value, long issuedAt, long expiresAt) {
