@@ -28,10 +28,8 @@ public class MessagesService {
 		this.messageRepository = messageRepository;
 	}
 
-	public List<Message> getMessages(long before, int limit, Channel channel) throws MessageNotFoundException {
+	public List<Message> getMessages(long before, int limit, Channel channel) {
 		List<Message> messagesArray = messageRepository.findAllByChannel(channel);
-
-		if (messagesArray.isEmpty()) throw new MessageNotFoundException();
 
 		log.info("MESSAGES ({}, {}) in CHANNEL ({}) found successfully", limit, before, channel.getId());
 
