@@ -68,8 +68,7 @@ public class AuthenticationService {
 		}
 		log.info("USER created ({}, {}) successfully", username, email);
 
-		if (!apiConfig.isDevelopment())
-			sendConfirmationEmail(user);
+		sendConfirmationEmail(user);
 
 		return jwtService.generate(user.getId());
 	}
@@ -78,7 +77,7 @@ public class AuthenticationService {
 		String id = Snowflake.create();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
-		long flags = apiConfig.isDevelopment() ? 0 : UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
+		long flags = UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
 		int type = UserConstants.Type.USER.getType();
 		String key = Base64.getEncoder().encodeToString(Totp.generateKey().getEncoded());
 
