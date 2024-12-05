@@ -46,7 +46,7 @@ public class ChannelsController {
 		return new ChannelDTO(channel);
 	}
 
-	@PostMapping("/{id}/join")
+	@DeleteMapping("/{id}/join")
 	public MemberDTO joinChannel(@RequestAttribute(value = "user") User user, @RequestAttribute(value = "channel") Channel channel, @PathVariable long id) throws MemberAlreadyInChannelException {
 		log.info("CHANNEL join ({}) request", channel.getId());
 
