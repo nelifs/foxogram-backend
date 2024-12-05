@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import su.foxogram.constants.AttributesConstants;
 import su.foxogram.exceptions.UserEmailNotVerifiedException;
 import su.foxogram.exceptions.UserUnauthorizedException;
 import su.foxogram.models.User;
@@ -43,8 +44,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
 		User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
 
-		request.setAttribute("user", user);
-		request.setAttribute("accessToken", accessToken);
+		request.setAttribute(AttributesConstants.USER, user);
+		request.setAttribute(AttributesConstants.ACCESS_TOKEN, accessToken);
 
 		return true;
 	}

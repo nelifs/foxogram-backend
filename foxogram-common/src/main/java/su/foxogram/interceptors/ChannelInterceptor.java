@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.HandlerMapping;
+import su.foxogram.constants.AttributesConstants;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.services.ChannelsService;
 
@@ -30,7 +31,7 @@ public class ChannelInterceptor implements HandlerInterceptor {
 
 		String channelId = getChannelId(uriVariables).orElseThrow(ChannelNotFoundException::new);
 
-		request.setAttribute("channel", channelsService.getChannel(channelId));
+		request.setAttribute(AttributesConstants.CHANNEL, channelsService.getChannel(channelId));
 
 		return true;
 	}

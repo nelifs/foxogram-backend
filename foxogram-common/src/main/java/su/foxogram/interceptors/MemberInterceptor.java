@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import su.foxogram.constants.AttributesConstants;
 import su.foxogram.exceptions.ChannelNotFoundException;
 import su.foxogram.models.Channel;
 import su.foxogram.models.Member;
@@ -25,8 +26,8 @@ public class MemberInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
-		User user = (User) request.getAttribute("user");
-		Channel channel = (Channel) request.getAttribute("channel");
+		User user = (User) request.getAttribute(AttributesConstants.USER);
+		Channel channel = (Channel) request.getAttribute(AttributesConstants.CHANNEL);
 
 		Member member = channelsService.getMember(channel, user.getId());
 

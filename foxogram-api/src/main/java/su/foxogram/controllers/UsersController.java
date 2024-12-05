@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
+import su.foxogram.constants.AttributesConstants;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.dtos.response.UserDTO;
 import su.foxogram.exceptions.UserCredentialsDuplicateException;
@@ -23,7 +24,7 @@ public class UsersController {
 	}
 
 	@GetMapping("/@me")
-	public UserDTO getYourself(@RequestAttribute(value = "user") User authenticatedUser) {
+	public UserDTO getYourself(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser) {
 		return new UserDTO(authenticatedUser, true);
 	}
 
@@ -35,7 +36,7 @@ public class UsersController {
 	}
 
 	@PatchMapping("/@me")
-	public UserDTO editUser(@RequestAttribute(value = "user") User authenticatedUser, @Valid @RequestBody UserEditDTO userEditRequest) throws UserCredentialsDuplicateException {
+	public UserDTO editUser(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser, @Valid @RequestBody UserEditDTO userEditRequest) throws UserCredentialsDuplicateException {
 		authenticatedUser = usersService.editUser(authenticatedUser, userEditRequest);
 
 		return new UserDTO(authenticatedUser, false);
