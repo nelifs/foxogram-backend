@@ -124,57 +124,6 @@ public class AuthenticationService {
 		return accessToken;
 	}
 
-	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException {
-		if (!isCodeValid(pathCode))
-			throw new CodeIsInvalidException();
-
-		deleteUserAndCode(user, pathCode);
-	}
-
-	private boolean isCodeValid(String pathCode) {
-		if (apiConfig.isDevelopment())
-			return true;
-
-		Code code = codeRepository.findByValue(pathCode);
-		return code != null;
-	}
-
-	private void deleteUserAndCode(User user, String pathCode) {
-		deleteUser(user);
-
-		Code code = codeRepository.findByValue(pathCode);
-
-		if (code != null)
-			deleteVerificationCode(code);
-	}
-
-	private void deleteUser(User user) {
-		userRepository.delete(user);
-		log.info("USER record deleted ({}, {}) successfully", user.getId(), user.getEmail());
-	}
-
-	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
-		if (!Encryptor.verifyPassword(password, user.getPassword()))
-			throw new UserCredentialsIsInvalidException();
-
-		if (apiConfig.isDevelopment())
-			confirmUserDelete(user, "0");
-		else
-			sendDeleteRequestEmail(user, accessToken);
-	}
-
-	private void sendDeleteRequestEmail(User user, String accessToken) {
-		String emailType = EmailConstants.Type.ACCOUNT_DELETE.getValue();
-		String code = CodeGenerator.generateDigitCode();
-		long issuedAt = System.currentTimeMillis();
-		long expiresAt = issuedAt + CodesConstants.Lifetime.BASE.getValue();
-
-		emailService.sendEmail(user.getEmail(), user.getId(), emailType, user.getUsername(), code, issuedAt, expiresAt, accessToken);
-
-		log.info("Sent EMAIL ({}, {}) to USER ({}, {})", emailType, code, user.getId(), user.getEmail());
-		log.info("USER deletion requested ({}, {}) successfully", user.getId(), user.getEmail());
-	}
-
 	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
 		Code code = validateCode(pathCode);
 

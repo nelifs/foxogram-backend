@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
-import su.foxogram.dtos.request.UserDeleteDTO;
 import su.foxogram.dtos.request.UserLoginDTO;
 import su.foxogram.dtos.request.UserSignUpDTO;
 import su.foxogram.dtos.response.OkDTO;
@@ -57,25 +56,6 @@ public class AuthenticationController {
 		log.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
 
 		authenticationService.verifyEmail(user, code);
-
-		return new OkDTO(true);
-	}
-
-	@PostMapping("/delete/confirm/{code}")
-	public OkDTO deleteConfirm(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException {
-		log.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
-
-		authenticationService.confirmUserDelete(user, code);
-
-		return new OkDTO(true);
-	}
-
-	@PostMapping("/delete")
-	public OkDTO delete(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
-		String password = body.getPassword();
-		log.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
-
-		authenticationService.requestUserDelete(user, password, accessToken);
 
 		return new OkDTO(true);
 	}
