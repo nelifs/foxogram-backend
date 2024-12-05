@@ -17,10 +17,8 @@ import su.foxogram.repositories.UserRepository;
 import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
-import su.foxogram.util.Totp;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
 @Slf4j
 @Service
@@ -44,19 +42,14 @@ public class AuthenticationService {
 		this.apiConfig = apiConfig;
 	}
 
-	public User getUser(String header, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header.substring(7), checkIfEmailVerified);
+	public User getUser(String header) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+		return validate(header.substring(7));
 	}
 
-	public User validate(String token, boolean checkIfEmailVerified) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+	public User validate(String token) throws UserUnauthorizedException, UserEmailNotVerifiedException {
 		String userId = jwtService.validate(token).getId();
 
-		User user = userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
-
-		if (user.hasFlag(UserConstants.Flags.AWAITING_CONFIRMATION) && !checkIfEmailVerified)
-			throw new UserEmailNotVerifiedException();
-
-		return user;
+		return userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
 	}
 
 	public String userSignUp(String username, String email, String password) throws UserCredentialsDuplicateException, NoSuchAlgorithmException {
@@ -79,7 +72,7 @@ public class AuthenticationService {
 		String avatar = new Avatar("").getId();
 		long flags = UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
 		int type = UserConstants.Type.USER.getType();
-		String key = Base64.getEncoder().encodeToString(Totp.generateKey().getEncoded());
+		String key = null;
 
 		return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion, key);
 	}
@@ -135,7 +128,7 @@ public class AuthenticationService {
 		deleteVerificationCode(code);
 	}
 
-	private Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
+	public Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
 		Code code = codeRepository.findByValue(pathCode);
 
 		if (code == null)

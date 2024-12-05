@@ -9,13 +9,15 @@ import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.exceptions.*;
-import su.foxogram.models.Code;
 import su.foxogram.models.User;
 import su.foxogram.repositories.CodeRepository;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
+import su.foxogram.util.Totp;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Optional;
 
 @Slf4j
@@ -60,39 +62,36 @@ public class UsersService {
 		return user;
 	}
 
-	public void requestUserDelete(User user, String password, String accessToken) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
+	public void requestUserDelete(User user, String password) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
 		if (!Encryptor.verifyPassword(password, user.getPassword()))
 			throw new UserCredentialsIsInvalidException();
 
 		sendEmail(user, EmailConstants.Type.ACCOUNT_DELETE);
 	}
 
-	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
-		Code code = validateCode(pathCode);
-
-		deleteUserAndCode(user, code);
-	}
-
-	private Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
-		Code code = codeRepository.findByValue(pathCode);
-
-		if (code == null)
-			throw new CodeIsInvalidException();
-
-		if (code.expiresAt <= System.currentTimeMillis())
-			throw new CodeExpiredException();
-
-		return code;
-	}
-
-	private void deleteUserAndCode(User user, Code code) {
+	public void confirmUserDelete(User user) {
 		deleteUser(user);
-		deleteVerificationCode(code);
 	}
 
-	private void deleteVerificationCode(Code code) {
-		codeRepository.delete(code);
-		log.info("CODE record deleted ({}, {}) successfully", code.getUserId(), code.getValue());
+	public String setupMFA(User user) throws NoSuchAlgorithmException, MFAIsAlreadySetException {
+		if (user.hasFlag(UserConstants.Flags.MFA_ENABLED)) throw new MFAIsAlreadySetException();
+
+		String encodedKey = Base64.getEncoder().encodeToString(Totp.generateKey().getEncoded());
+
+		user.addFlag(UserConstants.Flags.MFA_ENABLED);
+		user.addFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
+		user.setKey(encodedKey);
+
+		userRepository.save(user);
+
+		return encodedKey;
+	}
+
+	public void deleteMFA(User user) throws MFAIsNotSetException {
+		if (!user.hasFlag(UserConstants.Flags.MFA_ENABLED)) throw new MFAIsNotSetException();
+
+		user.removeFlag(UserConstants.Flags.MFA_ENABLED);
+		user.setKey(null);
 	}
 
 	private void deleteUser(User user) {

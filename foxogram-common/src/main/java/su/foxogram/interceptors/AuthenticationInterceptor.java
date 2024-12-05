@@ -8,10 +8,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import su.foxogram.constants.AttributesConstants;
-import su.foxogram.exceptions.UserEmailNotVerifiedException;
-import su.foxogram.exceptions.UserUnauthorizedException;
+import su.foxogram.constants.UserConstants;
+import su.foxogram.exceptions.*;
 import su.foxogram.models.User;
 import su.foxogram.services.AuthenticationService;
+import su.foxogram.util.Totp;
 
 import java.util.Set;
 
@@ -19,9 +20,9 @@ import java.util.Set;
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
 	private static final Set<String> ALLOWED_PATHS = Set.of(
-			"email/verify",
-			"users/@me",
-			"email/resend"
+			"/v1/auth/email/verify",
+			"/v1/users/@me/**",
+			"/v1/auth/email/resend"
 	);
 
 	final AuthenticationService authenticationService;
@@ -32,21 +33,35 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 	}
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException, MFAIsInvalidException, TOTPKeyIsInvalidException, CodeExpiredException, CodeIsInvalidException {
 		String requestURI = request.getRequestURI();
-
-		boolean checkIfEmailVerified = ALLOWED_PATHS.stream().anyMatch(requestURI::contains);
+		boolean MFAValidationRequired = ALLOWED_PATHS.stream().anyMatch(requestURI::contains);
 
 		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
 		if (accessToken == null || !accessToken.startsWith("Bearer "))
 			throw new UserUnauthorizedException();
 
-		User user = authenticationService.getUser(accessToken, checkIfEmailVerified);
+		User user = authenticationService.getUser(accessToken);
 
-		request.setAttribute(AttributesConstants.USER, user);
-		request.setAttribute(AttributesConstants.ACCESS_TOKEN, accessToken);
+		if (MFAValidationRequired && user.hasFlag(UserConstants.Flags.AWAITING_CONFIRMATION)) {
+			validateMFA(user, request);
+		}
 
 		return true;
+	}
+
+	private void validateMFA(User user, HttpServletRequest request) throws MFAIsInvalidException, TOTPKeyIsInvalidException, CodeExpiredException, CodeIsInvalidException {
+		String code = request.getHeader("Code");
+
+		if (!user.hasFlag(UserConstants.Flags.MFA_ENABLED)) {
+			boolean MFAVerified = authenticationService.validateCode(code) != null;
+
+			request.setAttribute(AttributesConstants.MFA_VERIFIED, MFAVerified);
+		} else {
+			boolean MFAVerified = Totp.validate(user.getKey(), code);
+
+			request.setAttribute(AttributesConstants.MFA_VERIFIED, MFAVerified);
+		}
 	}
 }

@@ -16,7 +16,9 @@ public class ExceptionsConstants {
 		CODE_EXPIRED(502),
 		NEED_TO_WAIT_BEFORE_RESEND(503),
 		TOTP_KEY_IS_INVALID(601),
-		MFA_IS_INVALID(602);
+		MFA_IS_INVALID(602),
+		MFA_IS_ALREADY_SET(603),
+		MFA_IS_NOT_SET(604);
 
 		private final int code;
 
