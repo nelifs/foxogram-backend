@@ -14,6 +14,8 @@ import su.foxogram.models.User;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 public class UsersService {
@@ -29,10 +31,11 @@ public class UsersService {
 	}
 
 	public User getUser(String key) throws UserNotFoundException {
-		User user = userRepository.findByUsername(key);
-		if (user == null) user = userRepository.findById(key).orElseThrow(UserNotFoundException::new);
+		Optional<User> optionalUser = userRepository.findByIdOrUsername(key, key);
 
-		return user;
+		if (optionalUser.isEmpty()) throw new UserNotFoundException();
+
+		return optionalUser.get();
 	}
 
 	public User editUser(User user, UserEditDTO body) throws UserCredentialsDuplicateException {
