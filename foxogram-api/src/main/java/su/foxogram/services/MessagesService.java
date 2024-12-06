@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.dtos.request.MessageCreateDTO;
+import su.foxogram.dtos.response.MessageDTO;
 import su.foxogram.exceptions.MessageNotFoundException;
 import su.foxogram.exceptions.MissingPermissionsException;
 import su.foxogram.models.Channel;
@@ -16,6 +17,7 @@ import su.foxogram.structures.Snowflake;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,12 +30,20 @@ public class MessagesService {
 		this.messageRepository = messageRepository;
 	}
 
-	public List<Message> getMessages(long before, int limit, Channel channel) {
+	public List<MessageDTO> getMessages(long before, int limit, Channel channel) {
 		List<Message> messagesArray = messageRepository.findAllByChannel(channel);
 
 		log.info("MESSAGES ({}, {}) in CHANNEL ({}) found successfully", limit, before, channel.getId());
 
-		return messagesArray;
+		return messagesArray.stream()
+				.map(message -> new MessageDTO(
+						message.getId(),
+						message.getContent(),
+						message.getAuthor().getUserId(),
+						message.getChannel().getId(),
+						message.getAttachments()
+				))
+				.collect(Collectors.toList());
 	}
 
 	public Message getMessage(String id, Channel channel) throws MessageNotFoundException {

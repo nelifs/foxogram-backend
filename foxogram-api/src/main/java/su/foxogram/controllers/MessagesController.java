@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
 import su.foxogram.dtos.request.MessageCreateDTO;
+import su.foxogram.dtos.response.MessageDTO;
 import su.foxogram.dtos.response.MessagesDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.exceptions.MessageNotFoundException;
@@ -36,12 +37,10 @@ public class MessagesController {
 
 	@Operation(summary = "Get messages")
 	@GetMapping("/channel/{channelId}")
-	public MessagesDTO getMessages(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit) {
+	public List<MessageDTO> getMessages(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit) {
 		log.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channel.getId(), user.getId(), user.getEmail());
 
-		List<Message> messagesArray = messagesService.getMessages(before, limit, channel);
-
-		return new MessagesDTO(messagesArray);
+		return messagesService.getMessages(before, limit, channel);
 	}
 
 	@Operation(summary = "Get message")
