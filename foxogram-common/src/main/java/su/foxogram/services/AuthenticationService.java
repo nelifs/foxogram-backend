@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import su.foxogram.configs.APIConfig;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
@@ -18,8 +17,6 @@ import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
 
-import java.security.NoSuchAlgorithmException;
-
 @Slf4j
 @Service
 public class AuthenticationService {
@@ -31,15 +28,12 @@ public class AuthenticationService {
 
 	private final JwtService jwtService;
 
-	private final APIConfig apiConfig;
-
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, APIConfig apiConfig) {
+	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
 		this.userRepository = userRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
-		this.apiConfig = apiConfig;
 	}
 
 	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -56,7 +50,7 @@ public class AuthenticationService {
 		return userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
 	}
 
-	public String userSignUp(String username, String email, String password) throws UserCredentialsDuplicateException, NoSuchAlgorithmException {
+	public String userSignUp(String username, String email, String password) throws UserCredentialsDuplicateException {
 		User user = createUser(username, email, password);
 		try {
 			userRepository.save(user);

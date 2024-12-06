@@ -2,7 +2,6 @@ package su.foxogram.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public class MessagesController {
 
 	@Operation(summary = "Get messages")
 	@GetMapping("/channel/{channelId}")
-	public MessagesDTO getMessages(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit, HttpServletRequest request) throws MessageNotFoundException {
+	public MessagesDTO getMessages(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit) {
 		log.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> messagesArray = messagesService.getMessages(before, limit, channel);
@@ -67,7 +66,7 @@ public class MessagesController {
 
 	@Operation(summary = "Delete message")
 	@DeleteMapping("/channel/{channelId}/{id}")
-	public OkDTO deleteMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
+	public OkDTO deleteMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String id) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		messagesService.deleteMessage(id, member, channel);
@@ -77,7 +76,7 @@ public class MessagesController {
 
 	@Operation(summary = "Edit message")
 	@PatchMapping("/channel/{channelId}/{id}")
-	public MessagesDTO editMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
+	public MessagesDTO editMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body, @PathVariable String id) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> message = List.of(messagesService.editMessage(id, channel, member, body));

@@ -10,7 +10,6 @@ import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.exceptions.*;
 import su.foxogram.models.User;
-import su.foxogram.repositories.CodeRepository;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
@@ -26,13 +25,10 @@ public class UsersService {
 
 	private final EmailService emailService;
 
-	private final CodeRepository codeRepository;
-
 	@Autowired
-	public UsersService(UserRepository userRepository, EmailService emailService, CodeRepository codeRepository) {
+	public UsersService(UserRepository userRepository, EmailService emailService) {
 		this.userRepository = userRepository;
 		this.emailService = emailService;
-		this.codeRepository = codeRepository;
 	}
 
 	public User getUser(String key) throws UserNotFoundException {
@@ -60,7 +56,7 @@ public class UsersService {
 		return user;
 	}
 
-	public void requestUserDelete(User user, String password) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
+	public void requestUserDelete(User user, String password) throws UserCredentialsIsInvalidException {
 		if (!Encryptor.verifyPassword(password, user.getPassword()))
 			throw new UserCredentialsIsInvalidException();
 

@@ -46,7 +46,7 @@ public class ChannelsController {
 
 	@Operation(summary = "Get channel")
 	@GetMapping("/{id}")
-	public ChannelDTO getChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) {
+	public ChannelDTO getChannel(@RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) {
 		log.info("CHANNEL info ({}) request", channel.getId());
 
 		return new ChannelDTO(channel);
@@ -74,7 +74,7 @@ public class ChannelsController {
 
 	@Operation(summary = "Edit channel")
 	@PatchMapping("/{id}")
-	public ChannelDTO editChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody ChannelEditDTO body) throws MissingPermissionsException {
+	public ChannelDTO editChannel(@RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody ChannelEditDTO body) throws MissingPermissionsException {
 		log.info("CHANNEL edit ({}) request", channel.getId());
 
 		channel = channelsService.editChannel(member, channel, body);
@@ -94,7 +94,7 @@ public class ChannelsController {
 
 	@Operation(summary = "Get members")
 	@GetMapping("/{id}/members")
-	public List<MemberDTO> getMembers(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) {
+	public List<MemberDTO> getMembers(@RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) {
 		log.info("CHANNEL get members ({}) request", channel.getId());
 
 		return channelsService.getMembers(channel);
@@ -102,7 +102,7 @@ public class ChannelsController {
 
 	@Operation(summary = "Get member")
 	@GetMapping("/{id}/members/{memberId}")
-	public MemberDTO getMember(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String memberId) throws MemberInChannelNotFoundException {
+	public MemberDTO getMember(@RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String memberId) throws MemberInChannelNotFoundException {
 		log.info("CHANNEL get member ({}, {}) request", channel.getId(), memberId);
 
 		Member member = channelsService.getMember(channel, memberId);

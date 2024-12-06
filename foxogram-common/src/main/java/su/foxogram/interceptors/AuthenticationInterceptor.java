@@ -37,7 +37,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 	}
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException, MFAIsInvalidException, TOTPKeyIsInvalidException, CodeExpiredException, CodeIsInvalidException {
+	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException, MFAIsInvalidException, CodeExpiredException, CodeIsInvalidException {
 		String requestURI = request.getRequestURI();
 		boolean MFAValidationRequired = MFA_REQUIRED_PATHS.stream().anyMatch(requestURI::contains);
 		boolean ignoreEmailVerification = EMAIL_VERIFICATION_IGNORE_PATHS.stream().anyMatch(requestURI::contains);
@@ -59,7 +59,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		return true;
 	}
 
-	private void validateMFA(User user, HttpServletRequest request) throws MFAIsInvalidException, TOTPKeyIsInvalidException, CodeExpiredException, CodeIsInvalidException {
+	private void validateMFA(User user, HttpServletRequest request) throws MFAIsInvalidException, CodeExpiredException, CodeIsInvalidException {
 		String code = request.getHeader("Code");
 
 		if (!user.hasFlag(UserConstants.Flags.MFA_ENABLED)) {

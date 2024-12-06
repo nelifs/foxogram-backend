@@ -2,7 +2,6 @@ package su.foxogram.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,6 @@ import su.foxogram.exceptions.*;
 import su.foxogram.models.User;
 import su.foxogram.services.UsersService;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 @Slf4j
@@ -52,7 +50,7 @@ public class UsersController {
 
 	@Operation(summary = "Delete")
 	@DeleteMapping("/@me")
-	public OkDTO deleteUser(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, @RequestBody UserDeleteDTO body, HttpServletRequest request) throws UserCredentialsIsInvalidException, CodeIsInvalidException {
+	public OkDTO deleteUser(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody UserDeleteDTO body) throws UserCredentialsIsInvalidException {
 		String password = body.getPassword();
 		log.info("USER deletion requested ({}, {}) request", user.getId(), user.getEmail());
 
@@ -63,7 +61,7 @@ public class UsersController {
 
 	@Operation(summary = "Confirm delete")
 	@PostMapping("/@me/delete/confirm/")
-	public OkDTO deleteUserConfirm(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, HttpServletRequest request) throws CodeIsInvalidException, CodeExpiredException {
+	public OkDTO deleteUserConfirm(@RequestAttribute(value = AttributesConstants.USER) User user) {
 		log.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
 		usersService.confirmUserDelete(user);
@@ -73,7 +71,7 @@ public class UsersController {
 
 	@Operation(summary = "Setup MFA")
 	@PostMapping("/@me/mfa")
-	public MFAKeyDTO setupMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws NoSuchAlgorithmException, MFAIsAlreadySetException {
+	public MFAKeyDTO setupMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsAlreadySetException {
 		log.info("USER mfa setup ({}, {}) request", user.getId(), user.getEmail());
 
 		String key = usersService.setupMFA(user);
@@ -83,7 +81,7 @@ public class UsersController {
 
 	@Operation(summary = "Delete MFA")
 	@DeleteMapping("/@me/mfa")
-	public OkDTO deleteMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws NoSuchAlgorithmException, MFAIsAlreadySetException, MFAIsNotSetException {
+	public OkDTO deleteMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsNotSetException {
 		log.info("USER mfa delete ({}, {}) request", user.getId(), user.getEmail());
 
 		usersService.deleteMFA(user);
