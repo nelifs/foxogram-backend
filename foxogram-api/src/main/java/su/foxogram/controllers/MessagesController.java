@@ -1,5 +1,7 @@
 package su.foxogram.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@Tag(name = "Messages")
 @RequestMapping(value = APIConstants.MESSAGES, produces = "application/json")
 public class MessagesController {
 
@@ -32,6 +35,7 @@ public class MessagesController {
 		this.messagesService = messagesService;
 	}
 
+	@Operation(summary = "Get messages")
 	@GetMapping("/channel/{channelId}")
 	public MessagesDTO getMessages(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit, HttpServletRequest request) throws MessageNotFoundException {
 		log.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channel.getId(), user.getId(), user.getEmail());
@@ -41,6 +45,7 @@ public class MessagesController {
 		return new MessagesDTO(messagesArray);
 	}
 
+	@Operation(summary = "Get message")
 	@GetMapping("/channel/{channelId}/{id}")
 	public MessagesDTO getMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String id) throws MessageNotFoundException {
 		log.info("MESSAGE ({}) from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
@@ -50,6 +55,7 @@ public class MessagesController {
 		return new MessagesDTO(message);
 	}
 
+	@Operation(summary = "Create message")
 	@PostMapping("/channel/{channelId}")
 	public OkDTO createMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body) {
 		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channel.getId(), user.getId(), user.getEmail());
@@ -59,6 +65,7 @@ public class MessagesController {
 		return new OkDTO(true);
 	}
 
+	@Operation(summary = "Delete message")
 	@DeleteMapping("/channel/{channelId}/{id}")
 	public OkDTO deleteMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
@@ -68,6 +75,7 @@ public class MessagesController {
 		return new OkDTO(true);
 	}
 
+	@Operation(summary = "Edit message")
 	@PatchMapping("/channel/{channelId}/{id}")
 	public MessagesDTO editMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body, @PathVariable String id, HttpServletRequest request) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());

@@ -1,5 +1,7 @@
 package su.foxogram.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@Tag(name = "Channels")
 @RequestMapping(value = APIConstants.CHANNELS, produces = "application/json")
 public class ChannelsController {
 
@@ -31,6 +34,7 @@ public class ChannelsController {
 		this.channelsService = channelsService;
 	}
 
+	@Operation(summary = "Create channel")
 	@PostMapping("/")
 	public ChannelDTO createChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @Valid @RequestBody ChannelCreateDTO body) {
 		log.info("CHANNEL create ({}, {}) request", body.getName(), body.getType());
@@ -40,6 +44,7 @@ public class ChannelsController {
 		return new ChannelDTO(channel);
 	}
 
+	@Operation(summary = "Get channel")
 	@GetMapping("/{id}")
 	public ChannelDTO getChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) {
 		log.info("CHANNEL info ({}) request", channel.getId());
@@ -47,6 +52,7 @@ public class ChannelsController {
 		return new ChannelDTO(channel);
 	}
 
+	@Operation(summary = "Join channel")
 	@PutMapping("/{id}/members/@me")
 	public MemberDTO joinChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable long id) throws MemberAlreadyInChannelException {
 		log.info("CHANNEL join ({}) request", channel.getId());
@@ -56,6 +62,7 @@ public class ChannelsController {
 		return new MemberDTO(member);
 	}
 
+	@Operation(summary = "Leave channel")
 	@DeleteMapping("/{id}/members/@me")
 	public OkDTO leaveChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) throws MemberInChannelNotFoundException {
 		log.info("CHANNEL leave ({}) request", channel.getId());
@@ -65,6 +72,7 @@ public class ChannelsController {
 		return new OkDTO(true);
 	}
 
+	@Operation(summary = "Edit channel")
 	@PatchMapping("/{id}")
 	public ChannelDTO editChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody ChannelEditDTO body) throws MissingPermissionsException {
 		log.info("CHANNEL edit ({}) request", channel.getId());
@@ -74,6 +82,7 @@ public class ChannelsController {
 		return new ChannelDTO(channel);
 	}
 
+	@Operation(summary = "Delete channel")
 	@DeleteMapping("/{id}")
 	public OkDTO deleteChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) throws MissingPermissionsException {
 		log.info("CHANNEL delete ({}) request", channel.getId());
@@ -83,6 +92,7 @@ public class ChannelsController {
 		return new OkDTO(true);
 	}
 
+	@Operation(summary = "Get members")
 	@GetMapping("/{id}/members")
 	public List<MemberDTO> getMembers(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) {
 		log.info("CHANNEL get members ({}) request", channel.getId());
@@ -90,6 +100,7 @@ public class ChannelsController {
 		return channelsService.getMembers(channel);
 	}
 
+	@Operation(summary = "Get member")
 	@GetMapping("/{id}/members/{memberId}")
 	public MemberDTO getMember(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String memberId) throws MemberInChannelNotFoundException {
 		log.info("CHANNEL get member ({}, {}) request", channel.getId(), memberId);

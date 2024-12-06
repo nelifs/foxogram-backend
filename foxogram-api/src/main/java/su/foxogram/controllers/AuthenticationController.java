@@ -1,5 +1,7 @@
 package su.foxogram.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 
 @Slf4j
 @RestController
+@Tag(name = "Authentication")
 @RequestMapping(value = APIConstants.AUTH, produces = "application/json")
 public class AuthenticationController {
 	private final AuthenticationService authenticationService;
@@ -28,18 +31,20 @@ public class AuthenticationController {
 		this.authenticationService = authenticationService;
 	}
 
-	@PostMapping("/signup")
-	public TokenDTO signup(@Valid @RequestBody UserSignUpDTO body) throws UserCredentialsDuplicateException, NoSuchAlgorithmException {
+	@Operation(summary = "Register")
+	@PostMapping("/register")
+	public TokenDTO register(@Valid @RequestBody UserSignUpDTO body) throws UserCredentialsDuplicateException, NoSuchAlgorithmException {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
-		log.info("USER signup ({}, {}) request", username, email);
+		log.info("USER register ({}, {}) request", username, email);
 
 		String accessToken = authenticationService.userSignUp(username, email, password);
 
 		return new TokenDTO(accessToken);
 	}
 
+	@Operation(summary = "Login")
 	@PostMapping("/login")
 	public TokenDTO login(@Valid @RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
 		String email = body.getEmail();
@@ -51,6 +56,7 @@ public class AuthenticationController {
 		return new TokenDTO(accessToken);
 	}
 
+	@Operation(summary = "Verify email")
 	@PostMapping("/email/verify/{code}")
 	public OkDTO emailVerify(@RequestAttribute(value = AttributesConstants.USER) User user, @PathVariable String code, HttpServletRequest request) throws CodeIsInvalidException, CodeExpiredException {
 		log.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
@@ -60,6 +66,7 @@ public class AuthenticationController {
 		return new OkDTO(true);
 	}
 
+	@Operation(summary = "Resend email")
 	@PostMapping("/email/resend")
 	public OkDTO resendEmail(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, HttpServletRequest request) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
 		log.info("USER email verify resend requested ({}, {}) request", user.getId(), user.getEmail());
