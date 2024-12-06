@@ -3,6 +3,8 @@ package su.foxogram.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
@@ -20,6 +22,8 @@ import su.foxogram.util.Encryptor;
 @Slf4j
 @Service
 public class AuthenticationService {
+	private final AuthenticationManager authenticationManager;
+
 	private final UserRepository userRepository;
 
 	private final CodeRepository codeRepository;
@@ -29,25 +33,12 @@ public class AuthenticationService {
 	private final JwtService jwtService;
 
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
+	public AuthenticationService(AuthenticationManager authenticationManager, UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
+		this.authenticationManager = authenticationManager;
 		this.userRepository = userRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
-	}
-
-	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header.substring(7), ignoreEmailVerification);
-	}
-
-	public User validate(String token, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		String userId = jwtService.validate(token).getId();
-		User user = userRepository.findById(userId).get();
-
-		if (!ignoreEmailVerification && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED))
-			throw new UserEmailNotVerifiedException();
-
-		return userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
 	}
 
 	public String userSignUp(String username, String email, String password) throws UserCredentialsDuplicateException {
@@ -90,16 +81,14 @@ public class AuthenticationService {
 	public String loginUser(String email, String password) throws UserCredentialsIsInvalidException {
 		User user = findUserByEmail(email);
 		validatePassword(user, password);
-		return generateAccessToken(user);
+
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+
+		return jwtService.generate(user.getId());
 	}
 
-	private User findUserByEmail(String email) throws UserCredentialsIsInvalidException {
-		User user = userRepository.findByEmail(email);
-
-		if (user == null)
-			throw new UserCredentialsIsInvalidException();
-
-		return user;
+	public User findUserByEmail(String email) throws UserCredentialsIsInvalidException {
+		return userRepository.findByEmail(email).orElseThrow(UserCredentialsIsInvalidException::new);
 	}
 
 	private void validatePassword(User user, String password) throws UserCredentialsIsInvalidException {
@@ -107,12 +96,6 @@ public class AuthenticationService {
 			throw new UserCredentialsIsInvalidException();
 
 		log.info("PASSWORD VERIFIED FOR USER ({}, {})", user.getId(), user.getEmail());
-	}
-
-	private String generateAccessToken(User user) {
-		String accessToken = jwtService.generate(user.getId());
-		log.info("USER SIGNED IN ({}, {}) successfully", user.getId(), user.getEmail());
-		return accessToken;
 	}
 
 	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
