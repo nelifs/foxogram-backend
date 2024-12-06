@@ -47,7 +47,7 @@ public class ChannelsController {
 		return new ChannelDTO(channel);
 	}
 
-	@DeleteMapping("/{id}/join")
+	@PutMapping("/{id}/members/@me")
 	public MemberDTO joinChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable long id) throws MemberAlreadyInChannelException {
 		log.info("CHANNEL join ({}) request", channel.getId());
 
@@ -56,7 +56,7 @@ public class ChannelsController {
 		return new MemberDTO(member);
 	}
 
-	@PostMapping("/{id}/leave")
+	@DeleteMapping("/{id}/members/@me")
 	public OkDTO leaveChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel) throws MemberInChannelNotFoundException {
 		log.info("CHANNEL leave ({}) request", channel.getId());
 
