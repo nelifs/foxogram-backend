@@ -7,7 +7,8 @@ public class UserConstants {
 	public enum Flags {
 		AWAITING_CONFIRMATION(1),
 		MFA_ENABLED(1 << 1),
-		DISABLED(1 << 2);
+		EMAIL_VERIFIED(1 << 2),
+		DISABLED(1 << 3);
 
 		private final long bit;
 

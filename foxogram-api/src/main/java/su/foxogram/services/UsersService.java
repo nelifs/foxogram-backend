@@ -16,8 +16,6 @@ import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
 import su.foxogram.util.Totp;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.Optional;
 
 @Slf4j
@@ -73,18 +71,18 @@ public class UsersService {
 		deleteUser(user);
 	}
 
-	public String setupMFA(User user) throws NoSuchAlgorithmException, MFAIsAlreadySetException {
+	public String setupMFA(User user) throws MFAIsAlreadySetException {
 		if (user.hasFlag(UserConstants.Flags.MFA_ENABLED)) throw new MFAIsAlreadySetException();
 
-		String encodedKey = Base64.getEncoder().encodeToString(Totp.generateKey().getEncoded());
+		String secretKey = Totp.generateKey();
 
 		user.addFlag(UserConstants.Flags.MFA_ENABLED);
 		user.addFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
-		user.setKey(encodedKey);
+		user.setKey(secretKey);
 
 		userRepository.save(user);
 
-		return encodedKey;
+		return secretKey;
 	}
 
 	public void deleteMFA(User user) throws MFAIsNotSetException {

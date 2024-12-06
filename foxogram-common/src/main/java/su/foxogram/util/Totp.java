@@ -1,41 +1,26 @@
 package su.foxogram.util;
 
-import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
+import dev.samstevens.totp.code.CodeVerifier;
+import dev.samstevens.totp.code.DefaultCodeGenerator;
+import dev.samstevens.totp.code.DefaultCodeVerifier;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
+import dev.samstevens.totp.time.SystemTimeProvider;
+import dev.samstevens.totp.time.TimeProvider;
 import su.foxogram.exceptions.MFAIsInvalidException;
-import su.foxogram.exceptions.TOTPKeyIsInvalidException;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
 
 public class Totp {
-	private static final TimeBasedOneTimePasswordGenerator totp = new TimeBasedOneTimePasswordGenerator();
-
-	public static Key generateKey() throws NoSuchAlgorithmException {
-		final KeyGenerator keyGenerator = KeyGenerator.getInstance(totp.getAlgorithm());
-
-		final int macLengthInBytes = Mac.getInstance(totp.getAlgorithm()).getMacLength();
-		keyGenerator.init(macLengthInBytes * 8);
-
-		return keyGenerator.generateKey();
+	public static String generateKey() {
+		SecretGenerator secretGenerator = new DefaultSecretGenerator();
+		return secretGenerator.generate();
 	}
 
-	public static boolean validate(String userKey, String userOTP) throws TOTPKeyIsInvalidException, MFAIsInvalidException {
-		final Instant now = Instant.now();
-		String serverOTP;
-		Key key = new SecretKeySpec(userKey.getBytes(), 0, userKey.getBytes().length, "DES");
+	public static boolean validate(String userSecretKey, String userOTP) throws MFAIsInvalidException {
+		TimeProvider timeProvider = new SystemTimeProvider();
+		DefaultCodeGenerator codeGenerator = new DefaultCodeGenerator();
+		CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
 
-		try {
-			serverOTP = totp.generateOneTimePasswordString(key, now);
-		} catch (InvalidKeyException e) {
-			throw new TOTPKeyIsInvalidException();
-		}
-
-		boolean MFAVerified = userOTP.equals(serverOTP);
+		boolean MFAVerified = verifier.isValidCode(userSecretKey, userOTP);
 
 		if (!MFAVerified) throw new MFAIsInvalidException();
 

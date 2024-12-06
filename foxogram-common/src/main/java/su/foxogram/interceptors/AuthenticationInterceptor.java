@@ -19,9 +19,13 @@ import java.util.Set;
 @Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
-	private static final Set<String> ALLOWED_PATHS = Set.of(
+	private static final Set<String> MFA_REQUIRED_PATHS = Set.of(
+			"/v1/users/@me/delete/confirm"
+	);
+
+	private static final Set<String> EMAIL_VERIFICATION_IGNORE_PATHS = Set.of(
 			"/v1/auth/email/verify",
-			"/v1/users/@me/**",
+			"/v1/users/@me",
 			"/v1/auth/email/resend"
 	);
 
@@ -35,18 +39,22 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws UserUnauthorizedException, UserEmailNotVerifiedException, MFAIsInvalidException, TOTPKeyIsInvalidException, CodeExpiredException, CodeIsInvalidException {
 		String requestURI = request.getRequestURI();
-		boolean MFAValidationRequired = ALLOWED_PATHS.stream().anyMatch(requestURI::contains);
+		boolean MFAValidationRequired = MFA_REQUIRED_PATHS.stream().anyMatch(requestURI::contains);
+		boolean ignoreEmailVerification = EMAIL_VERIFICATION_IGNORE_PATHS.stream().anyMatch(requestURI::contains);
 
 		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
 		if (accessToken == null || !accessToken.startsWith("Bearer "))
 			throw new UserUnauthorizedException();
 
-		User user = authenticationService.getUser(accessToken);
+		User user = authenticationService.getUser(accessToken, ignoreEmailVerification);
 
 		if (MFAValidationRequired && user.hasFlag(UserConstants.Flags.AWAITING_CONFIRMATION)) {
 			validateMFA(user, request);
 		}
+
+		request.setAttribute(AttributesConstants.USER, user);
+		request.setAttribute(AttributesConstants.ACCESS_TOKEN, accessToken);
 
 		return true;
 	}

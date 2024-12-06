@@ -42,12 +42,16 @@ public class AuthenticationService {
 		this.apiConfig = apiConfig;
 	}
 
-	public User getUser(String header) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validate(header.substring(7));
+	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+		return validate(header.substring(7), ignoreEmailVerification);
 	}
 
-	public User validate(String token) throws UserUnauthorizedException, UserEmailNotVerifiedException {
+	public User validate(String token, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
 		String userId = jwtService.validate(token).getId();
+		User user = userRepository.findById(userId).get();
+
+		if (!ignoreEmailVerification && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED))
+			throw new UserEmailNotVerifiedException();
 
 		return userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
 	}
@@ -66,7 +70,7 @@ public class AuthenticationService {
 		return jwtService.generate(user.getId());
 	}
 
-	private User createUser(String username, String email, String password) throws NoSuchAlgorithmException {
+	private User createUser(String username, String email, String password) {
 		String id = Snowflake.create();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
@@ -121,6 +125,7 @@ public class AuthenticationService {
 		Code code = validateCode(pathCode);
 
 		user.removeFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
+		user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
 		userRepository.save(user);
 		log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
 		log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
