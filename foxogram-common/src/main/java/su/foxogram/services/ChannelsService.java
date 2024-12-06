@@ -22,13 +22,12 @@ import java.util.List;
 @Slf4j
 @Service
 public class ChannelsService {
-
 	private final ChannelRepository channelRepository;
 
 	private final MemberRepository memberRepository;
 
 	@Autowired
-	public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, AuthenticationService authenticationService) {
+	public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository) {
 		this.channelRepository = channelRepository;
 		this.memberRepository = memberRepository;
 	}

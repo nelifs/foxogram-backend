@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,7 +24,6 @@ import su.foxogram.services.impl.UserDetailsServiceImpl;
 @EnableWebSecurity
 public class SecurityConfig {
 	private final JwtService jwtService;
-
 	private final UserDetailsServiceImpl userDetailsService;
 
 	@Autowired
@@ -35,7 +35,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-				.cors(AbstractHttpConfigurer::disable)
+				.cors(Customizer.withDefaults())
 				.csrf(AbstractHttpConfigurer::disable)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests((authorize) -> authorize
@@ -44,7 +44,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/docs").permitAll()
 						.anyRequest().authenticated())
 				.authenticationManager(authenticationManager())
-				.addFilterBefore(new AuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class).build();
+				.addFilterBefore(new AuthenticationFilter(jwtService, userDetailsService), UsernamePasswordAuthenticationFilter.class).build();
 	}
 
 	@Bean

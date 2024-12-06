@@ -30,12 +30,20 @@ public class JwtService {
 	}
 
 	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		return validateUser(header.substring(7), ignoreEmailVerification);
-	}
+		String userId;
 
-	public User validateUser(String token, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		String userId = validate(token).getId();
-		User user = userRepository.findById(userId).get();
+		try {
+			Jws<Claims> claimsJws = Jwts.parserBuilder()
+					.setSigningKey(getSigningKey())
+					.build()
+					.parseClaimsJws(header.substring(7));
+
+			userId = claimsJws.getBody().getId();
+		} catch (Exception e) {
+			throw new UserUnauthorizedException();
+		}
+
+		User user = userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
 
 		if (!ignoreEmailVerification && user.hasFlag(UserConstants.Flags.EMAIL_VERIFIED))
 			throw new UserEmailNotVerifiedException();
@@ -52,19 +60,6 @@ public class JwtService {
 				.setExpiration(expirationDate)
 				.signWith(getSigningKey())
 				.compact();
-	}
-
-	public Claims validate(String token) throws UserUnauthorizedException {
-		try {
-			Jws<Claims> claimsJws = Jwts.parserBuilder()
-					.setSigningKey(getSigningKey())
-					.build()
-					.parseClaimsJws(token);
-
-			return claimsJws.getBody();
-		} catch (Exception e) {
-			throw new UserUnauthorizedException();
-		}
 	}
 
 	private Key getSigningKey() {

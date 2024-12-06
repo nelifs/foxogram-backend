@@ -61,9 +61,8 @@ public class AuthenticationService {
 		String avatar = new Avatar("").getId();
 		long flags = UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
 		int type = UserConstants.Type.USER.getType();
-		String key = null;
 
-		return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion, key);
+		return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion, null);
 	}
 
 	private void sendConfirmationEmail(User user) {
