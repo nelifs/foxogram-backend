@@ -8,19 +8,19 @@ import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserEditDTO;
-import su.foxogram.exceptions.*;
+import su.foxogram.exceptions.UserCredentialsDuplicateException;
+import su.foxogram.exceptions.UserCredentialsIsInvalidException;
+import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.models.User;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
-import su.foxogram.util.Totp;
 
 import java.util.Optional;
 
 @Slf4j
 @Service
 public class UsersService {
-
 	private final UserRepository userRepository;
 
 	private final EmailService emailService;
@@ -65,27 +65,6 @@ public class UsersService {
 
 	public void confirmUserDelete(User user) {
 		deleteUser(user);
-	}
-
-	public String setupMFA(User user) throws MFAIsAlreadySetException {
-		if (user.hasFlag(UserConstants.Flags.MFA_ENABLED)) throw new MFAIsAlreadySetException();
-
-		String secretKey = Totp.generateKey();
-
-		user.addFlag(UserConstants.Flags.MFA_ENABLED);
-		user.addFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
-		user.setKey(secretKey);
-
-		userRepository.save(user);
-
-		return secretKey;
-	}
-
-	public void deleteMFA(User user) throws MFAIsNotSetException {
-		if (!user.hasFlag(UserConstants.Flags.MFA_ENABLED)) throw new MFAIsNotSetException();
-
-		user.removeFlag(UserConstants.Flags.MFA_ENABLED);
-		user.setKey(null);
 	}
 
 	private void deleteUser(User user) {

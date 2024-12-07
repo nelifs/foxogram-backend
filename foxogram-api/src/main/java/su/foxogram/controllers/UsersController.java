@@ -14,6 +14,7 @@ import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.dtos.response.UserDTO;
 import su.foxogram.exceptions.*;
 import su.foxogram.models.User;
+import su.foxogram.services.MfaService;
 import su.foxogram.services.UsersService;
 
 import java.util.Objects;
@@ -23,11 +24,13 @@ import java.util.Objects;
 @Tag(name = "Users")
 @RequestMapping(value = APIConstants.USERS, produces = "application/json")
 public class UsersController {
-
 	private final UsersService usersService;
 
-	public UsersController(UsersService usersService) {
+	private final MfaService mfaService;
+
+	public UsersController(UsersService usersService, MfaService mfaService) {
 		this.usersService = usersService;
+		this.mfaService = mfaService;
 	}
 
 	@Operation(summary = "Get user")
@@ -74,7 +77,7 @@ public class UsersController {
 	public MFAKeyDTO setupMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsAlreadySetException {
 		log.info("USER mfa setup ({}, {}) request", user.getId(), user.getEmail());
 
-		String key = usersService.setupMFA(user);
+		String key = mfaService.setupMFA(user);
 
 		return new MFAKeyDTO(key);
 	}
@@ -92,7 +95,7 @@ public class UsersController {
 	public OkDTO deleteMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsNotSetException {
 		log.info("USER mfa delete ({}, {}) request", user.getId(), user.getEmail());
 
-		usersService.deleteMFA(user);
+		mfaService.deleteMFA(user);
 
 		return new OkDTO(true);
 	}
