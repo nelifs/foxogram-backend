@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
+import su.foxogram.dtos.request.CodeDTO;
 import su.foxogram.dtos.request.UserDeleteDTO;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.dtos.response.MFAKeyDTO;
@@ -84,10 +85,12 @@ public class UsersController {
 
 	@Operation(summary = "Validate MFA")
 	@PostMapping("/@me/mfa")
-	public OkDTO validateMfa(@RequestAttribute(value = AttributesConstants.USER) User user) {
+	public OkDTO validateMfa(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody CodeDTO body) {
 		log.info("USER mfa validation ({}, {}) request", user.getId(), user.getEmail());
 
-		return new OkDTO(true);
+		boolean result = mfaService.validateMFA(user, body.getCode());
+
+		return new OkDTO(result);
 	}
 
 	@Operation(summary = "Delete MFA")

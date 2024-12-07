@@ -8,8 +8,8 @@ import su.foxogram.constants.ValidationConstants;
 
 @Setter
 @Getter
-public class EmailCodeDTO {
+public class CodeDTO {
 	@NotNull(message = "Code" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
-	@Size(min = 6, max = 6, message = ValidationConstants.Messages.EMAIL_CODE_NAME_WRONG_LENGTH)
+	@Size(min = 6, max = 6, message = ValidationConstants.Messages.CODE_NAME_WRONG_LENGTH)
 	private String code;
 }

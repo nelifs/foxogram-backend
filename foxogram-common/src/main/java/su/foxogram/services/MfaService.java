@@ -32,6 +32,10 @@ public class MfaService {
 		return secretKey;
 	}
 
+	public boolean validateMFA(User user, String code) {
+		return Totp.validate(user.getKey(), code);
+	}
+
 	public void deleteMFA(User user) throws MFAIsNotSetException {
 		if (!user.hasFlag(UserConstants.Flags.MFA_ENABLED)) throw new MFAIsNotSetException();
 

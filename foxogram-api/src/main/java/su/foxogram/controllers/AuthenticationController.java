@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
-import su.foxogram.dtos.request.EmailCodeDTO;
+import su.foxogram.dtos.request.CodeDTO;
 import su.foxogram.dtos.request.UserLoginDTO;
 import su.foxogram.dtos.request.UserSignUpDTO;
 import su.foxogram.dtos.response.OkDTO;
@@ -53,7 +53,7 @@ public class AuthenticationController {
 
 	@Operation(summary = "Verify email")
 	@PostMapping("/email/verify")
-	public OkDTO emailVerify(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody EmailCodeDTO body) throws CodeIsInvalidException, CodeExpiredException {
+	public OkDTO emailVerify(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody CodeDTO body) throws CodeIsInvalidException, CodeExpiredException {
 		authenticationService.verifyEmail(user, body.getCode());
 
 		return new OkDTO(true);
