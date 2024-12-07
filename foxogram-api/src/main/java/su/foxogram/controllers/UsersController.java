@@ -70,7 +70,7 @@ public class UsersController {
 	}
 
 	@Operation(summary = "Setup MFA")
-	@PostMapping("/@me/mfa")
+	@PutMapping("/@me/mfa")
 	public MFAKeyDTO setupMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsAlreadySetException {
 		log.info("USER mfa setup ({}, {}) request", user.getId(), user.getEmail());
 
@@ -90,8 +90,8 @@ public class UsersController {
 	}
 
 	@Operation(summary = "Validate MFA")
-	@PostMapping("/@me/mfa/setup/validate")
-	public OkDTO mfaValidate(@RequestAttribute(value = AttributesConstants.USER) User user) {
+	@PostMapping("/@me/mfa")
+	public OkDTO validateMfa(@RequestAttribute(value = AttributesConstants.USER) User user) {
 		log.info("USER mfa validation ({}, {}) request", user.getId(), user.getEmail());
 
 		return new OkDTO(true);
