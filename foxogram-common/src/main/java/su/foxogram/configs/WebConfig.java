@@ -33,7 +33,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(channelInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/create", "/docs");
-		registry.addInterceptor(memberInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/create", "/docs");
+		registry.addInterceptor(channelInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/", "/docs");
+		registry.addInterceptor(memberInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/", "/docs");
 	}
 }
