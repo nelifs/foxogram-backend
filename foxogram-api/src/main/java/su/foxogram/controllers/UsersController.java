@@ -60,7 +60,7 @@ public class UsersController {
 	}
 
 	@Operation(summary = "Confirm delete")
-	@PostMapping("/@me/delete/confirm/")
+	@DeleteMapping("/@me/confirm")
 	public OkDTO deleteUserConfirm(@RequestAttribute(value = AttributesConstants.USER) User user) {
 		log.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
@@ -79,20 +79,20 @@ public class UsersController {
 		return new MFAKeyDTO(key);
 	}
 
+	@Operation(summary = "Validate MFA")
+	@PostMapping("/@me/mfa")
+	public OkDTO validateMfa(@RequestAttribute(value = AttributesConstants.USER) User user) {
+		log.info("USER mfa validation ({}, {}) request", user.getId(), user.getEmail());
+
+		return new OkDTO(true);
+	}
+
 	@Operation(summary = "Delete MFA")
 	@DeleteMapping("/@me/mfa")
 	public OkDTO deleteMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsNotSetException {
 		log.info("USER mfa delete ({}, {}) request", user.getId(), user.getEmail());
 
 		usersService.deleteMFA(user);
-
-		return new OkDTO(true);
-	}
-
-	@Operation(summary = "Validate MFA")
-	@PostMapping("/@me/mfa")
-	public OkDTO validateMfa(@RequestAttribute(value = AttributesConstants.USER) User user) {
-		log.info("USER mfa validation ({}, {}) request", user.getId(), user.getEmail());
 
 		return new OkDTO(true);
 	}
