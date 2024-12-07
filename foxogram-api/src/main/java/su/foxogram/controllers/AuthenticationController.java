@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
+import su.foxogram.dtos.request.EmailCodeDTO;
 import su.foxogram.dtos.request.UserLoginDTO;
 import su.foxogram.dtos.request.UserSignUpDTO;
 import su.foxogram.dtos.response.OkDTO;
@@ -34,8 +35,6 @@ public class AuthenticationController {
 		String username = body.getUsername();
 		String email = body.getEmail();
 		String password = body.getPassword();
-		log.info("USER register ({}, {}) request", username, email);
-
 		String accessToken = authenticationService.userSignUp(username, email, password);
 
 		return new TokenDTO(accessToken);
@@ -46,7 +45,6 @@ public class AuthenticationController {
 	public TokenDTO login(@Valid @RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
 		String email = body.getEmail();
 		String password = body.getPassword();
-		log.info("USER ({}) LOGIN request", email);
 
 		String accessToken = authenticationService.loginUser(email, password);
 
@@ -54,11 +52,9 @@ public class AuthenticationController {
 	}
 
 	@Operation(summary = "Verify email")
-	@PostMapping("/email/verify/{code}")
-	public OkDTO emailVerify(@RequestAttribute(value = AttributesConstants.USER) User user, @PathVariable String code) throws CodeIsInvalidException, CodeExpiredException {
-		log.info("EMAIL verification for USER ({}, {}) request", user.getId(), user.getEmail());
-
-		authenticationService.verifyEmail(user, code);
+	@PostMapping("/email/verify")
+	public OkDTO emailVerify(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody EmailCodeDTO body) throws CodeIsInvalidException, CodeExpiredException {
+		authenticationService.verifyEmail(user, body.getCode());
 
 		return new OkDTO(true);
 	}
@@ -66,8 +62,6 @@ public class AuthenticationController {
 	@Operation(summary = "Resend email")
 	@PostMapping("/email/resend")
 	public OkDTO resendEmail(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
-		log.info("USER email verify resend requested ({}, {}) request", user.getId(), user.getEmail());
-
 		authenticationService.resendEmail(user, accessToken);
 
 		return new OkDTO(true);

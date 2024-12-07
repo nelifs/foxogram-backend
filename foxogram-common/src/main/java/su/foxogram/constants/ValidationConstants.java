@@ -40,6 +40,8 @@ public class ValidationConstants {
 
 		public static final String MESSAGE_WRONG_LENGTH = "Message length must be between {min} and {max} characters long";
 
+		public static final String EMAIL_CODE_NAME_WRONG_LENGTH = "Email code must be {min} characters long";
+
 		public static final String MUST_NOT_BE_NULL = " must not be null";
 	}
 
