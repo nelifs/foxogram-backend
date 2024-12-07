@@ -7,15 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
-import su.foxogram.dtos.request.CodeDTO;
 import su.foxogram.dtos.request.UserDeleteDTO;
 import su.foxogram.dtos.request.UserEditDTO;
-import su.foxogram.dtos.response.MFAKeyDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.dtos.response.UserDTO;
-import su.foxogram.exceptions.*;
+import su.foxogram.exceptions.UserCredentialsDuplicateException;
+import su.foxogram.exceptions.UserCredentialsIsInvalidException;
+import su.foxogram.exceptions.UserNotFoundException;
 import su.foxogram.models.User;
-import su.foxogram.services.MfaService;
 import su.foxogram.services.UsersService;
 
 import java.util.Objects;
@@ -27,11 +26,8 @@ import java.util.Objects;
 public class UsersController {
 	private final UsersService usersService;
 
-	private final MfaService mfaService;
-
-	public UsersController(UsersService usersService, MfaService mfaService) {
+	public UsersController(UsersService usersService) {
 		this.usersService = usersService;
-		this.mfaService = mfaService;
 	}
 
 	@Operation(summary = "Get user")
@@ -69,36 +65,6 @@ public class UsersController {
 		log.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
 		usersService.confirmUserDelete(user);
-
-		return new OkDTO(true);
-	}
-
-	@Operation(summary = "Setup MFA")
-	@PutMapping("/@me/mfa")
-	public MFAKeyDTO setupMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsAlreadySetException {
-		log.info("USER mfa setup ({}, {}) request", user.getId(), user.getEmail());
-
-		String key = mfaService.setupMFA(user);
-
-		return new MFAKeyDTO(key);
-	}
-
-	@Operation(summary = "Validate MFA")
-	@PostMapping("/@me/mfa")
-	public OkDTO validateMfa(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody CodeDTO body) {
-		log.info("USER mfa validation ({}, {}) request", user.getId(), user.getEmail());
-
-		boolean result = mfaService.validateMFA(user, body.getCode());
-
-		return new OkDTO(result);
-	}
-
-	@Operation(summary = "Delete MFA")
-	@DeleteMapping("/@me/mfa")
-	public OkDTO deleteMFA(@RequestAttribute(value = AttributesConstants.USER) User user) throws MFAIsNotSetException {
-		log.info("USER mfa delete ({}, {}) request", user.getId(), user.getEmail());
-
-		mfaService.deleteMFA(user);
 
 		return new OkDTO(true);
 	}

@@ -8,6 +8,4 @@ public class AttributesConstants {
 	public static final String CHANNEL = "channel";
 
 	public static final String ACCESS_TOKEN = "access_token";
-
-	public static final String MFA_VERIFIED = "mfa_verified";
 }
