@@ -7,13 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
+import su.foxogram.dtos.request.CodeDTO;
 import su.foxogram.dtos.request.UserDeleteDTO;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.dtos.response.UserDTO;
-import su.foxogram.exceptions.UserCredentialsDuplicateException;
-import su.foxogram.exceptions.UserCredentialsIsInvalidException;
-import su.foxogram.exceptions.UserNotFoundException;
+import su.foxogram.exceptions.*;
 import su.foxogram.models.User;
 import su.foxogram.services.UsersService;
 
@@ -61,10 +60,10 @@ public class UsersController {
 
 	@Operation(summary = "Confirm delete")
 	@DeleteMapping("/@me/confirm")
-	public OkDTO deleteUserConfirm(@RequestAttribute(value = AttributesConstants.USER) User user) {
+	public OkDTO deleteUserConfirm(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody CodeDTO body) throws CodeExpiredException, CodeIsInvalidException {
 		log.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 
-		usersService.confirmUserDelete(user);
+		usersService.confirmUserDelete(user, body.getCode());
 
 		return new OkDTO(true);
 	}

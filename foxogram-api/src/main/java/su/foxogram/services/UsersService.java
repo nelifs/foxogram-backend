@@ -8,10 +8,10 @@ import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserEditDTO;
-import su.foxogram.exceptions.UserCredentialsDuplicateException;
-import su.foxogram.exceptions.UserCredentialsIsInvalidException;
-import su.foxogram.exceptions.UserNotFoundException;
+import su.foxogram.exceptions.*;
+import su.foxogram.models.Code;
 import su.foxogram.models.User;
+import su.foxogram.repositories.CodeRepository;
 import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
@@ -25,10 +25,13 @@ public class UsersService {
 
 	private final EmailService emailService;
 
+	private final CodeRepository codeRepository;
+
 	@Autowired
-	public UsersService(UserRepository userRepository, EmailService emailService) {
+	public UsersService(UserRepository userRepository, EmailService emailService, CodeRepository codeRepository) {
 		this.userRepository = userRepository;
 		this.emailService = emailService;
+		this.codeRepository = codeRepository;
 	}
 
 	public User getUser(String key) throws UserNotFoundException {
@@ -63,13 +66,30 @@ public class UsersService {
 		sendEmail(user, EmailConstants.Type.ACCOUNT_DELETE);
 	}
 
-	public void confirmUserDelete(User user) {
-		deleteUser(user);
+	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
+		Code code = validateCode(pathCode);
+
+		userRepository.delete(user);
+		log.info("User deleted ({}, {}) successfully", user.getId(), user.getEmail());
+
+		deleteVerificationCode(code);
 	}
 
-	private void deleteUser(User user) {
-		userRepository.delete(user);
-		log.info("USER record deleted ({}, {}) successfully", user.getId(), user.getEmail());
+	public Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
+		Code code = codeRepository.findByValue(pathCode);
+
+		if (code == null)
+			throw new CodeIsInvalidException();
+
+		if (code.expiresAt <= System.currentTimeMillis())
+			throw new CodeExpiredException();
+
+		return code;
+	}
+
+	private void deleteVerificationCode(Code code) {
+		codeRepository.delete(code);
+		log.info("CODE record deleted ({}, {}) successfully", code.getUserId(), code.getValue());
 	}
 
 	private void changeEmail(User user, UserEditDTO body) {
