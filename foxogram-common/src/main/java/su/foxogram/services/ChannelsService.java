@@ -2,19 +2,18 @@ package su.foxogram.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.dtos.request.ChannelEditDTO;
 import su.foxogram.dtos.response.MemberDTO;
-import su.foxogram.exceptions.ChannelNotFoundException;
-import su.foxogram.exceptions.MemberAlreadyInChannelException;
-import su.foxogram.exceptions.MemberInChannelNotFoundException;
-import su.foxogram.exceptions.MissingPermissionsException;
+import su.foxogram.exceptions.*;
 import su.foxogram.models.Channel;
 import su.foxogram.models.Member;
 import su.foxogram.models.User;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MemberRepository;
+import su.foxogram.repositories.UserRepository;
 
 import java.util.List;
 
@@ -25,17 +24,27 @@ public class ChannelsService {
 
 	private final MemberRepository memberRepository;
 
+	private final UserRepository userRepository;
+
 	@Autowired
-	public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository) {
+	public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, UserRepository userRepository) {
 		this.channelRepository = channelRepository;
 		this.memberRepository = memberRepository;
+		this.userRepository = userRepository;
 	}
 
-	public Channel createChannel(User user, int type, String name) {
+	public Channel createChannel(User user, int type, String name) throws ChannelAlreadyExistException {
 		String owner = user.getUsername();
+		Channel channel;
 
-		Channel channel = new Channel(0, name, type, owner);
-		channelRepository.save(channel);
+		try {
+			channel = new Channel(0, name, type, owner);
+			channelRepository.save(channel);
+		} catch (DataIntegrityViolationException e) {
+			throw new ChannelAlreadyExistException();
+		}
+
+		user = userRepository.findByUsername(owner);
 
 		Member member = new Member(user, channel, MemberConstants.Permissions.ADMIN.getBit());
 		memberRepository.save(member);
@@ -76,6 +85,8 @@ public class ChannelsService {
 		Member member = memberRepository.findByChannelAndUsername(channel, user.getUsername());
 
 		if (member != null) throw new MemberAlreadyInChannelException();
+
+		user = userRepository.findByUsername(user.getUsername());
 
 		member = new Member(user, channel, 0);
 		return memberRepository.save(member);
