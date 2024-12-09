@@ -29,9 +29,9 @@ public class ChannelInterceptor implements HandlerInterceptor {
 	public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
 		Map<String, String> uriVariables = (Map<String, String>) getUriVariables(request);
 
-		String channelId = getChannelId(uriVariables).orElseThrow(ChannelNotFoundException::new);
+		String channelName = getChannelName(uriVariables).orElseThrow(ChannelNotFoundException::new);
 
-		request.setAttribute(AttributesConstants.CHANNEL, channelsService.getChannel(channelId));
+		request.setAttribute(AttributesConstants.CHANNEL, channelsService.getChannel(channelName));
 
 		return true;
 	}
@@ -43,11 +43,11 @@ public class ChannelInterceptor implements HandlerInterceptor {
 				.orElseGet(Collections::emptyMap);
 	}
 
-	private Optional<String> getChannelId(Map<String, String> uriVariables) {
-		String channelIdString = uriVariables.get("id");
+	private Optional<String> getChannelName(Map<String, String> uriVariables) {
+		String channelName = uriVariables.get("name");
 
 		try {
-			return Optional.ofNullable(channelIdString);
+			return Optional.ofNullable(channelName);
 		} catch (NumberFormatException e) {
 			return Optional.empty();
 		}

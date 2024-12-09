@@ -15,7 +15,8 @@ import java.util.List;
 })
 public class Channel {
 	@Id
-	public String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public long id;
 
 	@Column()
 	public String name;
@@ -24,7 +25,7 @@ public class Channel {
 	public int type;
 
 	@Column()
-	public String ownerId;
+	public String owner;
 
 	@OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Member> members;
@@ -35,10 +36,10 @@ public class Channel {
 	public Channel() {
 	}
 
-	public Channel(String id, String name, int type, String ownerId) {
+	public Channel(long id, String name, int type, String owner) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
-		this.ownerId = ownerId;
+		this.owner = owner;
 	}
 }

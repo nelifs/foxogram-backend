@@ -30,13 +30,13 @@ public class UsersController {
 	}
 
 	@Operation(summary = "Get user")
-	@GetMapping("/{userKey}")
-	public UserDTO getUser(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser, @PathVariable String userKey) throws UserNotFoundException {
-		if (Objects.equals(userKey, "@me")) {
+	@GetMapping("/{username}")
+	public UserDTO getUser(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser, @PathVariable String username) throws UserNotFoundException {
+		if (Objects.equals(username, "@me")) {
 			return new UserDTO(authenticatedUser, true);
 		}
 
-		return new UserDTO(usersService.getUser(userKey), false);
+		return new UserDTO(usersService.getUser(username), false);
 	}
 
 	@Operation(summary = "Edit user")

@@ -12,11 +12,12 @@ import java.util.List;
 @Table(name = "messages", indexes = {
 		@Index(name = "idx_message_id", columnList = "id", unique = true),
 		@Index(name = "idx_message_channel", columnList = "channel", unique = true),
-		@Index(name = "idx_message__id_channel_id", columnList = "id, channel", unique = true)
+		@Index(name = "idx_message_id_channel_id", columnList = "id, channel", unique = true)
 })
 public class Message {
 	@Id
-	public String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public long id;
 
 	@Column()
 	public String content;
@@ -40,7 +41,7 @@ public class Message {
 	public Message() {
 	}
 
-	public Message(String id, Channel channel, String content, String authorId, long timestamp, List<String> attachments) {
+	public Message(long id, Channel channel, String content, long authorId, long timestamp, List<String> attachments) {
 		this.id = id;
 		this.channel = channel;
 		this.author = new Member(authorId);

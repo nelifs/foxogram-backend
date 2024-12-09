@@ -13,7 +13,7 @@ import lombok.Setter;
 })
 public class Code {
 	@Id()
-	public String userId;
+	public long userId;
 
 	@Column()
 	public String type;
@@ -30,7 +30,7 @@ public class Code {
 	public Code() {
 	}
 
-	public Code(String userId, String type, String value, long issuedAt, long expiresAt) {
+	public Code(long userId, String type, String value, long issuedAt, long expiresAt) {
 		this.userId = userId;
 		this.type = type;
 		this.value = value;

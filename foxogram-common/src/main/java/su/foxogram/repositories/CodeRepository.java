@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 import su.foxogram.models.Code;
 
 @Repository
-public interface CodeRepository extends CrudRepository<Code, String> {
-	Code findByUserId(String userId);
+public interface CodeRepository extends CrudRepository<Code, Long> {
+	Code findByUserId(long userId);
 
 	Code findByValue(String value);
 

@@ -15,7 +15,6 @@ import su.foxogram.models.Member;
 import su.foxogram.models.User;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MemberRepository;
-import su.foxogram.structures.Snowflake;
 
 import java.util.List;
 
@@ -33,10 +32,9 @@ public class ChannelsService {
 	}
 
 	public Channel createChannel(User user, int type, String name) {
-		String id = Snowflake.create();
-		String ownerId = user.getId();
+		String owner = user.getUsername();
 
-		Channel channel = new Channel(id, name, type, ownerId);
+		Channel channel = new Channel(0, name, type, owner);
 		channelRepository.save(channel);
 
 		Member member = new Member(user, channel, MemberConstants.Permissions.ADMIN.getBit());
@@ -45,8 +43,12 @@ public class ChannelsService {
 		return channel;
 	}
 
-	public Channel getChannel(String id) throws ChannelNotFoundException {
-		return channelRepository.findById(id).orElseThrow(ChannelNotFoundException::new);
+	public Channel getChannel(String name) throws ChannelNotFoundException {
+		Channel channel = channelRepository.findByName(name);
+
+		if (channel == null) throw new ChannelNotFoundException();
+
+		return channel;
 	}
 
 	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
@@ -61,7 +63,7 @@ public class ChannelsService {
 	}
 
 	public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
-		Member member = memberRepository.findByChannelAndId(channel, user.getId());
+		Member member = memberRepository.findByChannelAndUser(channel, user);
 
 		if (member.hasPermission(MemberConstants.Permissions.ADMIN)) {
 			channelRepository.delete(channel);
@@ -71,7 +73,7 @@ public class ChannelsService {
 	}
 
 	public Member joinUser(Channel channel, User user) throws MemberAlreadyInChannelException {
-		Member member = memberRepository.findByChannelAndId(channel, user.getId());
+		Member member = memberRepository.findByChannelAndUsername(channel, user.getId());
 
 		if (member != null) throw new MemberAlreadyInChannelException();
 
@@ -80,11 +82,11 @@ public class ChannelsService {
 	}
 
 	public void leaveUser(Channel channel, User user) throws MemberInChannelNotFoundException {
-		Member member = memberRepository.findByChannelAndId(channel, user.getId());
+		Member member = memberRepository.findByChannelAndUser(channel, user);
 
 		if (member == null) throw new MemberInChannelNotFoundException();
 
-		member = memberRepository.findByChannelAndId(channel, user.getId());
+		member = memberRepository.findByChannelAndUser(channel, user);
 		memberRepository.delete(member);
 	}
 
@@ -94,7 +96,7 @@ public class ChannelsService {
 				.toList();
 	}
 
-	public Member getMember(Channel channel, String id) {
-		return memberRepository.findByChannelAndId(channel, id);
+	public Member getMember(Channel channel, String memberUsername) {
+		return memberRepository.findByChannelAndUsername(channel, memberUsername);
 	}
 }

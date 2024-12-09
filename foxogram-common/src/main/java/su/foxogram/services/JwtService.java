@@ -30,7 +30,7 @@ public class JwtService {
 	}
 
 	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
-		String userId;
+		long userId;
 
 		try {
 			Jws<Claims> claimsJws = Jwts.parserBuilder()
@@ -38,7 +38,7 @@ public class JwtService {
 					.build()
 					.parseClaimsJws(header.substring(7));
 
-			userId = claimsJws.getBody().getId();
+			userId = Long.parseLong(claimsJws.getBody().getId());
 		} catch (Exception e) {
 			throw new UserUnauthorizedException();
 		}
@@ -51,12 +51,12 @@ public class JwtService {
 		return userRepository.findById(userId).orElseThrow(UserUnauthorizedException::new);
 	}
 
-	public String generate(String id) {
+	public String generate(long id) {
 		long now = System.currentTimeMillis();
 		Date expirationDate = new Date(now + TokenConstants.LIFETIME);
 
 		return Jwts.builder()
-				.setId(id)
+				.setId(String.valueOf(id))
 				.setExpiration(expirationDate)
 				.signWith(getSigningKey())
 				.compact();

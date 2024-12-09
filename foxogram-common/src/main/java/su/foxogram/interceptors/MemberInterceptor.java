@@ -29,9 +29,7 @@ public class MemberInterceptor implements HandlerInterceptor {
 		User user = (User) request.getAttribute(AttributesConstants.USER);
 		Channel channel = (Channel) request.getAttribute(AttributesConstants.CHANNEL);
 
-		Member member = channelsService.getMember(channel, user.getId());
-
-		if (member == null) throw new ChannelNotFoundException();
+		Member member = channelsService.getMember(channel, user.getUsername());
 
 		request.setAttribute("member", member);
 		return true;

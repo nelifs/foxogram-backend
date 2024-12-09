@@ -16,8 +16,6 @@ import su.foxogram.repositories.UserRepository;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 public class UsersService {
@@ -34,12 +32,12 @@ public class UsersService {
 		this.codeRepository = codeRepository;
 	}
 
-	public User getUser(String key) throws UserNotFoundException {
-		Optional<User> optionalUser = userRepository.findByIdOrUsername(key, key);
+	public User getUser(String username) throws UserNotFoundException {
+		User user = userRepository.findByUsername(username);
 
-		if (optionalUser.isEmpty()) throw new UserNotFoundException();
+		if (user == null) throw new UserNotFoundException();
 
-		return optionalUser.get();
+		return user;
 	}
 
 	public User editUser(User user, UserEditDTO body) throws UserCredentialsDuplicateException {

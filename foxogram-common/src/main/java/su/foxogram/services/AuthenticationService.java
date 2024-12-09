@@ -15,7 +15,6 @@ import su.foxogram.models.Code;
 import su.foxogram.models.User;
 import su.foxogram.repositories.CodeRepository;
 import su.foxogram.repositories.UserRepository;
-import su.foxogram.structures.Snowflake;
 import su.foxogram.util.CodeGenerator;
 import su.foxogram.util.Encryptor;
 
@@ -56,13 +55,12 @@ public class AuthenticationService {
 	}
 
 	private User createUser(String username, String email, String password) {
-		String id = Snowflake.create();
 		long deletion = 0;
 		String avatar = new Avatar("").getId();
 		long flags = UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
 		int type = UserConstants.Type.USER.getType();
 
-		return new User(id, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion, null);
+		return new User(0, avatar, null, username, email, Encryptor.hashPassword(password), flags, type, deletion, null);
 	}
 
 	private void sendConfirmationEmail(User user) {

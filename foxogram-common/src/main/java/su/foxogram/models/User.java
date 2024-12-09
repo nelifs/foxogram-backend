@@ -15,7 +15,8 @@ import su.foxogram.constants.UserConstants;
 })
 public class User {
 	@Id
-	public String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public long id;
 
 	@Column()
 	public String displayName;
@@ -47,7 +48,7 @@ public class User {
 	public User() {
 	}
 
-	public User(String id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion, String key) {
+	public User(long id, String avatar, String displayName, String username, String email, String password, long flags, int type, long deletion, String key) {
 		this.id = id;
 		this.avatar = avatar;
 		this.displayName = displayName;

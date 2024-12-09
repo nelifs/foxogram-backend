@@ -8,7 +8,6 @@ import su.foxogram.models.User;
 @Getter
 @Setter
 public class UserDTO {
-	private String id;
 
 	private String avatar;
 
@@ -24,7 +23,6 @@ public class UserDTO {
 	private long type;
 
 	public UserDTO(User user, boolean includeEmail) {
-		this.id = user.getId();
 		this.avatar = user.getAvatar();
 		this.displayName = user.getDisplayName();
 		this.username = user.getUsername();

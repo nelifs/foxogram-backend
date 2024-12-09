@@ -12,31 +12,34 @@ import su.foxogram.constants.MemberConstants;
 		@Index(name = "idx_member_user_channel_id", columnList = "user_id, channel")
 })
 public class Member {
+	@Id
+	public long userId;
+
+	public String username;
+
 	@Column()
 	public long permissions;
 
 	@MapsId
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "channel", nullable = false)
 	private Channel channel;
-
-	@Id
-	private String userId;
 
 	public Member() {
 
 	}
 
-	public Member(String userId) {
+	public Member(long userId) {
 		this.userId = userId;
 	}
 
 	public Member(User user, Channel channel, long permissions) {
 		this.userId = user.getId();
+		this.username = user.getUsername();
 		this.user = user;
 		this.channel = channel;
 		this.permissions = permissions;

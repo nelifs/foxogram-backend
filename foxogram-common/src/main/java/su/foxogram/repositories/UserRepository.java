@@ -8,11 +8,11 @@ import su.foxogram.models.User;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<User, String> {
+public interface UserRepository extends CrudRepository<User, Long> {
 	@NotNull
-	Optional<User> findById(@NotNull String id);
+	Optional<User> findById(long id);
 
-	Optional<User> findByIdOrUsername(String id, String username);
+	Optional<User> findByIdOrUsername(long id, String username);
 
 	Optional<User> findByEmail(String email);
 

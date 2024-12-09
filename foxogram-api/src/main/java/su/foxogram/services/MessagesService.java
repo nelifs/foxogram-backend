@@ -13,7 +13,6 @@ import su.foxogram.models.Member;
 import su.foxogram.models.Message;
 import su.foxogram.models.User;
 import su.foxogram.repositories.MessageRepository;
-import su.foxogram.structures.Snowflake;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,16 +36,15 @@ public class MessagesService {
 
 		return messagesArray.stream()
 				.map(message -> new MessageDTO(
-						message.getId(),
 						message.getContent(),
-						message.getAuthor().getUserId(),
-						message.getChannel().getId(),
+						message.getAuthor().getUser().getUsername(),
+						message.getChannel().getName(),
 						message.getAttachments()
 				))
 				.collect(Collectors.toList());
 	}
 
-	public Message getMessage(String id, Channel channel) throws MessageNotFoundException {
+	public Message getMessage(long id, Channel channel) throws MessageNotFoundException {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
@@ -57,35 +55,34 @@ public class MessagesService {
 	}
 
 	public void addMessage(Channel channel, User user, MessageCreateDTO body) {
-		String id = Snowflake.create();
-		String authorId = user.getId();
+		long authorId = user.getId();
 		long timestamp = System.currentTimeMillis();
 		List<String> attachments = body.getAttachments();
 		String content = body.getContent();
 
-		Message message = new Message(id, channel, content, authorId, timestamp, attachments);
+		Message message = new Message(0, channel, content, authorId, timestamp, attachments);
 
 		messageRepository.save(message);
-		log.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", id, channel.getId());
+		log.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", message.getId(), channel.getId());
 	}
 
-	public void deleteMessage(String id, Member member, Channel channel) throws MessageNotFoundException, MissingPermissionsException {
+	public void deleteMessage(long id, Member member, Channel channel) throws MessageNotFoundException, MissingPermissionsException {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getUserId(), member.getUserId()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
+		if (!Objects.equals(message.getAuthor().getUsername(), member.getUsername()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
 			throw new MissingPermissionsException();
 
 		messageRepository.delete(message);
 		log.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channel.getId());
 	}
 
-	public Message editMessage(String id, Channel channel, Member member, MessageCreateDTO body) throws MessageNotFoundException, MissingPermissionsException {
+	public Message editMessage(long id, Channel channel, Member member, MessageCreateDTO body) throws MessageNotFoundException, MissingPermissionsException {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 		String content = body.getContent();
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getUserId(), member.getUserId()))
+		if (!Objects.equals(message.getAuthor().getUsername(), member.getUsername()))
 			throw new MissingPermissionsException();
 
 		message.setContent(content);

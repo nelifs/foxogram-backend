@@ -7,18 +7,16 @@ import su.foxogram.models.Channel;
 @Getter
 @Setter
 public class ChannelDTO {
-	private String id;
 
 	private String name;
 
 	private int type;
 
-	private String ownerId;
+	private String owner;
 
 	public ChannelDTO(Channel channel) {
-		this.id = channel.getId();
 		this.name = channel.getName();
 		this.type = channel.getType();
-		this.ownerId = channel.getOwnerId();
+		this.owner = channel.getOwner();
 	}
 }

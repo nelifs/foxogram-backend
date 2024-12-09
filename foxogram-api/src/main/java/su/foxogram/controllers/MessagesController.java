@@ -36,7 +36,7 @@ public class MessagesController {
 	}
 
 	@Operation(summary = "Get messages")
-	@GetMapping("/channel/{channelId}")
+	@GetMapping("/channel/{name}")
 	public List<MessageDTO> getMessages(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @RequestParam(required = false, defaultValue = "0") long before, @RequestParam(required = false, defaultValue = "0") int limit) {
 		log.info("MESSAGES ({}, {}) from CHANNEL ({}) by USER ({}, {}) requested", before, limit, channel.getId(), user.getId(), user.getEmail());
 
@@ -44,8 +44,8 @@ public class MessagesController {
 	}
 
 	@Operation(summary = "Get message")
-	@GetMapping("/channel/{channelId}/{id}")
-	public MessagesDTO getMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String id) throws MessageNotFoundException {
+	@GetMapping("/channel/{name}/{id}")
+	public MessagesDTO getMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable long id) throws MessageNotFoundException {
 		log.info("MESSAGE ({}) from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> message = List.of(messagesService.getMessage(id, channel));
@@ -54,7 +54,7 @@ public class MessagesController {
 	}
 
 	@Operation(summary = "Create message")
-	@PostMapping("/channel/{channelId}")
+	@PostMapping("/channel/{name}")
 	public OkDTO createMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body) {
 		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channel.getId(), user.getId(), user.getEmail());
 
@@ -64,8 +64,8 @@ public class MessagesController {
 	}
 
 	@Operation(summary = "Delete message")
-	@DeleteMapping("/channel/{channelId}/{id}")
-	public OkDTO deleteMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable String id) throws MessageNotFoundException, MissingPermissionsException {
+	@DeleteMapping("/channel/{name}/{id}")
+	public OkDTO deleteMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @PathVariable long id) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) delete from CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		messagesService.deleteMessage(id, member, channel);
@@ -74,8 +74,8 @@ public class MessagesController {
 	}
 
 	@Operation(summary = "Edit message")
-	@PatchMapping("/channel/{channelId}/{id}")
-	public MessagesDTO editMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body, @PathVariable String id) throws MessageNotFoundException, MissingPermissionsException {
+	@PatchMapping("/channel/{name}/{id}")
+	public MessagesDTO editMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body, @PathVariable long id) throws MessageNotFoundException, MissingPermissionsException {
 		log.info("MESSAGE ({}) patch in CHANNEL ({}) by USER ({}, {}) requested", id, channel.getId(), user.getId(), user.getEmail());
 
 		List<Message> message = List.of(messagesService.editMessage(id, channel, member, body));
