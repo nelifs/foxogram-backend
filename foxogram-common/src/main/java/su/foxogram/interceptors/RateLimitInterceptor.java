@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import su.foxogram.constants.APIConstants;
+import su.foxogram.constants.RateLimitConstants;
 import su.foxogram.exceptions.RateLimitExceededException;
 
 import java.time.Duration;
@@ -20,18 +20,17 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws RateLimitExceededException {
 		String clientRemoteAddr = request.getRemoteAddr();
-
 		Bucket bucket = clients.computeIfAbsent(clientRemoteAddr, this::createNewBucket);
 
-		long estimateAbilityToConsumeInMs = bucket.estimateAbilityToConsume(APIConstants.RATE_LIMIT_CONSUME).getNanosToWaitForRefill() / 1000000;
+		long estimateAbilityToConsumeInMs = bucket.estimateAbilityToConsume(RateLimitConstants.RATE_LIMIT_CONSUME).getNanosToWaitForRefill() / 1000000;
 
-		if (bucket.tryConsume(10)) return true;
+		if (bucket.tryConsume(RateLimitConstants.RATE_LIMIT_CONSUME)) return true;
 		else throw new RateLimitExceededException(estimateAbilityToConsumeInMs);
 	}
 
 	private Bucket createNewBucket(String clientRemoteAddr) {
 		return Bucket.builder()
-				.addLimit(limit -> limit.capacity(APIConstants.RATE_LIMIT_CAPACITY).refillGreedy(APIConstants.RATE_LIMIT_REFILL, Duration.ofMinutes(APIConstants.RATE_LIMIT_DURATION)))
+				.addLimit(limit -> limit.capacity(RateLimitConstants.RATE_LIMIT_CAPACITY).refillGreedy(RateLimitConstants.RATE_LIMIT_REFILL, Duration.ofMinutes(RateLimitConstants.RATE_LIMIT_DURATION)))
 				.build();
 	}
 }
