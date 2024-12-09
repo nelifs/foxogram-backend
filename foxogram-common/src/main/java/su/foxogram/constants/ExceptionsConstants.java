@@ -16,7 +16,8 @@ public class ExceptionsConstants {
 		CODE_IS_INVALID(501),
 		CODE_EXPIRED(502),
 		NEED_TO_WAIT_BEFORE_RESEND(503),
-		TOTP_KEY_IS_INVALID(601);
+		TOTP_KEY_IS_INVALID(601),
+		RATE_LIMIT_EXCEEDED(701);
 
 		private final int code;
 

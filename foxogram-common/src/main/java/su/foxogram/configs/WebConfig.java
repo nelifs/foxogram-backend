@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import su.foxogram.interceptors.AuthenticationInterceptor;
 import su.foxogram.interceptors.ChannelInterceptor;
 import su.foxogram.interceptors.MemberInterceptor;
+import su.foxogram.interceptors.RateLimitInterceptor;
 
 @Configuration
 @EnableWebMvc
@@ -19,11 +20,14 @@ public class WebConfig implements WebMvcConfigurer {
 
 	private final MemberInterceptor memberInterceptor;
 
+	private final RateLimitInterceptor rateLimitInterceptor;
+
 	@Autowired
-	public WebConfig(AuthenticationInterceptor authenticationInterceptor, ChannelInterceptor channelInterceptor, MemberInterceptor memberInterceptor) {
+	public WebConfig(AuthenticationInterceptor authenticationInterceptor, ChannelInterceptor channelInterceptor, MemberInterceptor memberInterceptor, RateLimitInterceptor rateLimitInterceptor) {
 		this.authenticationInterceptor = authenticationInterceptor;
 		this.channelInterceptor = channelInterceptor;
 		this.memberInterceptor = memberInterceptor;
+		this.rateLimitInterceptor = rateLimitInterceptor;
 	}
 
 	@Override
@@ -36,6 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(rateLimitInterceptor).excludePathPatterns("/docs", "/actuator/health");
 		registry.addInterceptor(authenticationInterceptor).excludePathPatterns("/auth/register", "/auth/login", "/docs", "/actuator/health");
 		registry.addInterceptor(channelInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/", "/docs", "/actuator/health");
 		registry.addInterceptor(memberInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/", "/docs", "/actuator/health");
