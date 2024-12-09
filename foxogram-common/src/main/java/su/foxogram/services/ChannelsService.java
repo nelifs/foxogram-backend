@@ -73,7 +73,7 @@ public class ChannelsService {
 	}
 
 	public Member joinUser(Channel channel, User user) throws MemberAlreadyInChannelException {
-		Member member = memberRepository.findByChannelAndUsername(channel, user.getId());
+		Member member = memberRepository.findByChannelAndUsername(channel, user.getUsername());
 
 		if (member != null) throw new MemberAlreadyInChannelException();
 

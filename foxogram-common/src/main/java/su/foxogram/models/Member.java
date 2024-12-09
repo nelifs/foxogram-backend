@@ -9,11 +9,12 @@ import su.foxogram.constants.MemberConstants;
 @Getter
 @Entity
 @Table(name = "members", indexes = {
-		@Index(name = "idx_member_user_channel_id", columnList = "user_id, channel")
+		@Index(name = "idx_member_user_channel_id", columnList = "id, channel")
 })
 public class Member {
 	@Id
-	public long userId;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public long id;
 
 	public String username;
 
@@ -33,12 +34,11 @@ public class Member {
 
 	}
 
-	public Member(long userId) {
-		this.userId = userId;
+	public Member(long id) {
+		this.id = id;
 	}
 
 	public Member(User user, Channel channel, long permissions) {
-		this.userId = user.getId();
 		this.username = user.getUsername();
 		this.user = user;
 		this.channel = channel;
