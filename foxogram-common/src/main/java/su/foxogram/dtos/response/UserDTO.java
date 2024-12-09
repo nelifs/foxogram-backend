@@ -22,6 +22,8 @@ public class UserDTO {
 
 	private long type;
 
+	private long createdAt;
+
 	public UserDTO(User user, boolean includeEmail) {
 		this.avatar = user.getAvatar();
 		this.displayName = user.getDisplayName();
@@ -31,5 +33,6 @@ public class UserDTO {
 		}
 		this.flags = user.getFlags();
 		this.type = user.getType();
+		this.createdAt = user.getCreatedAt();
 	}
 }

@@ -33,6 +33,9 @@ public class Channel {
 	@OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Message> messages;
 
+	@Column()
+	public long createdAt;
+
 	public Channel() {
 	}
 
@@ -41,5 +44,6 @@ public class Channel {
 		this.name = name;
 		this.type = type;
 		this.owner = owner;
+		this.createdAt = System.currentTimeMillis();
 	}
 }

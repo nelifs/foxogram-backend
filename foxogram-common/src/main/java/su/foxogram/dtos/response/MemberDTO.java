@@ -7,13 +7,19 @@ import su.foxogram.models.Member;
 @Getter
 @Setter
 public class MemberDTO {
+	private String username;
+
 	private String channel;
 
 	private long permissions;
 
+	private long joinedAt;
+
 	public MemberDTO(Member member) {
+		this.username = member.getUser().getUsername();
 		this.channel = member.getChannel().getName();
 		this.permissions = member.getPermissions();
+		this.joinedAt = member.getJoinedAt();
 	}
 }
 

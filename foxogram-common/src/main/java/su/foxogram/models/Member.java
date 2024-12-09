@@ -9,14 +9,12 @@ import su.foxogram.constants.MemberConstants;
 @Getter
 @Entity
 @Table(name = "members", indexes = {
-		@Index(name = "idx_member_user_channel_id", columnList = "user_id, channel")
+		@Index(name = "idx_member_user_channel", columnList = "user_id, channel")
 })
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public long id;
-
-	public String username;
 
 	@Column()
 	public long permissions;
@@ -30,6 +28,9 @@ public class Member {
 	@JoinColumn(name = "channel", nullable = false)
 	private Channel channel;
 
+	@Column()
+	public long joinedAt;
+
 	public Member() {
 
 	}
@@ -39,10 +40,10 @@ public class Member {
 	}
 
 	public Member(User user, Channel channel, long permissions) {
-		this.username = user.getUsername();
 		this.user = user;
 		this.channel = channel;
 		this.permissions = permissions;
+		this.joinedAt = System.currentTimeMillis();
 	}
 
 	public void addPermission(MemberConstants.Permissions permission) {

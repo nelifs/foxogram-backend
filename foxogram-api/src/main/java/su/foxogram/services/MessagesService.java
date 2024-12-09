@@ -70,7 +70,7 @@ public class MessagesService {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getUsername(), member.getUsername()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
+		if (!Objects.equals(message.getAuthor().getUser().getUsername(), member.getUser().getUsername()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
 			throw new MissingPermissionsException();
 
 		messageRepository.delete(message);
@@ -82,7 +82,7 @@ public class MessagesService {
 		String content = body.getContent();
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getUsername(), member.getUsername()))
+		if (!Objects.equals(message.getAuthor().getUser().getUsername(), member.getUser().getUsername()))
 			throw new MissingPermissionsException();
 
 		message.setContent(content);

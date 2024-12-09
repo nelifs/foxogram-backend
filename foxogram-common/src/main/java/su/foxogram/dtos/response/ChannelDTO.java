@@ -14,9 +14,12 @@ public class ChannelDTO {
 
 	private String owner;
 
+	private long createdAt;
+
 	public ChannelDTO(Channel channel) {
 		this.name = channel.getName();
 		this.type = channel.getType();
 		this.owner = channel.getOwner();
+		this.createdAt = channel.getCreatedAt();
 	}
 }

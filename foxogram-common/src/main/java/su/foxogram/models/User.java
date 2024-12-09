@@ -25,6 +25,12 @@ public class User {
 	public String username;
 
 	@Column()
+	private String email;
+
+	@Column()
+	private String password;
+
+	@Column()
 	public String avatar;
 
 	@Column()
@@ -34,10 +40,7 @@ public class User {
 	public int type;
 
 	@Column()
-	private String email;
-
-	@Column()
-	private String password;
+	private long createdAt;
 
 	@Column()
 	private long deletion;
@@ -57,6 +60,7 @@ public class User {
 		this.password = password;
 		this.flags = flags;
 		this.type = type;
+		this.createdAt = System.currentTimeMillis();
 		this.deletion = deletion;
 		this.key = key;
 	}
