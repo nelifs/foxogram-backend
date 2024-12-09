@@ -36,6 +36,7 @@ public class MessagesService {
 
 		return messagesArray.stream()
 				.map(message -> new MessageDTO(
+						message.getId(),
 						message.getContent(),
 						message.getAuthor().getUser().getUsername(),
 						message.getChannel().getName(),
