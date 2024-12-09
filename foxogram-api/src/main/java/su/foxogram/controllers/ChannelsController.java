@@ -12,6 +12,7 @@ import su.foxogram.dtos.request.ChannelEditDTO;
 import su.foxogram.dtos.response.ChannelDTO;
 import su.foxogram.dtos.response.MemberDTO;
 import su.foxogram.dtos.response.OkDTO;
+import su.foxogram.exceptions.ChannelAlreadyExistException;
 import su.foxogram.exceptions.MemberAlreadyInChannelException;
 import su.foxogram.exceptions.MemberInChannelNotFoundException;
 import su.foxogram.exceptions.MissingPermissionsException;
@@ -37,7 +38,7 @@ public class ChannelsController {
 
 	@Operation(summary = "Create channel")
 	@PostMapping("/")
-	public ChannelDTO createChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @Valid @RequestBody ChannelCreateDTO body) {
+	public ChannelDTO createChannel(@RequestAttribute(value = AttributesConstants.USER) User user, @Valid @RequestBody ChannelCreateDTO body) throws ChannelAlreadyExistException {
 		Channel channel = channelsService.createChannel(user, body.getType(), body.getName());
 
 		return new ChannelDTO(channel);
