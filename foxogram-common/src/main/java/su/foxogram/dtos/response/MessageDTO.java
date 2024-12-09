@@ -11,16 +11,16 @@ public class MessageDTO {
 
 	private String content;
 
-	private String authorUsername;
+	private String author;
 
-	private String channelName;
+	private String channel;
 
 	private List<String> attachments;
 
 	public MessageDTO(String content, String authorUsername, String channelName, List<String> attachments) {
 		this.content = content;
-		this.authorUsername = authorUsername;
-		this.channelName = channelName;
+		this.author = authorUsername;
+		this.channel = channelName;
 		this.attachments = attachments;
 	}
 }

@@ -9,7 +9,7 @@ import su.foxogram.constants.MemberConstants;
 @Getter
 @Entity
 @Table(name = "members", indexes = {
-		@Index(name = "idx_member_user_channel_id", columnList = "id, channel")
+		@Index(name = "idx_member_user_channel_id", columnList = "user_id, channel")
 })
 public class Member {
 	@Id
