@@ -33,7 +33,6 @@ dependencies {
     implementation 'org.aspectj:aspectjrt:1.9.7'
     implementation 'dev.samstevens.totp:totp:1.7.1'
     implementation 'com.bucket4j:bucket4j_jdk17-core:8.14.0'
-    implementation 'com.bucket4j:bucket4j_jdk17-jcache:8.14.0'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
