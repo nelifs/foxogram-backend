@@ -10,7 +10,6 @@ import su.foxogram.constants.AttributesConstants;
 import su.foxogram.models.Channel;
 import su.foxogram.models.Member;
 import su.foxogram.models.User;
-import su.foxogram.repositories.MemberRepository;
 import su.foxogram.services.ChannelsService;
 
 @Component
@@ -19,7 +18,7 @@ public class MemberInterceptor implements HandlerInterceptor {
 	private final ChannelsService channelsService;
 
 	@Autowired
-	public MemberInterceptor(MemberRepository memberRepository, ChannelsService channelsService) {
+	public MemberInterceptor(ChannelsService channelsService) {
 		this.channelsService = channelsService;
 	}
 
@@ -30,7 +29,7 @@ public class MemberInterceptor implements HandlerInterceptor {
 
 		Member member = channelsService.getMember(channel, user.getUsername());
 
-		request.setAttribute("member", member);
+		request.setAttribute(AttributesConstants.MEMBER, member);
 		return true;
 	}
 }

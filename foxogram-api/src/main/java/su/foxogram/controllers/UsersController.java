@@ -59,7 +59,7 @@ public class UsersController {
 	}
 
 	@Operation(summary = "Confirm delete")
-	@DeleteMapping("/@me/confirm")
+	@PostMapping("/@me/confirm")
 	public OkDTO deleteUserConfirm(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestBody CodeDTO body) throws CodeExpiredException, CodeIsInvalidException {
 		log.info("USER deletion confirm ({}, {}) request", user.getId(), user.getEmail());
 

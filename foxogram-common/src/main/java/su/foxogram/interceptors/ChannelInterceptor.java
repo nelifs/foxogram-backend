@@ -27,6 +27,7 @@ public class ChannelInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws ChannelNotFoundException {
+		@SuppressWarnings("unchecked")
 		Map<String, String> uriVariables = (Map<String, String>) getUriVariables(request);
 
 		String channelName = getChannelName(uriVariables).orElseThrow(ChannelNotFoundException::new);
