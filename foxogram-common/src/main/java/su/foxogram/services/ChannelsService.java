@@ -61,8 +61,7 @@ public class ChannelsService {
 	}
 
 	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
-		if (member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL))
-			throw new MissingPermissionsException();
+		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL);
 
 		if (body.getName() != null) channel.setName(body.getName());
 
@@ -74,11 +73,9 @@ public class ChannelsService {
 	public void deleteChannel(Channel channel, User user) throws MissingPermissionsException {
 		Member member = memberRepository.findByChannelAndUser(channel, user);
 
-		if (member.hasPermission(MemberConstants.Permissions.ADMIN)) {
-			channelRepository.delete(channel);
-		} else {
-			throw new MissingPermissionsException();
-		}
+		member.hasAnyPermission(MemberConstants.Permissions.ADMIN);
+
+		channelRepository.delete(channel);
 	}
 
 	public Member joinUser(Channel channel, User user) throws MemberAlreadyInChannelException {

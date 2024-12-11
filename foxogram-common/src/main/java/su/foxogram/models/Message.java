@@ -3,6 +3,7 @@ package su.foxogram.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import su.foxogram.exceptions.MissingPermissionsException;
 
 import java.util.List;
 
@@ -48,5 +49,10 @@ public class Message {
 		this.content = content;
 		this.timestamp = timestamp;
 		this.attachments = attachments;
+	}
+
+	public void isAuthor(Member member) throws MissingPermissionsException {
+		if (!author.getUser().getEmail().equals(member.getUser().getUsername()))
+			throw new MissingPermissionsException();
 	}
 }

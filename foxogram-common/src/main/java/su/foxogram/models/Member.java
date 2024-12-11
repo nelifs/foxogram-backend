@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import su.foxogram.constants.MemberConstants;
+import su.foxogram.exceptions.MissingPermissionsException;
 
 @Setter
 @Getter
@@ -58,19 +59,19 @@ public class Member {
 		return (this.permissions & permission.getBit()) != 0;
 	}
 
-	public boolean hasPermissions(MemberConstants.Permissions... permissions) {
+	public boolean hasPermissions(MemberConstants.Permissions... permissions) throws MissingPermissionsException {
 		for (MemberConstants.Permissions permission : permissions) {
 			if ((this.permissions & permission.getBit()) == 0) {
-				return false;
+				throw new MissingPermissionsException();
 			}
 		}
 		return true;
 	}
 
-	public boolean hasAnyPermission(MemberConstants.Permissions... permissions) {
+	public boolean hasAnyPermission(MemberConstants.Permissions... permissions) throws MissingPermissionsException {
 		for (MemberConstants.Permissions permission : permissions) {
 			if ((this.permissions & permission.getBit()) != 0) {
-				return false;
+				throw new MissingPermissionsException();
 			}
 		}
 		return true;

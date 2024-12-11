@@ -15,7 +15,6 @@ import su.foxogram.models.User;
 import su.foxogram.repositories.MessageRepository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,8 +71,8 @@ public class MessagesService {
 		Message message = messageRepository.findByChannelAndId(channel, id);
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getUser().getUsername(), member.getUser().getUsername()) || member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES))
-			throw new MissingPermissionsException();
+		message.isAuthor(member);
+		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES);
 
 		messageRepository.delete(message);
 		log.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channel.getId());
@@ -84,8 +83,7 @@ public class MessagesService {
 		String content = body.getContent();
 
 		if (message == null) throw new MessageNotFoundException();
-		if (!Objects.equals(message.getAuthor().getUser().getUsername(), member.getUser().getUsername()))
-			throw new MissingPermissionsException();
+		message.isAuthor(member);
 
 		message.setContent(content);
 		messageRepository.save(message);
