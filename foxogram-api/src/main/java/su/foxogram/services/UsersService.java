@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import su.foxogram.configs.APIConfig;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
@@ -25,11 +26,14 @@ public class UsersService {
 
 	private final CodeRepository codeRepository;
 
+	private final APIConfig APIConfig;
+
 	@Autowired
-	public UsersService(UserRepository userRepository, EmailService emailService, CodeRepository codeRepository) {
+	public UsersService(UserRepository userRepository, EmailService emailService, CodeRepository codeRepository, APIConfig APIConfig) {
 		this.userRepository = userRepository;
 		this.emailService = emailService;
 		this.codeRepository = codeRepository;
+		this.APIConfig = APIConfig;
 	}
 
 	public User getUser(String username) throws UserNotFoundException {
@@ -70,11 +74,13 @@ public class UsersService {
 		userRepository.delete(user);
 		log.info("User deleted ({}, {}) successfully", user.getId(), user.getEmail());
 
-		deleteVerificationCode(code);
+		if (!APIConfig.isDevelopment()) deleteVerificationCode(code);
 	}
 
 	public Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
 		Code code = codeRepository.findByValue(pathCode);
+
+		if (APIConfig.isDevelopment()) return null;
 
 		if (code == null)
 			throw new CodeIsInvalidException();

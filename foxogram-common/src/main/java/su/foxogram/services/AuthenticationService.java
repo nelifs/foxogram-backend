@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import su.foxogram.configs.APIConfig;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
@@ -30,12 +31,15 @@ public class AuthenticationService {
 
 	private final JwtService jwtService;
 
+	private final APIConfig APIConfig;
+
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService) {
+	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, APIConfig APIConfig) {
 		this.userRepository = userRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
+		this.APIConfig = APIConfig;
 	}
 
 	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -122,11 +126,13 @@ public class AuthenticationService {
 		log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
 		log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
 
-		deleteVerificationCode(code);
+		if (!APIConfig.isDevelopment()) deleteVerificationCode(code);
 	}
 
 	public Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
 		Code code = codeRepository.findByValue(pathCode);
+
+		if (APIConfig.isDevelopment()) return null;
 
 		if (code == null)
 			throw new CodeIsInvalidException();
