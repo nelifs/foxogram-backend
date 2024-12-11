@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import su.foxogram.configs.APIConfig;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
@@ -31,15 +30,15 @@ public class AuthenticationService {
 
 	private final JwtService jwtService;
 
-	private final APIConfig APIConfig;
+	private final CodeValidationService codeValidationService;
 
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, APIConfig APIConfig) {
+	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, CodeValidationService codeValidationService) {
 		this.userRepository = userRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
-		this.APIConfig = APIConfig;
+		this.codeValidationService = codeValidationService;
 	}
 
 	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -118,7 +117,7 @@ public class AuthenticationService {
 	}
 
 	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
-		Code code = validateCode(pathCode);
+		Code code = codeValidationService.validateCode(pathCode);
 
 		user.removeFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
 		user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
@@ -126,26 +125,7 @@ public class AuthenticationService {
 		log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
 		log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
 
-		if (!APIConfig.isDevelopment()) deleteVerificationCode(code);
-	}
-
-	public Code validateCode(String pathCode) throws CodeIsInvalidException, CodeExpiredException {
-		Code code = codeRepository.findByValue(pathCode);
-
-		if (APIConfig.isDevelopment()) return null;
-
-		if (code == null)
-			throw new CodeIsInvalidException();
-
-		if (code.expiresAt <= System.currentTimeMillis())
-			throw new CodeExpiredException();
-
-		return code;
-	}
-
-	private void deleteVerificationCode(Code code) {
-		codeRepository.delete(code);
-		log.info("CODE record deleted ({}, {}) successfully", code.getUserId(), code.getValue());
+		codeValidationService.deleteCode(code);
 	}
 
 	public void resendEmail(User user, String accessToken) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
