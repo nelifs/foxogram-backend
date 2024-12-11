@@ -12,8 +12,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import su.foxogram.configs.EmailConfig;
 import su.foxogram.constants.EmailConstants;
-import su.foxogram.models.Code;
-import su.foxogram.repositories.CodeRepository;
 import su.foxogram.util.Algorithm;
 
 import java.io.IOException;
@@ -24,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class EmailService {
 
-	private final CodeRepository codeRepository;
+	private final CodeValidationService codeValidationService;
 
 	private final ResourceLoader resourceLoader;
 
@@ -33,10 +31,10 @@ public class EmailService {
 	private final EmailConfig emailConfig;
 
 	@Autowired
-	public EmailService(JavaMailSender javaMailSender, ResourceLoader resourceLoader, CodeRepository codeRepository, EmailConfig emailConfig) {
+	public EmailService(CodeValidationService codeValidationService, JavaMailSender javaMailSender, ResourceLoader resourceLoader, EmailConfig emailConfig) {
+		this.codeValidationService = codeValidationService;
 		this.javaMailSender = javaMailSender;
 		this.resourceLoader = resourceLoader;
-		this.codeRepository = codeRepository;
 		this.emailConfig = emailConfig;
 	}
 
@@ -57,7 +55,7 @@ public class EmailService {
 
 			javaMailSender.send(mimeMessage);
 
-			saveCode(id, type, digitCode, issuedAt, expiresAt);
+			codeValidationService.saveCode(id, type, digitCode, issuedAt, expiresAt);
 		} catch (IllegalArgumentException | MessagingException | IOException e) {
 			log.error("Error occurred while sending email to {}: {}", to, e.getMessage(), e);
 		}
@@ -89,10 +87,5 @@ public class EmailService {
 		try (InputStream inputStream = resource.getInputStream()) {
 			return Algorithm.inputStreamToString(inputStream, StandardCharsets.UTF_8);
 		}
-	}
-
-	private void saveCode(long id, String type, String digitCode, long issuedAt, long expiresAt) {
-		Code code = new Code(id, type, digitCode, issuedAt, expiresAt);
-		codeRepository.save(code);
 	}
 }
