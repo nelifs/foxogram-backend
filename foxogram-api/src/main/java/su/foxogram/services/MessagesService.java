@@ -30,11 +30,12 @@ public class MessagesService {
 	}
 
 	public List<MessageDTO> getMessages(long before, int limit, Channel channel) {
-		List<Message> messagesArray = messageRepository.findAllByChannel(channel);
+		List<Message> messagesArray = messageRepository.findAllByChannel(channel, limit);
 
 		log.info("MESSAGES ({}, {}) in CHANNEL ({}) found successfully", limit, before, channel.getId());
 
 		return messagesArray.stream()
+				.limit(limit)
 				.map(message -> new MessageDTO(
 						message.getId(),
 						message.getContent(),

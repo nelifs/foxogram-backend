@@ -12,7 +12,8 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends CrudRepository<Message, Long> {
-	List<Message> findAllByChannel(Channel channel);
+	@Query("SELECT m FROM Message m WHERE m.channel = :ch AND m.timestamp > :before")
+	List<Message> findAllByChannel(Channel channel, long before);
 
 	@Query("SELECT m FROM Message m WHERE m.channel = :ch AND m.id = :id")
 	Message findByChannelAndId(@Param("ch") Channel channel, @Param("id") long id);
