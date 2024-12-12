@@ -10,13 +10,13 @@ import su.foxogram.repositories.CodeRepository;
 
 @Slf4j
 @Service
-public class CodeValidationService {
+public class CodeService {
 
 	private final CodeRepository codeRepository;
 
 	private final APIConfig apiConfig;
 
-	public CodeValidationService(CodeRepository codeRepository, APIConfig apiConfig) {
+	public CodeService(CodeRepository codeRepository, APIConfig apiConfig) {
 		this.codeRepository = codeRepository;
 		this.apiConfig = apiConfig;
 	}

@@ -22,13 +22,13 @@ public class UsersService {
 
 	private final EmailService emailService;
 
-	private final CodeValidationService codeValidationService;
+	private final CodeService codeService;
 
 	@Autowired
-	public UsersService(UserRepository userRepository, EmailService emailService, CodeValidationService codeValidationService) {
+	public UsersService(UserRepository userRepository, EmailService emailService, CodeService codeService) {
 		this.userRepository = userRepository;
 		this.emailService = emailService;
-		this.codeValidationService = codeValidationService;
+		this.codeService = codeService;
 	}
 
 	public User getUser(String username) throws UserNotFoundException {
@@ -64,12 +64,12 @@ public class UsersService {
 	}
 
 	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
-		Code code = codeValidationService.validateCode(pathCode);
+		Code code = codeService.validateCode(pathCode);
 
 		userRepository.delete(user);
 		log.info("User deleted ({}, {}) successfully", user.getId(), user.getEmail());
 
-		codeValidationService.deleteCode(code);
+		codeService.deleteCode(code);
 	}
 
 	private void changeEmail(User user, UserEditDTO body) {
