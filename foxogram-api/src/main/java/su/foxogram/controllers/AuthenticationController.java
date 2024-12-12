@@ -73,7 +73,7 @@ public class AuthenticationController {
 		return new OkDTO(true);
 	}
 
-	@Operation(summary = "Reset password")
+	@Operation(summary = "Confirm reset password")
 	@PostMapping("/reset-password/confirm")
 	public OkDTO confirmResetPassword(@RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, @RequestBody UserResetPasswordConfirmDTO body) throws CodeExpiredException, CodeIsInvalidException, UserCredentialsIsInvalidException {
 		authenticationService.confirmResetPassword(body);
