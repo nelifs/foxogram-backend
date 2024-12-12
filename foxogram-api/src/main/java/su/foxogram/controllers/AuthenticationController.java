@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
-import su.foxogram.dtos.request.CodeDTO;
-import su.foxogram.dtos.request.UserLoginDTO;
-import su.foxogram.dtos.request.UserSignUpDTO;
+import su.foxogram.dtos.request.*;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.dtos.response.TokenDTO;
 import su.foxogram.exceptions.*;
@@ -63,6 +61,22 @@ public class AuthenticationController {
 	@PostMapping("/email/resend")
 	public OkDTO resendEmail(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
 		authenticationService.resendEmail(user, accessToken);
+
+		return new OkDTO(true);
+	}
+
+	@Operation(summary = "Reset password")
+	@PostMapping("/reset-password")
+	public OkDTO resetPassword(@RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, @RequestBody UserResetPasswordDTO body) throws UserCredentialsIsInvalidException {
+		authenticationService.resetPassword(accessToken, body);
+
+		return new OkDTO(true);
+	}
+
+	@Operation(summary = "Reset password")
+	@PostMapping("/reset-password/confirm")
+	public OkDTO confirmResetPassword(@RequestAttribute(value = AttributesConstants.ACCESS_TOKEN) String accessToken, @RequestBody UserResetPasswordConfirmDTO body) throws CodeExpiredException, CodeIsInvalidException, UserCredentialsIsInvalidException {
+		authenticationService.confirmResetPassword(body);
 
 		return new OkDTO(true);
 	}

@@ -41,7 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(rateLimitInterceptor).excludePathPatterns("/docs", "/actuator/health");
-		registry.addInterceptor(authenticationInterceptor).excludePathPatterns("/auth/register", "/auth/login", "/docs", "/actuator/health");
+		registry.addInterceptor(authenticationInterceptor).excludePathPatterns("/auth/register", "/auth/login", "/auth/reset-password", "/auth/reset-password/**", "/docs", "/actuator/health");
 		registry.addInterceptor(channelInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/", "/docs", "/actuator/health");
 		registry.addInterceptor(memberInterceptor).excludePathPatterns("/auth/**", "/users/**", "/channels/", "/docs", "/actuator/health");
 	}

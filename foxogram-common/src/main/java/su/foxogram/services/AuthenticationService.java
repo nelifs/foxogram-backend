@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
+import su.foxogram.dtos.request.UserResetPasswordConfirmDTO;
+import su.foxogram.dtos.request.UserResetPasswordDTO;
 import su.foxogram.exceptions.*;
 import su.foxogram.models.Avatar;
 import su.foxogram.models.Code;
@@ -30,15 +32,15 @@ public class AuthenticationService {
 
 	private final JwtService jwtService;
 
-	private final CodeValidationService codeValidationService;
+	private final CodeService codeService;
 
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, CodeValidationService codeValidationService) {
+	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, CodeService codeService) {
 		this.userRepository = userRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
-		this.codeValidationService = codeValidationService;
+		this.codeService = codeService;
 	}
 
 	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -117,7 +119,7 @@ public class AuthenticationService {
 	}
 
 	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
-		Code code = codeValidationService.validateCode(pathCode);
+		Code code = codeService.validateCode(pathCode);
 
 		user.removeFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
 		user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
@@ -125,7 +127,7 @@ public class AuthenticationService {
 		log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
 		log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
 
-		codeValidationService.deleteCode(code);
+		codeService.deleteCode(code);
 	}
 
 	public void resendEmail(User user, String accessToken) throws CodeIsInvalidException, NeedToWaitBeforeResendException {
@@ -138,5 +140,28 @@ public class AuthenticationService {
 			throw new NeedToWaitBeforeResendException();
 
 		emailService.sendEmail(user.getEmail(), user.getId(), code.getType(), user.getUsername(), code.getValue(), System.currentTimeMillis(), code.getExpiresAt(), accessToken);
+	}
+
+	public void resetPassword(String accessToken, UserResetPasswordDTO body) throws UserCredentialsIsInvalidException {
+		User user = userRepository.findByEmail(body.getEmail()).orElseThrow(UserCredentialsIsInvalidException::new);
+
+		String type = EmailConstants.Type.EMAIL_VERIFY.getValue();
+		String value = CodeGenerator.generateDigitCode();
+		long issuedAt = System.currentTimeMillis();
+		long expiresAt = issuedAt + CodesConstants.Lifetime.BASE.getValue();
+
+		user.addFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
+
+		emailService.sendEmail(user.getEmail(), user.getId(), type, user.getUsername(), value, System.currentTimeMillis(), expiresAt, accessToken);
+	}
+
+	public void confirmResetPassword(UserResetPasswordConfirmDTO body) throws CodeExpiredException, CodeIsInvalidException, UserCredentialsIsInvalidException {
+		User user = userRepository.findByEmail(body.getEmail()).orElseThrow(UserCredentialsIsInvalidException::new);
+		Code code = codeService.validateCode(body.getCode());
+
+		user.setPassword(body.getNewPassword());
+		user.removeFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
+
+		codeService.deleteCode(code);
 	}
 }
