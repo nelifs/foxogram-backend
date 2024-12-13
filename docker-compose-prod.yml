@@ -5,6 +5,7 @@ services:
     restart: always
     networks:
       - db_network
+      - minio_network
       - traefik
     labels:
       traefik.enable: true
@@ -14,6 +15,8 @@ services:
 
 networks:
   db_network:
+    external: true
+  minio_network:
     external: true
   traefik:
     external: true
