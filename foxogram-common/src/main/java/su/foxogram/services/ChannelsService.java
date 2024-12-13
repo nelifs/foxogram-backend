@@ -61,13 +61,17 @@ public class ChannelsService {
 		return channel;
 	}
 
-	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
+	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException, UserCredentialsDuplicateException {
 		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL);
 
-		if (body.getDisplayName() != null) channel.setDisplayName(body.getDisplayName());
-		if (body.getName() != null) channel.setName(body.getName());
+		try {
+			if (body.getDisplayName() != null) channel.setDisplayName(body.getDisplayName());
+			if (body.getName() != null) channel.setName(body.getName());
 
-		channelRepository.save(channel);
+			channelRepository.save(channel);
+		} catch (DataIntegrityViolationException e) {
+			throw new UserCredentialsDuplicateException();
+		}
 
 		return channel;
 	}

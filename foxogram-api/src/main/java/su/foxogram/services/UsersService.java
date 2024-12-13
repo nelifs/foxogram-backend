@@ -47,11 +47,11 @@ public class UsersService {
 			if (body.getUsername() != null) user.setUsername(body.getUsername());
 			if (body.getEmail() != null) changeEmail(user, body);
 			if (body.getPassword() != null) changePassword(user, body);
+
+			userRepository.save(user);
 		} catch (DataIntegrityViolationException e) {
 			throw new UserCredentialsDuplicateException();
 		}
-
-		userRepository.save(user);
 
 		return user;
 	}
