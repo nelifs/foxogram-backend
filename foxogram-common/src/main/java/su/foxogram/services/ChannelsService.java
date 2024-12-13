@@ -61,7 +61,7 @@ public class ChannelsService {
 		return channel;
 	}
 
-	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException, UserCredentialsDuplicateException {
+	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException, ChannelAlreadyExistException {
 		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL);
 
 		try {
@@ -70,7 +70,7 @@ public class ChannelsService {
 
 			channelRepository.save(channel);
 		} catch (DataIntegrityViolationException e) {
-			throw new UserCredentialsDuplicateException();
+			throw new ChannelAlreadyExistException();
 		}
 
 		return channel;

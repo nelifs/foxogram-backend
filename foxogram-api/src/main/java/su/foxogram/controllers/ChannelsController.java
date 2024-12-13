@@ -52,7 +52,7 @@ public class ChannelsController {
 
 	@Operation(summary = "Edit channel")
 	@PatchMapping("/{name}")
-	public ChannelDTO editChannel(@RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody ChannelEditDTO body) throws MissingPermissionsException {
+	public ChannelDTO editChannel(@RequestAttribute(value = AttributesConstants.MEMBER) Member member, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody ChannelEditDTO body) throws MissingPermissionsException, ChannelAlreadyExistException {
 		channel = channelsService.editChannel(member, channel, body);
 
 		return new ChannelDTO(channel);
