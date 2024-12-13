@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import su.foxogram.constants.ExceptionsConstants;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
+@ResponseStatus(HttpStatus.FORBIDDEN)
 public class MissingPermissionsException extends BaseException {
 
 	public MissingPermissionsException() {
