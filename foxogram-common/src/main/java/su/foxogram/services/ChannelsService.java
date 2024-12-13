@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import su.foxogram.constants.MemberConstants;
+import su.foxogram.dtos.request.ChannelCreateDTO;
 import su.foxogram.dtos.request.ChannelEditDTO;
 import su.foxogram.dtos.response.MemberDTO;
 import su.foxogram.exceptions.*;
@@ -33,12 +34,12 @@ public class ChannelsService {
 		this.userRepository = userRepository;
 	}
 
-	public Channel createChannel(User user, int type, String name) throws ChannelAlreadyExistException {
+	public Channel createChannel(User user, ChannelCreateDTO body) throws ChannelAlreadyExistException {
 		String owner = user.getUsername();
 		Channel channel;
 
 		try {
-			channel = new Channel(0, name, type, owner);
+			channel = new Channel(0, body.getDisplayName(), body.getName(), body.getType(), owner);
 			channelRepository.save(channel);
 		} catch (DataIntegrityViolationException e) {
 			throw new ChannelAlreadyExistException();
@@ -63,6 +64,7 @@ public class ChannelsService {
 	public Channel editChannel(Member member, Channel channel, ChannelEditDTO body) throws MissingPermissionsException {
 		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL);
 
+		if (body.getDisplayName() != null) channel.setDisplayName(body.getDisplayName());
 		if (body.getName() != null) channel.setName(body.getName());
 
 		channelRepository.save(channel);

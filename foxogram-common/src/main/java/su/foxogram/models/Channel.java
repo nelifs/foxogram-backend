@@ -19,6 +19,9 @@ public class Channel {
 	public long id;
 
 	@Column()
+	public String displayName;
+
+	@Column()
 	public String name;
 
 	@Column()
@@ -39,8 +42,9 @@ public class Channel {
 	public Channel() {
 	}
 
-	public Channel(long id, String name, int type, String owner) {
+	public Channel(long id, String displayName, String name, int type, String owner) {
 		this.id = id;
+		this.displayName = displayName;
 		this.name = name;
 		this.type = type;
 		this.owner = owner;
