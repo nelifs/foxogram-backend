@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.dtos.request.ChannelCreateDTO;
 import su.foxogram.dtos.request.ChannelEditDTO;
@@ -27,11 +28,14 @@ public class ChannelsService {
 
 	private final UserRepository userRepository;
 
+	private final StorageService storageService;
+
 	@Autowired
-	public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, UserRepository userRepository) {
+	public ChannelsService(ChannelRepository channelRepository, MemberRepository memberRepository, UserRepository userRepository, StorageService storageService) {
 		this.channelRepository = channelRepository;
 		this.memberRepository = memberRepository;
 		this.userRepository = userRepository;
+		this.storageService = storageService;
 	}
 
 	public Channel createChannel(User user, ChannelCreateDTO body) throws ChannelAlreadyExistException {
@@ -65,11 +69,12 @@ public class ChannelsService {
 		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL);
 
 		try {
+			if (body.getIcon() != null) changeIcon(channel, body);
 			if (body.getDisplayName() != null) channel.setDisplayName(body.getDisplayName());
 			if (body.getName() != null) channel.setName(body.getName());
 
 			channelRepository.save(channel);
-		} catch (DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException | UploadFailedException e) {
 			throw new ChannelAlreadyExistException();
 		}
 
@@ -112,5 +117,17 @@ public class ChannelsService {
 
 	public Member getMember(Channel channel, String memberUsername) {
 		return memberRepository.findByChannelAndUsername(channel, memberUsername);
+	}
+
+	private void changeIcon(Channel channel, ChannelEditDTO body) throws UploadFailedException {
+		String hash;
+
+		try {
+			hash = storageService.uploadFile(body.getIcon(), BucketsConstants.AVATARS_BUCKET);
+		} catch (Exception e) {
+			throw new UploadFailedException();
+		}
+
+		channel.setIcon(hash);
 	}
 }

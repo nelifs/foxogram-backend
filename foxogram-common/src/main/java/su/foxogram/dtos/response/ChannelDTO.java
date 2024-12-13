@@ -12,6 +12,8 @@ public class ChannelDTO {
 
 	private String name;
 
+	private String icon;
+
 	private int type;
 
 	private String owner;
@@ -21,6 +23,7 @@ public class ChannelDTO {
 	public ChannelDTO(Channel channel) {
 		this.displayName = channel.getDisplayName();
 		this.name = channel.getName();
+		this.icon = channel.getIcon();
 		this.type = channel.getType();
 		this.owner = channel.getOwner();
 		this.createdAt = channel.getCreatedAt();

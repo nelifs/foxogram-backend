@@ -25,6 +25,9 @@ public class Channel {
 	public String name;
 
 	@Column()
+	public String icon;
+
+	@Column()
 	public int type;
 
 	@Column()
