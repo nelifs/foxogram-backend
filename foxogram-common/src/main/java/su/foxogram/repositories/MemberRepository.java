@@ -19,6 +19,8 @@ public interface MemberRepository extends CrudRepository<Member, Long> {
 	@Query(value = "SELECT m FROM Member m WHERE m.channel = :ch AND m.user.username = :username")
 	Member findByChannelAndUsername(@Param("ch") Channel channel, @Param("username") String username);
 
+	List<Member> findAllByUserId(long userId);
+
 	List<Member> findAllByChannel(Channel channel);
 
 	@Override

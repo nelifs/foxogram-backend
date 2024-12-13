@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import su.foxogram.models.User;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class UserDTO {
@@ -18,18 +20,24 @@ public class UserDTO {
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String email;
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private List<String> channels;
+
 	private long flags;
 
 	private long type;
 
 	private long createdAt;
 
-	public UserDTO(User user, boolean includeEmail) {
+	public UserDTO(User user, List<String> channels, boolean includeEmail, boolean includeChannels) {
 		this.avatar = user.getAvatar();
 		this.displayName = user.getDisplayName();
 		this.username = user.getUsername();
 		if (includeEmail) {
 			this.email = user.getEmail();
+		}
+		if (includeChannels) {
+			this.channels = channels;
 		}
 		this.flags = user.getFlags();
 		this.type = user.getType();

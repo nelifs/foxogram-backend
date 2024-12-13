@@ -20,7 +20,6 @@ public class Member {
 	@Column()
 	public long permissions;
 
-	@MapsId
 	@ManyToOne()
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;

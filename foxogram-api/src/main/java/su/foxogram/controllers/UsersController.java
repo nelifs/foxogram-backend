@@ -13,10 +13,15 @@ import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.dtos.response.UserDTO;
 import su.foxogram.exceptions.*;
+import su.foxogram.models.Channel;
+import su.foxogram.models.Member;
 import su.foxogram.models.User;
+import su.foxogram.repositories.MemberRepository;
 import su.foxogram.services.UsersService;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -25,18 +30,27 @@ import java.util.Objects;
 public class UsersController {
 	private final UsersService usersService;
 
-	public UsersController(UsersService usersService) {
+	private final MemberRepository memberRepository;
+
+	public UsersController(UsersService usersService, MemberRepository memberRepository) {
 		this.usersService = usersService;
+		this.memberRepository = memberRepository;
 	}
 
 	@Operation(summary = "Get user")
 	@GetMapping("/{username}")
 	public UserDTO getUser(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser, @PathVariable String username) throws UserNotFoundException {
 		if (Objects.equals(username, "@me")) {
-			return new UserDTO(authenticatedUser, true);
+			List<String> channels = memberRepository.findAllByUserId(authenticatedUser.getId())
+					.stream()
+					.map(Member::getChannel)
+					.map(Channel::getName)
+					.collect(Collectors.toList());
+
+			return new UserDTO(authenticatedUser, channels, true, true);
 		}
 
-		return new UserDTO(usersService.getUser(username), false);
+		return new UserDTO(usersService.getUser(username), null, false, false);
 	}
 
 	@Operation(summary = "Edit user")
@@ -44,7 +58,7 @@ public class UsersController {
 	public UserDTO editUser(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser, @Valid @RequestBody UserEditDTO userEditRequest) throws UserCredentialsDuplicateException {
 		authenticatedUser = usersService.editUser(authenticatedUser, userEditRequest);
 
-		return new UserDTO(authenticatedUser, false);
+		return new UserDTO(authenticatedUser, null, true, true);
 	}
 
 	@Operation(summary = "Delete")
