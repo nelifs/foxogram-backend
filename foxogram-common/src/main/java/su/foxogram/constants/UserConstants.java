@@ -6,8 +6,8 @@ public class UserConstants {
 	@Getter
 	public enum Flags {
 		AWAITING_CONFIRMATION(1),
-		EMAIL_VERIFIED(1 << 2),
-		DISABLED(1 << 3);
+		EMAIL_VERIFIED(1 << 1),
+		DISABLED(1 << 2);
 
 		private final long bit;
 
