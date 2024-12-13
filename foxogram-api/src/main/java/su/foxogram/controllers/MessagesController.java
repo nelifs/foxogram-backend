@@ -14,6 +14,7 @@ import su.foxogram.dtos.response.MessagesDTO;
 import su.foxogram.dtos.response.OkDTO;
 import su.foxogram.exceptions.MessageNotFoundException;
 import su.foxogram.exceptions.MissingPermissionsException;
+import su.foxogram.exceptions.UploadFailedException;
 import su.foxogram.models.Channel;
 import su.foxogram.models.Member;
 import su.foxogram.models.Message;
@@ -55,7 +56,7 @@ public class MessagesController {
 
 	@Operation(summary = "Create message")
 	@PostMapping("/channel/{name}")
-	public OkDTO createMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body) {
+	public OkDTO createMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body) throws UploadFailedException {
 		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channel.getId(), user.getId(), user.getEmail());
 
 		messagesService.addMessage(channel, user, body);
