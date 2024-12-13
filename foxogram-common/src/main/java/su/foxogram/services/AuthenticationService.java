@@ -13,7 +13,6 @@ import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserResetPasswordConfirmDTO;
 import su.foxogram.dtos.request.UserResetPasswordDTO;
 import su.foxogram.exceptions.*;
-import su.foxogram.models.Avatar;
 import su.foxogram.models.Code;
 import su.foxogram.models.User;
 import su.foxogram.repositories.CodeRepository;
@@ -81,7 +80,7 @@ public class AuthenticationService {
 
 	private User createUser(String username, String email, String password) {
 		long deletion = 0;
-		String avatar = new Avatar("").getId();
+		String avatar = null;
 		long flags = UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
 		int type = UserConstants.Type.USER.getType();
 

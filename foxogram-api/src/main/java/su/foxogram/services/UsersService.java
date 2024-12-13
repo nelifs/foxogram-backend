@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
@@ -24,11 +25,14 @@ public class UsersService {
 
 	private final CodeService codeService;
 
+	private final StorageService storageService;
+
 	@Autowired
-	public UsersService(UserRepository userRepository, EmailService emailService, CodeService codeService) {
+	public UsersService(UserRepository userRepository, EmailService emailService, CodeService codeService, StorageService storageService) {
 		this.userRepository = userRepository;
 		this.emailService = emailService;
 		this.codeService = codeService;
+		this.storageService = storageService;
 	}
 
 	public User getUser(String username) throws UserNotFoundException {
@@ -39,9 +43,9 @@ public class UsersService {
 		return user;
 	}
 
-	public User editUser(User user, UserEditDTO body) throws UserCredentialsDuplicateException {
+	public User editUser(User user, UserEditDTO body) throws UserCredentialsDuplicateException, UploadFailedException {
 		if (body.getDisplayName() != null) user.setDisplayName(body.getDisplayName());
-		if (body.getAvatar() != null) user.setAvatar(body.getAvatar());
+		if (body.getAvatar() != null) changeAvatar(user, body);
 
 		try {
 			if (body.getUsername() != null) user.setUsername(body.getUsername());
@@ -70,6 +74,18 @@ public class UsersService {
 		log.info("User deleted ({}, {}) successfully", user.getId(), user.getEmail());
 
 		codeService.deleteCode(code);
+	}
+
+	private void changeAvatar(User user, UserEditDTO body) throws UploadFailedException {
+		String hash;
+
+		try {
+			hash = storageService.uploadFile(body.getAvatar(), BucketsConstants.AVATARS_BUCKET);
+		} catch (Exception e) {
+			throw new UploadFailedException();
+		}
+
+		user.setAvatar(hash);
 	}
 
 	private void changeEmail(User user, UserEditDTO body) {
