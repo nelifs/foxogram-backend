@@ -18,4 +18,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
 	@Override
 	void delete(@NotNull User user);
+
+	User findByAvatar(String avatar);
 }
