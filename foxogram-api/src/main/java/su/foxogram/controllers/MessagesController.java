@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import su.foxogram.constants.APIConstants;
 import su.foxogram.constants.AttributesConstants;
 import su.foxogram.dtos.request.MessageCreateDTO;
@@ -56,10 +57,10 @@ public class MessagesController {
 
 	@Operation(summary = "Create message")
 	@PostMapping("/channel/{name}")
-	public OkDTO createMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @RequestBody MessageCreateDTO body) throws UploadFailedException {
+	public OkDTO createMessage(@RequestAttribute(value = AttributesConstants.USER) User user, @RequestAttribute(value = AttributesConstants.CHANNEL) Channel channel, @Valid @ModelAttribute MessageCreateDTO body, List<MultipartFile> attachments) throws UploadFailedException {
 		log.info("MESSAGE post to CHANNEL ({}) by USER ({}, {}) requested", channel.getId(), user.getId(), user.getEmail());
 
-		messagesService.addMessage(channel, user, body);
+		messagesService.addMessage(channel, user, body, attachments);
 
 		return new OkDTO(true);
 	}

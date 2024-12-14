@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.dtos.request.ChannelCreateDTO;
@@ -69,7 +70,7 @@ public class ChannelsService {
 		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_CHANNEL);
 
 		try {
-			if (body.getIcon() != null) changeIcon(channel, body);
+			if (body.getIcon() != null) changeIcon(channel, body.getIcon());
 			if (body.getDisplayName() != null) channel.setDisplayName(body.getDisplayName());
 			if (body.getName() != null) channel.setName(body.getName());
 
@@ -119,11 +120,11 @@ public class ChannelsService {
 		return memberRepository.findByChannelAndUsername(channel, memberUsername);
 	}
 
-	private void changeIcon(Channel channel, ChannelEditDTO body) throws UploadFailedException {
+	private void changeIcon(Channel channel, MultipartFile icon) throws UploadFailedException {
 		String hash;
 
 		try {
-			hash = storageService.uploadFile(body.getIcon(), BucketsConstants.AVATARS_BUCKET);
+			hash = storageService.uploadFile(icon, BucketsConstants.AVATARS_BUCKET);
 		} catch (Exception e) {
 			throw new UploadFailedException();
 		}

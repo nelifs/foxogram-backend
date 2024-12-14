@@ -4,16 +4,18 @@ import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import su.foxogram.repositories.UserRepository;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
+@Slf4j
 @Service
 public class StorageService {
 
@@ -29,14 +31,15 @@ public class StorageService {
 	@Autowired
 	private UserRepository userRepository;
 
-	public String uploadFile(String base64String, String bucketName) throws RuntimeException {
-		byte[] byteArray = Base64.getDecoder().decode(base64String);
+	public String uploadFile(MultipartFile file, String bucketName) throws RuntimeException, IOException {
+		byte[] byteArray = file.getBytes();
+		log.info("Uploading FILE ({}) to BUCKET ({})", file.getOriginalFilename(), bucketName);
 
 		if (!isBucketExist(bucketName)) createBucket(bucketName);
 
 		try {
 			String fileHash = getHash(byteArray);
-			InputStream inputStream = new ByteArrayInputStream(byteArray);
+			InputStream inputStream = file.getInputStream();
 
 			if (isHashExists(fileHash)) return fileHash;
 
@@ -80,10 +83,9 @@ public class StorageService {
 
 	private String getHash(byte[] imageBytes) throws NoSuchAlgorithmException {
 		MessageDigest messageDigest = MessageDigest.getInstance(ALGORITHM);
-
 		byte[] hashBytes = messageDigest.digest(imageBytes);
-
 		StringBuilder hexString = new StringBuilder();
+
 		for (byte b : hashBytes) {
 			hexString.append(String.format("%02x", b));
 		}

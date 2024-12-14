@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 import su.foxogram.constants.ValidationConstants;
 
 import java.util.List;
@@ -16,5 +17,5 @@ public class MessageCreateDTO {
 	private String content;
 
 	@NotNull(message = "Attachments" + ValidationConstants.Messages.MUST_NOT_BE_NULL)
-	private List<String> attachments;
+	private List<MultipartFile> attachments;
 }

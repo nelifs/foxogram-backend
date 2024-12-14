@@ -55,7 +55,7 @@ public class UsersController {
 
 	@Operation(summary = "Edit user")
 	@PatchMapping("/@me")
-	public UserDTO editUser(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser, @Valid @RequestBody UserEditDTO body) throws UserCredentialsDuplicateException, UploadFailedException {
+	public UserDTO editUser(@RequestAttribute(value = AttributesConstants.USER) User authenticatedUser, @Valid @ModelAttribute UserEditDTO body) throws UserCredentialsDuplicateException, UploadFailedException {
 		authenticatedUser = usersService.editUser(authenticatedUser, body);
 
 		return new UserDTO(authenticatedUser, null, true, true);

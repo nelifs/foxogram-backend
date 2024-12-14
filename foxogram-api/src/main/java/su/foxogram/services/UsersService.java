@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
@@ -45,7 +46,7 @@ public class UsersService {
 
 	public User editUser(User user, UserEditDTO body) throws UserCredentialsDuplicateException, UploadFailedException {
 		if (body.getDisplayName() != null) user.setDisplayName(body.getDisplayName());
-		if (body.getAvatar() != null) changeAvatar(user, body);
+		if (body.getAvatar() != null) changeAvatar(user, body.getAvatar());
 
 		try {
 			if (body.getUsername() != null) user.setUsername(body.getUsername());
@@ -76,11 +77,11 @@ public class UsersService {
 		codeService.deleteCode(code);
 	}
 
-	private void changeAvatar(User user, UserEditDTO body) throws UploadFailedException {
+	private void changeAvatar(User user, MultipartFile avatar) throws UploadFailedException {
 		String hash;
 
 		try {
-			hash = storageService.uploadFile(body.getAvatar(), BucketsConstants.AVATARS_BUCKET);
+			hash = storageService.uploadFile(avatar, BucketsConstants.AVATARS_BUCKET);
 		} catch (Exception e) {
 			throw new UploadFailedException();
 		}

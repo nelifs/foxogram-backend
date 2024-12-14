@@ -3,6 +3,7 @@ package su.foxogram.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.MemberConstants;
 import su.foxogram.dtos.request.MessageCreateDTO;
@@ -61,10 +62,9 @@ public class MessagesService {
 		return message;
 	}
 
-	public void addMessage(Channel channel, User user, MessageCreateDTO body) throws UploadFailedException {
+	public void addMessage(Channel channel, User user, MessageCreateDTO body, List<MultipartFile> attachments) throws UploadFailedException {
 		long authorId = user.getId();
 		long timestamp = System.currentTimeMillis();
-		List<String> attachments = body.getAttachments();
 		List<String> uploadedAttachments = new ArrayList<>();
 		String content = body.getContent();
 
@@ -113,7 +113,7 @@ public class MessagesService {
 		return message;
 	}
 
-	private String uploadAttachment(String attachment) throws UploadFailedException {
+	private String uploadAttachment(MultipartFile attachment) throws UploadFailedException {
 		String hash;
 
 		try {
