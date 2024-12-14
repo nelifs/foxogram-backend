@@ -25,11 +25,15 @@ public class StorageService {
 
 	private static final String CONTENT_TYPE_PNG = "image/webp";
 
-	@Autowired
-	private MinioClient minioClient;
+	private final MinioClient minioClient;
+
+	private final UserRepository userRepository;
 
 	@Autowired
-	private UserRepository userRepository;
+	public StorageService(UserRepository userRepository, MinioClient minioClient) {
+		this.minioClient = minioClient;
+		this.userRepository = userRepository;
+	}
 
 	public String uploadFile(MultipartFile file, String bucketName) throws RuntimeException, IOException {
 		byte[] byteArray = file.getBytes();
