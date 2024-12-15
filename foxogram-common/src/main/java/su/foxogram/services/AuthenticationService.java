@@ -71,16 +71,18 @@ public class AuthenticationService {
 		} catch (DataIntegrityViolationException e) {
 			throw new UserCredentialsDuplicateException();
 		}
-		log.info("USER created ({}, {}) successfully", username, email);
+
+		log.info("User ({}, {}) created successfully", user.getUsername(), user.getEmail());
 
 		sendConfirmationEmail(user);
+
+		log.info("User ({}, {}) email verification message sent successfully", user.getUsername(), user.getEmail());
 
 		return jwtService.generate(user.getId());
 	}
 
 	private User createUser(String username, String email, String password) {
 		long deletion = 0;
-		String avatar = null;
 		long flags = UserConstants.Flags.AWAITING_CONFIRMATION.getBit();
 		int type = UserConstants.Type.USER.getType();
 
@@ -95,14 +97,13 @@ public class AuthenticationService {
 		String accessToken = jwtService.generate(user.getId());
 
 		emailService.sendEmail(user.getEmail(), user.getId(), emailType, user.getUsername(), digitCode, issuedAt, expiresAt, accessToken);
-
-		log.info("Sent EMAIL ({}, {}) to USER ({}, {})", emailType, digitCode, user.getUsername(), user.getEmail());
 	}
 
 	public String loginUser(String email, String password) throws UserCredentialsIsInvalidException {
 		User user = findUserByEmail(email);
 		validatePassword(user, password);
 
+		log.info("User ({}, {}) login successfully", user.getUsername(), user.getEmail());
 		return jwtService.generate(user.getId());
 	}
 
@@ -113,8 +114,6 @@ public class AuthenticationService {
 	private void validatePassword(User user, String password) throws UserCredentialsIsInvalidException {
 		if (!Encryptor.verifyPassword(password, user.getPassword()))
 			throw new UserCredentialsIsInvalidException();
-
-		log.info("PASSWORD VERIFIED FOR USER ({}, {})", user.getId(), user.getEmail());
 	}
 
 	public void verifyEmail(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
@@ -123,8 +122,7 @@ public class AuthenticationService {
 		user.removeFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
 		user.addFlag(UserConstants.Flags.EMAIL_VERIFIED);
 		userRepository.save(user);
-		log.info("USER record updated ({}, {}) SET flags to EMAIL_VERIFIED", user.getId(), user.getEmail());
-		log.info("EMAIL verified for USER ({}, {}) successfully", user.getId(), user.getEmail());
+		log.info("User ({}, {}) email verified successfully", user.getUsername(), user.getEmail());
 
 		codeService.deleteCode(code);
 	}
@@ -138,6 +136,7 @@ public class AuthenticationService {
 		if (System.currentTimeMillis() - issuedAt < CodesConstants.Lifetime.RESEND.getValue())
 			throw new NeedToWaitBeforeResendException();
 
+		log.info("User ({}, {}) email resend successfully", user.getUsername(), user.getEmail());
 		emailService.sendEmail(user.getEmail(), user.getId(), code.getType(), user.getUsername(), code.getValue(), System.currentTimeMillis(), code.getExpiresAt(), accessToken);
 	}
 
@@ -152,6 +151,7 @@ public class AuthenticationService {
 		user.addFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
 
 		emailService.sendEmail(user.getEmail(), user.getId(), type, user.getUsername(), value, System.currentTimeMillis(), expiresAt, accessToken);
+		log.info("User ({}, {}) reset password requested successfully", user.getUsername(), user.getEmail());
 	}
 
 	public void confirmResetPassword(UserResetPasswordConfirmDTO body) throws CodeExpiredException, CodeIsInvalidException, UserCredentialsIsInvalidException {
@@ -162,5 +162,6 @@ public class AuthenticationService {
 		user.removeFlag(UserConstants.Flags.AWAITING_CONFIRMATION);
 
 		codeService.deleteCode(code);
+		log.info("User ({}, {}) password reset successfully", user.getUsername(), user.getEmail());
 	}
 }

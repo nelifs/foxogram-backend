@@ -23,7 +23,7 @@ public class StorageService {
 
 	private static final String CONTENT_TYPE_WEBP = "image/webp";
 
-	private static final String CONTENT_TYPE_PNG = "image/webp";
+	private static final String CONTENT_TYPE_PNG = "image/png";
 
 	private final MinioClient minioClient;
 
@@ -36,8 +36,9 @@ public class StorageService {
 	}
 
 	public String uploadFile(MultipartFile file, String bucketName) throws RuntimeException, IOException {
+
 		byte[] byteArray = file.getBytes();
-		log.info("Uploading FILE ({}) to BUCKET ({})", file.getOriginalFilename(), bucketName);
+		log.info("Uploading file ({}) to bucket ({})", file.getOriginalFilename(), bucketName);
 
 		if (!isBucketExist(bucketName)) createBucket(bucketName);
 
@@ -45,7 +46,7 @@ public class StorageService {
 			String fileHash = getHash(byteArray);
 			InputStream inputStream = file.getInputStream();
 
-			if (isHashExists(fileHash)) return fileHash;
+			//if (isHashExists(fileHash)) return fileHash;
 
 			minioClient.putObject(
 					PutObjectArgs.builder().bucket(bucketName).object(fileHash + ".png").stream(
@@ -53,12 +54,15 @@ public class StorageService {
 							.contentType(CONTENT_TYPE_PNG)
 							.build());
 
+			log.info("Image ({}) in PNG uploaded to bucket ({}) to CDN successfully", fileHash, bucketName);
+
 			minioClient.putObject(
 					PutObjectArgs.builder().bucket(bucketName).object(fileHash + ".webp").stream(
 									inputStream, inputStream.available(), -1)
 							.contentType(CONTENT_TYPE_WEBP)
 							.build());
 
+			log.info("Image ({}) in WEBP uploaded to bucket ({}) to CDN successfully", fileHash, bucketName);
 			return fileHash;
 		} catch (Exception e) {
 			throw new RuntimeException();

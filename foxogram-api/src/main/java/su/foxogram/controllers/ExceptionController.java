@@ -18,13 +18,12 @@ import java.util.stream.Collectors;
 public class ExceptionController {
 
 	private ResponseEntity<ExceptionDTO> buildErrorResponse(int errorCode, String message, HttpStatus status) {
-		log.error("SERVER EXCEPTION ({}, {}, {}) occurred!\n", errorCode, status, message);
+		log.error("Server exception ({}, {}, {}) occurred!", errorCode, status, message);
 		return ResponseEntity.status(status).body(new ExceptionDTO(false, errorCode, message));
 	}
 
 	@ExceptionHandler(BaseException.class)
 	public ResponseEntity<ExceptionDTO> handleBaseException(BaseException exception) {
-		log.error("CLIENT (USER) EXCEPTION ({}, {}, {}) occurred!\n", exception.getErrorCode(), exception.getStatus(), exception.getMessage());
 		return buildErrorResponse(exception.getErrorCode(), exception.getMessage(), exception.getStatus());
 	}
 
@@ -44,6 +43,7 @@ public class ExceptionController {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ExceptionDTO> handleException(Exception exception) {
+		exception.printStackTrace();
 		return buildErrorResponse(999, exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

@@ -38,7 +38,7 @@ public class MessagesService {
 	public List<MessageDTO> getMessages(long before, int limit, Channel channel) {
 		List<Message> messagesArray = messageRepository.findAllByChannel(channel, limit);
 
-		log.info("MESSAGES ({}, {}) in CHANNEL ({}) found successfully", limit, before, channel.getId());
+		log.info("Messages ({}, {}) in channel ({}) found successfully", limit, before, channel.getId());
 
 		return messagesArray.stream()
 				.limit(limit)
@@ -57,7 +57,7 @@ public class MessagesService {
 
 		if (message == null) throw new MessageNotFoundException();
 
-		log.info("MESSAGE ({}) in CHANNEL ({}) found successfully", id, channel.getId());
+		log.info("Message ({}) in channel ({}) found successfully", id, channel.getId());
 
 		return message;
 	}
@@ -84,7 +84,7 @@ public class MessagesService {
 			Message message = new Message(0, channel, content, authorId, timestamp, uploadedAttachments);
 			messageRepository.save(message);
 
-			log.info("MESSAGE ({}) to CHANNEL ({}) saved to database successfully", message.getId(), channel.getId());
+			log.info("Message ({}) to channel ({}) created successfully", message.getId(), channel.getId());
 		}
 	}
 
@@ -96,7 +96,7 @@ public class MessagesService {
 		member.hasAnyPermission(MemberConstants.Permissions.ADMIN, MemberConstants.Permissions.MANAGE_MESSAGES);
 
 		messageRepository.delete(message);
-		log.info("MESSAGE ({}) in CHANNEL ({}) deleted successfully", id, channel.getId());
+		log.info("Message ({}) in channel ({}) deleted successfully", id, channel.getId());
 	}
 
 	public Message editMessage(long id, Channel channel, Member member, MessageCreateDTO body) throws MessageNotFoundException, MissingPermissionsException {
@@ -108,7 +108,7 @@ public class MessagesService {
 
 		message.setContent(content);
 		messageRepository.save(message);
-		log.info("MESSAGE ({}) in CHANNEL ({}) patched successfully", id, channel.getId());
+		log.info("Message ({}) in channel ({}) edited successfully", id, channel.getId());
 
 		return message;
 	}

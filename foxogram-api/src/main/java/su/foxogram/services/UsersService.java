@@ -58,6 +58,8 @@ public class UsersService {
 			throw new UserCredentialsDuplicateException();
 		}
 
+		log.info("User ({}, {}) edited successfully", user.getUsername(), user.getEmail());
+
 		return user;
 	}
 
@@ -66,13 +68,15 @@ public class UsersService {
 			throw new UserCredentialsIsInvalidException();
 
 		sendEmail(user, EmailConstants.Type.ACCOUNT_DELETE);
+		log.info("User ({}, {}) delete requested successfully", user.getUsername(), user.getEmail());
 	}
 
 	public void confirmUserDelete(User user, String pathCode) throws CodeIsInvalidException, CodeExpiredException {
 		Code code = codeService.validateCode(pathCode);
 
 		userRepository.delete(user);
-		log.info("User deleted ({}, {}) successfully", user.getId(), user.getEmail());
+
+		log.info("User ({}, {}) deleted successfully", user.getUsername(), user.getEmail());
 
 		codeService.deleteCode(code);
 	}

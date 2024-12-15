@@ -32,16 +32,19 @@ public class CodeService {
 		if (code.expiresAt <= System.currentTimeMillis())
 			throw new CodeExpiredException();
 
+		log.info("Code ({}) for user ({}) validated successfully", code.getValue(), code.getUserId());
+
 		return code;
 	}
 
 	public void deleteCode(Code code) {
 		if (!apiConfig.isDevelopment()) codeRepository.delete(code);
-		log.info("CODE record deleted ({}, {}) successfully", code.getUserId(), code.getValue());
+		log.info("Code ({}, {}) deleted successfully", code.getValue(), code.getUserId());
 	}
 
 	public void saveCode(long id, String type, String digitCode, long issuedAt, long expiresAt) {
 		Code code = new Code(id, type, digitCode, issuedAt, expiresAt);
 		if (!apiConfig.isDevelopment()) codeRepository.save(code);
+		log.info("Code ({}, {}) saved successfully", code.getValue(), code.getUserId());
 	}
 }

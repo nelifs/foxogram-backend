@@ -55,6 +55,7 @@ public class ChannelsService {
 		Member member = new Member(user, channel, MemberConstants.Permissions.ADMIN.getBit());
 		memberRepository.save(member);
 
+		log.info("Channel ({}) by user ({}) created successfully", channel.getName(), user.getUsername());
 		return channel;
 	}
 
@@ -79,6 +80,7 @@ public class ChannelsService {
 			throw new ChannelAlreadyExistException();
 		}
 
+		log.info("Channel ({}) edited successfully", channel.getName());
 		return channel;
 	}
 
@@ -88,6 +90,7 @@ public class ChannelsService {
 		member.hasAnyPermission(MemberConstants.Permissions.ADMIN);
 
 		channelRepository.delete(channel);
+		log.info("Channel ({}) deleted successfully", channel.getName());
 	}
 
 	public Member joinUser(Channel channel, User user) throws MemberAlreadyInChannelException {
@@ -98,6 +101,7 @@ public class ChannelsService {
 		user = userRepository.findByUsername(user.getUsername());
 
 		member = new Member(user, channel, 0);
+		log.info("Member ({}) joined channel ({}) successfully", member.getUser().getUsername(), channel.getName());
 		return memberRepository.save(member);
 	}
 
@@ -108,6 +112,7 @@ public class ChannelsService {
 
 		member = memberRepository.findByChannelAndUser(channel, user);
 		memberRepository.delete(member);
+		log.info("Member ({}) left channel ({}) successfully", member.getUser().getUsername(), channel.getName());
 	}
 
 	public List<MemberDTO> getMembers(Channel channel) {

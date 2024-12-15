@@ -3,6 +3,7 @@ package su.foxogram.interceptors;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -13,6 +14,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
 	private final Map<String, Bucket> clients = new ConcurrentHashMap<>();
@@ -25,7 +27,10 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 		long estimateAbilityToConsumeInMs = bucket.estimateAbilityToConsume(RateLimitConstants.RATE_LIMIT_CONSUME).getNanosToWaitForRefill() / 1000000;
 
 		if (bucket.tryConsume(RateLimitConstants.RATE_LIMIT_CONSUME)) return true;
-		else throw new RateLimitExceededException(estimateAbilityToConsumeInMs);
+		else {
+			log.info("Rate-limited client ({}) successfully", clientRemoteAddr);
+			throw new RateLimitExceededException(estimateAbilityToConsumeInMs);
+		}
 	}
 
 	private Bucket createNewBucket(String clientRemoteAddr) {
