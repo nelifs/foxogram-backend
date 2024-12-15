@@ -11,9 +11,9 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "messages", indexes = {
-		@Index(name = "idx_message_id", columnList = "id", unique = true),
-		@Index(name = "idx_message_channel", columnList = "channel", unique = true),
-		@Index(name = "idx_message_id_channel_id", columnList = "id, channel", unique = true)
+		@Index(name = "idx_message_id", columnList = "id"),
+		@Index(name = "idx_message_channel", columnList = "channel"),
+		@Index(name = "idx_message_id_channel_id", columnList = "id, channel")
 })
 public class Message {
 	@Id
@@ -23,7 +23,7 @@ public class Message {
 	@Column()
 	public String content;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "author", nullable = false)
 	public Member author;
 
