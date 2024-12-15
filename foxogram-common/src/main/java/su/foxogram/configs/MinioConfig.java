@@ -1,6 +1,6 @@
 package su.foxogram.configs;
 
-import io.minio.MinioClient;
+import io.minio.MinioAsyncClient;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +23,8 @@ public class MinioConfig {
 	private String accessSecret;
 
 	@Bean
-	public MinioClient minioClient() {
-		return MinioClient.builder()
+	public MinioAsyncClient minioClient() {
+		return MinioAsyncClient.builder()
 				.endpoint(url)
 				.credentials(accessKey, accessSecret)
 				.build();
