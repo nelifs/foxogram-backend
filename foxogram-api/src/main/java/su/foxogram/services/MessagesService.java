@@ -114,14 +114,10 @@ public class MessagesService {
 	}
 
 	private String uploadAttachment(MultipartFile attachment) throws UploadFailedException {
-		String hash;
-
 		try {
-			hash = storageService.uploadFile(attachment, BucketsConstants.ATTACHMENTS_BUCKET);
+			return storageService.uploadFile(attachment, BucketsConstants.ATTACHMENTS_BUCKET);
 		} catch (Exception e) {
 			throw new UploadFailedException();
 		}
-
-		return hash;
 	}
 }
