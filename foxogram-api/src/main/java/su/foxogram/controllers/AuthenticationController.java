@@ -1,6 +1,7 @@
 package su.foxogram.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class AuthenticationController {
 	}
 
 	@Operation(summary = "Register")
+	@SecurityRequirements()
 	@PostMapping("/register")
 	public TokenDTO register(@Valid @RequestBody UserSignUpDTO body) throws UserCredentialsDuplicateException {
 		String username = body.getUsername();
@@ -39,6 +41,7 @@ public class AuthenticationController {
 	}
 
 	@Operation(summary = "Login")
+	@SecurityRequirements()
 	@PostMapping("/login")
 	public TokenDTO login(@Valid @RequestBody UserLoginDTO body) throws UserCredentialsIsInvalidException {
 		String email = body.getEmail();

@@ -15,10 +15,6 @@ smtp:
   password: pass
   email: noreply@foxogram.su
 
-springdoc:
-  swagger-ui:
-    path: /
-
 jwt:
   secret: 123
 
