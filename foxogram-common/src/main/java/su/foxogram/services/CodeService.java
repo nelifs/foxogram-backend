@@ -36,12 +36,12 @@ public class CodeService {
 	}
 
 	public void deleteCode(Code code) {
-		codeRepository.delete(code);
+		if (!apiConfig.isDevelopment()) codeRepository.delete(code);
 		log.info("CODE record deleted ({}, {}) successfully", code.getUserId(), code.getValue());
 	}
 
 	public void saveCode(long id, String type, String digitCode, long issuedAt, long expiresAt) {
 		Code code = new Code(id, type, digitCode, issuedAt, expiresAt);
-		codeRepository.save(code);
+		if (!apiConfig.isDevelopment()) codeRepository.save(code);
 	}
 }
