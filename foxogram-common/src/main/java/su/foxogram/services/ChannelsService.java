@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.MemberConstants;
+import su.foxogram.constants.StorageConstants;
 import su.foxogram.dtos.request.ChannelCreateDTO;
 import su.foxogram.dtos.request.ChannelEditDTO;
 import su.foxogram.dtos.response.MemberDTO;
@@ -129,7 +129,7 @@ public class ChannelsService {
 		String hash;
 
 		try {
-			hash = storageService.uploadFile(icon, BucketsConstants.AVATARS_BUCKET);
+			hash = storageService.uploadToMinio(icon, StorageConstants.AVATARS_BUCKET);
 		} catch (Exception e) {
 			throw new UploadFailedException();
 		}

@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.MemberConstants;
+import su.foxogram.constants.StorageConstants;
 import su.foxogram.dtos.request.MessageCreateDTO;
 import su.foxogram.dtos.response.MessageDTO;
 import su.foxogram.exceptions.MessageNotFoundException;
@@ -115,8 +115,9 @@ public class MessagesService {
 
 	private String uploadAttachment(MultipartFile attachment) throws UploadFailedException {
 		try {
-			return storageService.uploadFile(attachment, BucketsConstants.ATTACHMENTS_BUCKET);
+			return storageService.uploadToMinio(attachment, StorageConstants.ATTACHMENTS_BUCKET);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new UploadFailedException();
 		}
 	}

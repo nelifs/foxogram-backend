@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import su.foxogram.constants.BucketsConstants;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
+import su.foxogram.constants.StorageConstants;
 import su.foxogram.constants.UserConstants;
 import su.foxogram.dtos.request.UserEditDTO;
 import su.foxogram.exceptions.*;
@@ -85,7 +85,7 @@ public class UsersService {
 		String hash;
 
 		try {
-			hash = storageService.uploadFile(avatar, BucketsConstants.AVATARS_BUCKET);
+			hash = storageService.uploadToMinio(avatar, StorageConstants.AVATARS_BUCKET);
 		} catch (Exception e) {
 			throw new UploadFailedException();
 		}
