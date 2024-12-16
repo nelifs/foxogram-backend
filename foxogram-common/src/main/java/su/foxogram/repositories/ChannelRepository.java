@@ -12,6 +12,8 @@ public interface ChannelRepository extends CrudRepository<Channel, Long> {
 	@NotNull
 	Optional<Channel> findById(long id);
 
+	Channel findByIcon(String hash);
+
 	Channel findByName(String name);
 
 	Channel findByIdOrName(long id, String name);
