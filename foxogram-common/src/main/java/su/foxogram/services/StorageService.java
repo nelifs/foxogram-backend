@@ -14,8 +14,10 @@ import su.foxogram.models.User;
 import su.foxogram.repositories.ChannelRepository;
 import su.foxogram.repositories.MessageRepository;
 import su.foxogram.repositories.UserRepository;
+import su.foxogram.util.MetadataExtractor;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -69,22 +71,35 @@ public class StorageService {
 
 		if (!isBucketExists(bucketName).get()) createBucket(bucketName);
 
-		if (fileType.equals("image")) {
-			uploadImage(byteArray, fileHash, bucketName);
-		} else {
-			uploadFile(byteArray, fileHash, fileExtension, fileContentType, bucketName);
-		}
+		uploadFile(byteArray, fileHash, fileExtension, fileType, fileContentType, bucketName);
 
 		return fileHash;
 	}
 
-	private void uploadImage(byte[] byteArray, String fileHash, String bucketName) {
-		try (InputStream pngStream = new ByteArrayInputStream(byteArray);
-			 InputStream webpStream = new ByteArrayInputStream(byteArray)) {
+	public String uploadIdentityImage(MultipartFile file, String bucketName) throws IOException, NoSuchAlgorithmException, ExecutionException, InterruptedException {
+		byte[] byteArray = file.getBytes();
+		String fileName = file.getOriginalFilename();
+		assert fileName != null;
+		String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+		String fileContentType = file.getContentType();
+		assert fileContentType != null;
+		String fileType = fileContentType.substring(0, fileContentType.indexOf("/"));
+		String fileHash = getHash(byteArray);
+
+		log.info("Uploading file ({}, {}, {}, {}) to bucket ({})", fileName, fileExtension, fileType, fileContentType, bucketName);
+
+		if (isHashExists(fileHash)) {
+			log.info("Duplicate file ({}) found. Skipping upload...", fileHash);
+			return fileHash;
+		}
+
+		if (!isBucketExists(bucketName).get()) createBucket(bucketName);
+
+		try (InputStream inputStream = new ByteArrayInputStream(byteArray)) {
 
 			minioClient.putObject(
 					PutObjectArgs.builder().bucket(bucketName).object(fileHash + ".png").stream(
-									pngStream, pngStream.available(), -1)
+									inputStream, inputStream.available(), -1)
 							.contentType(CONTENT_TYPE_PNG)
 							.build());
 
@@ -92,21 +107,37 @@ public class StorageService {
 
 			minioClient.putObject(
 					PutObjectArgs.builder().bucket(bucketName).object(fileHash + ".webp").stream(
-									webpStream, webpStream.available(), -1)
+									inputStream, inputStream.available(), -1)
 							.contentType(CONTENT_TYPE_WEBP)
 							.build());
 
 			log.info("Image ({}) in WEBP uploaded to bucket ({}) to CDN successfully", fileHash, bucketName);
+
+			return fileHash;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void uploadFile(byte[] byteArray, String fileHash, String fileExtension, String fileContentType, String bucketName) {
-		try (InputStream fileStream = new ByteArrayInputStream(byteArray)) {
+	private void uploadFile(byte[] byteArray, String fileHash, String fileExtension, String fileType, String fileContentType, String bucketName) {
+		try {
+			InputStream inputStream = new ByteArrayInputStream(byteArray);
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+			switch (fileType) {
+				case "image":
+					MetadataExtractor.removeMetadata(fileExtension, inputStream, outputStream);
+					inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+					break;
+				default:
+					break;
+			}
+
 			minioClient.putObject(
-					PutObjectArgs.builder().bucket(bucketName).object(fileHash + fileExtension).stream(
-									fileStream, fileStream.available(), -1)
+					PutObjectArgs.builder()
+							.bucket(bucketName)
+							.object(fileHash + fileExtension)
+							.stream(inputStream, inputStream.available(), -1)
 							.contentType(fileContentType)
 							.build());
 
