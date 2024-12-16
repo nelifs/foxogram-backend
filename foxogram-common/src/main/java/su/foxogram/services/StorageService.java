@@ -51,22 +51,36 @@ public class StorageService {
 		this.messageRepository = messageRepository;
 	}
 
-	public String uploadFile(MultipartFile file, String bucketName) throws RuntimeException, IOException, ExecutionException, InterruptedException, NoSuchAlgorithmException {
+	public String uploadToMinio(MultipartFile file, String bucketName) throws RuntimeException, IOException, ExecutionException, InterruptedException, NoSuchAlgorithmException {
 		byte[] byteArray = file.getBytes();
-		long startTime = System.currentTimeMillis();
+		String fileName = file.getOriginalFilename();
+		assert fileName != null;
+		String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+		String fileContentType = file.getContentType();
+		assert fileContentType != null;
+		String fileType = fileContentType.substring(0, fileContentType.indexOf("/"));
 		String fileHash = getHash(byteArray);
-		log.info("Uploading file ({}) to bucket ({})", file.getOriginalFilename(), bucketName);
+		log.info("Uploading file ({}, {}, {}, {}) to bucket ({})", fileName, fileExtension, fileType, fileContentType, bucketName);
 
 		if (isHashExists(fileHash)) {
-			log.info("Duplicate image ({}) found. Skipping upload...", fileHash);
+			log.info("Duplicate file ({}) found. Skipping upload...", fileHash);
 			return fileHash;
 		}
 
 		if (!isBucketExists(bucketName).get()) createBucket(bucketName);
 
+		if (fileType.equals("image")) {
+			uploadImage(byteArray, fileHash, bucketName);
+		} else {
+			uploadFile(byteArray, fileHash, fileExtension, fileContentType, bucketName);
+		}
+
+		return fileHash;
+	}
+
+	private void uploadImage(byte[] byteArray, String fileHash, String bucketName) {
 		try (InputStream pngStream = new ByteArrayInputStream(byteArray);
 			 InputStream webpStream = new ByteArrayInputStream(byteArray)) {
-
 
 			minioClient.putObject(
 					PutObjectArgs.builder().bucket(bucketName).object(fileHash + ".png").stream(
@@ -82,9 +96,21 @@ public class StorageService {
 							.contentType(CONTENT_TYPE_WEBP)
 							.build());
 
-			long endTime = System.currentTimeMillis();
-			log.info("Image ({}) in WEBP uploaded to bucket ({}) to CDN successfully in {} ms ({}, {})", fileHash, bucketName, endTime - startTime, startTime, endTime);
-			return fileHash;
+			log.info("Image ({}) in WEBP uploaded to bucket ({}) to CDN successfully", fileHash, bucketName);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void uploadFile(byte[] byteArray, String fileHash, String fileExtension, String fileContentType, String bucketName) {
+		try (InputStream fileStream = new ByteArrayInputStream(byteArray)) {
+			minioClient.putObject(
+					PutObjectArgs.builder().bucket(bucketName).object(fileHash + fileExtension).stream(
+									fileStream, fileStream.available(), -1)
+							.contentType(fileContentType)
+							.build());
+
+			log.info("File ({}, {}, {}) uploaded to bucket ({}) to CDN successfully", fileHash, fileExtension, fileContentType, bucketName);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
