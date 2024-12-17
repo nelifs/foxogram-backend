@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import su.foxogram.configs.APIConfig;
 import su.foxogram.constants.CodesConstants;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.constants.UserConstants;
@@ -33,13 +34,16 @@ public class AuthenticationService {
 
 	private final CodeService codeService;
 
+	private final APIConfig apiConfig;
+
 	@Autowired
-	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, CodeService codeService) {
+	public AuthenticationService(UserRepository userRepository, CodeRepository codeRepository, EmailService emailService, JwtService jwtService, CodeService codeService, APIConfig apiConfig) {
 		this.userRepository = userRepository;
 		this.codeRepository = codeRepository;
 		this.emailService = emailService;
 		this.jwtService = jwtService;
 		this.codeService = codeService;
+		this.apiConfig = apiConfig;
 	}
 
 	public User getUser(String header, boolean ignoreEmailVerification) throws UserUnauthorizedException, UserEmailNotVerifiedException {
@@ -74,7 +78,9 @@ public class AuthenticationService {
 
 		log.info("User ({}, {}) created successfully", user.getUsername(), user.getEmail());
 
-		sendConfirmationEmail(user);
+		if (!apiConfig.isDevelopment()) {
+			sendConfirmationEmail(user);
+		}
 
 		log.info("User ({}, {}) email verification message sent successfully", user.getUsername(), user.getEmail());
 
