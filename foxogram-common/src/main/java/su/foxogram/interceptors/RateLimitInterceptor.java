@@ -21,7 +21,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws RateLimitExceededException {
-		String clientRemoteAddr = request.getRemoteAddr();
+		String clientRemoteAddr = request.getHeader("X-Forwarded-For");
 		Bucket bucket = clients.computeIfAbsent(clientRemoteAddr, this::createNewBucket);
 
 		long estimateAbilityToConsumeInMs = bucket.estimateAbilityToConsume(RateLimitConstants.RATE_LIMIT_CONSUME).getNanosToWaitForRefill() / 1000000;
