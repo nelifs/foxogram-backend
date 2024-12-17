@@ -24,11 +24,12 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 		String clientRemoteAddr = request.getHeader("X-Forwarded-For");
 		Bucket bucket = clients.computeIfAbsent(clientRemoteAddr, this::createNewBucket);
 
+		long availableTokens = bucket.getAvailableTokens();
 		long estimateAbilityToConsumeInMs = bucket.estimateAbilityToConsume(RateLimitConstants.RATE_LIMIT_CONSUME).getNanosToWaitForRefill() / 1000000;
 
 		if (bucket.tryConsume(RateLimitConstants.RATE_LIMIT_CONSUME)) return true;
 		else {
-			log.info("Rate-limited client ({}) successfully", clientRemoteAddr);
+			log.info("Rate-limited client ({}, {}, {}) successfully", clientRemoteAddr, availableTokens, estimateAbilityToConsumeInMs);
 			throw new RateLimitExceededException(estimateAbilityToConsumeInMs);
 		}
 	}
