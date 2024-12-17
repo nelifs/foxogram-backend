@@ -33,6 +33,8 @@ dependencies {
     implementation 'org.aspectj:aspectjrt:1.9.7'
     implementation 'dev.samstevens.totp:totp:1.7.1'
     implementation 'com.bucket4j:bucket4j_jdk17-core:8.14.0'
+    implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
     implementation 'io.minio:minio:8.5.14'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'

@@ -85,7 +85,7 @@ public class UsersService {
 		String hash;
 
 		try {
-			hash = storageService.uploadToMinio(avatar, StorageConstants.AVATARS_BUCKET);
+			hash = storageService.uploadIdentityImage(avatar, StorageConstants.AVATARS_BUCKET);
 		} catch (Exception e) {
 			throw new UploadFailedException();
 		}
