@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import su.foxogram.configs.APIConfig;
 import su.foxogram.configs.EmailConfig;
 import su.foxogram.constants.EmailConstants;
 import su.foxogram.util.Algorithm;
@@ -30,16 +31,21 @@ public class EmailService {
 
 	private final EmailConfig emailConfig;
 
+	private final APIConfig apiConfig;
+
 	@Autowired
-	public EmailService(CodeService codeService, JavaMailSender javaMailSender, ResourceLoader resourceLoader, EmailConfig emailConfig) {
+	public EmailService(CodeService codeService, JavaMailSender javaMailSender, ResourceLoader resourceLoader, EmailConfig emailConfig, APIConfig apiConfig) {
 		this.codeService = codeService;
 		this.javaMailSender = javaMailSender;
 		this.resourceLoader = resourceLoader;
 		this.emailConfig = emailConfig;
+		this.apiConfig = apiConfig;
 	}
 
 	@Async
 	public void sendEmail(String to, long id, String type, String username, String digitCode, long issuedAt, long expiresAt, String token) {
+		if (apiConfig.isDevelopment()) return;
+
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, StandardCharsets.UTF_8.name());
 
