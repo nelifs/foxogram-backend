@@ -7,5 +7,5 @@ public class RateLimitConstants {
 
 	public static final int RATE_LIMIT_REFILL = 50;
 
-	public static final int RATE_LIMIT_DURATION = 10;
+	public static final int RATE_LIMIT_DURATION = 1;
 }
